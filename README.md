@@ -4,4 +4,4 @@ Utilizes [Google Books API](https://developers.google.com/books)
 
 Database Schema:
 
-![database schema!](https://i.ibb.co/YRqCv8m/Screenshot-2023-07-09-at-7-50-19-PM.png)
+![database schema!](https://i.ibb.co/bdYkkNy/Screenshot-2023-07-10-at-10-16-05-AM.png)
