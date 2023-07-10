@@ -1,9 +1,3 @@
-DROP DATABASE IF EXISTS reads_stash;
-
-CREATE DATABASE reads_stash;
-
-\c reads_stash
-
 CREATE TABLE users
 (
     id SERIAL PRIMARY KEY,
