@@ -1,4 +1,4 @@
-# reads-collection
+# reads-stash
 
 Utilizes [Google Books API](https://developers.google.com/books)
 
