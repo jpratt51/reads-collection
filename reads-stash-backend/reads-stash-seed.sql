@@ -34,12 +34,6 @@ VALUES
     ('test1author'),
     ('test2author');
 
-INSERT INTO publishers
-    (name)
-VALUES
-    ('test1publisher'),
-    ('test2publisher');
-
 INSERT INTO users_badges
     (user_id, badge_id)
 VALUES
@@ -58,29 +52,11 @@ VALUES
     (1,1),
     (2,2);
 
-INSERT INTO reads_publishers
-    (read_id, publisher_id)
-VALUES
-    (1,1),
-    (2,2);
-
 INSERT INTO journals
     (title, date, text, user_id)
 VALUES
     ('test1journal', '2023-07-09', 'test1journalEntry', 1),
     ('test2journal', '2023-07-09', 'test2journalEntry', 2);
-
-INSERT INTO reads_ratings
-    (rating, users_reads_id)
-VALUES
-    (5, 1),
-    (4, 2);
-
-INSERT INTO reads_reviews
-    (review, date, users_reads_id)
-VALUES
-    ('test1review', '2023-07-09', 1),
-    ('test2review', '2023-07-09', 2);
 
 INSERT INTO followed
     (followed_id, user_id)

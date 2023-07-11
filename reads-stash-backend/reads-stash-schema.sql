@@ -18,7 +18,8 @@ CREATE TABLE reads
     description VARCHAR(500),
     isbn VARCHAR(20),
     avg_rating INTEGER,
-    print_type VARCHAR(20)
+    print_type VARCHAR(20),
+    publisher VARCHAR(50)
 );
 
 CREATE TABLE collections
@@ -38,17 +39,13 @@ CREATE TABLE badges
 CREATE TABLE users_reads
 (
     id SERIAL PRIMARY KEY,
+    rating INTEGER,
+    review_text VARCHAR(7500),
     user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
     read_id INTEGER NOT NULL REFERENCES reads ON DELETE CASCADE
 );
 
 CREATE TABLE authors
-(
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE publishers
 (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL
@@ -75,13 +72,6 @@ CREATE TABLE reads_authors
     author_id INTEGER NOT NULL REFERENCES authors ON DELETE CASCADE
 );
 
-CREATE TABLE reads_publishers
-(
-    id SERIAL PRIMARY KEY,
-    read_id INTEGER NOT NULL REFERENCES reads ON DELETE CASCADE,
-    publisher_id INTEGER NOT NULL REFERENCES publishers ON DELETE CASCADE
-);
-
 CREATE TABLE journals
 (
     id SERIAL PRIMARY KEY,
@@ -89,21 +79,6 @@ CREATE TABLE journals
     date DATE NOT NULL,
     text VARCHAR(7500),
     user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE
-);
-
-CREATE TABLE reads_ratings
-(
-    id SERIAL PRIMARY KEY,
-    rating INTEGER NOT NULL,
-    users_reads_id INTEGER NOT NULL REFERENCES users_reads ON DELETE CASCADE
-);
-
-CREATE TABLE reads_reviews
-(
-    id SERIAL PRIMARY KEY,
-    review VARCHAR(7500) NOT NULL,
-    date DATE NOT NULL,
-    users_reads_id INTEGER NOT NULL REFERENCES users_reads ON DELETE CASCADE
 );
 
 CREATE TABLE followed
@@ -190,29 +165,11 @@ CREATE TABLE recommendations
 --     (1,1),
 --     (2,2);
 
--- INSERT INTO reads_publishers
---     (read_id, publisher_id)
--- VALUES
---     (1,1),
---     (2,2);
-
 -- INSERT INTO journals
 --     (title, date, text, user_id)
 -- VALUES
 --     ('test1journal', '2023-07-09', 'test1journalEntry', 1),
 --     ('test2journal', '2023-07-09', 'test2journalEntry', 2);
-
--- INSERT INTO reads_ratings
---     (rating, users_reads_id)
--- VALUES
---     (5, 1),
---     (4, 2);
-
--- INSERT INTO reads_reviews
---     (review, date, users_reads_id)
--- VALUES
---     ('test1review', '2023-07-09', 1),
---     ('test2review', '2023-07-09', 2);
 
 -- INSERT INTO followed
 --     (followed_id, user_id)
@@ -274,36 +231,6 @@ CREATE TABLE recommendations
 --  test1read  | test1author
 --  test2read  | test2author
 
---testing reads_publishers Many-to-Many joins correctly
-
--- SELECT reads.title AS read_title, publishers.name AS publisher_name FROM reads_publishers JOIN reads ON reads_publishers.read_id = reads.id JOIN publishers ON reads_publishers.publisher_id = publishers.id;
-
--- Result:
---  read_title | publisher_name 
--- ------------+----------------
---  test1read  | test1publisher
---  test2read  | test2publisher
-
---testing reads_ratings One-to-Many joins correctly
-
--- SELECT users_reads.read_id AS read_id, reads_ratings.rating AS rating FROM reads_ratings JOIN users_reads ON reads_ratings.users_reads_id = users_reads.read_id;
-
--- Result:
---  read_id | rating 
--- ---------+--------
---        1 |      5
---        2 |      4
-
---testing reads_reviews One-to-Many joins correctly
-
--- SELECT users_reads.read_id AS read_id, reads_reviews.review AS review FROM reads_reviews JOIN users_reads ON reads_reviews.users_reads_id = users_reads.read_id;
-
--- Result:
---  read_id |   review    
--- ---------+-------------
---        1 | test1review
---        2 | test2review
-
 -- testing deleting user gives no error and deletes correctly
 
 -- DELETE FROM users WHERE username = 'test1user';
@@ -360,12 +287,8 @@ CREATE TABLE recommendations
 -- SELECT FROM users_reads WHERE read_id = 1;
 -- SELECT FROM reads_collections WHERE read_id = 1;
 -- SELECT FROM reads_authors WHERE read_id = 1;
--- SELECT FROM reads_publishers WHERE read_id = 1;
 
 -- Result:
--- --
--- (0 rows)
-
 -- --
 -- (0 rows)
 
