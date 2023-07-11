@@ -27,11 +27,14 @@ router.get(
     }
 );
 
-router.post("/", function createUserRecommendation(req, res, next) {
+router.post("/", async function createUserRecommendation(req, res, next) {
     try {
-        return res
-            .status(201)
-            .json({ msg: "Dummy created user recommendation response" });
+        const { message, friend_id, user_id } = req.body;
+        const results = await db.query(
+            "INSERT INTO recommendations (recommendation, friend_id, user_id) VALUES ($1, $2, $3) RETURNING *",
+            [message, friend_id, user_id]
+        );
+        return res.status(201).json(results.rows);
     } catch (error) {
         return next(error);
     }
