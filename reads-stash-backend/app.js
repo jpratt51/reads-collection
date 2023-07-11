@@ -53,6 +53,11 @@ app.use("/api/reads/:read_id/authors", readAuthorsRoutes);
 app.use("/api/authors", authorRoutes);
 app.use("/api/badges", badgeRoutes);
 
+app.use(function notFoundErrorHandler(req, res, next) {
+    const e = new ExpressError("Page Not Found", 404);
+    next(e);
+});
+
 app.use(function expressErrorHandler(error, req, res, next) {
     let status = error.status || 500;
     let message = error.msg || "Internal Server Error";
