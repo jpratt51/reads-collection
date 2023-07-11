@@ -12,6 +12,7 @@ const userRecommendationsRoutes = require("./routes/users/userRecommendationsRou
 
 // read routers
 const readRoutes = require("./routes/reads/readRoutes.js");
+const readCollectionsRoutes = require("./routes/reads/readCollectionsRoutes.js");
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use("/api/users/:user_id/recommendations", userRecommendationsRoutes);
 
 // app.use reads
 app.use("/api/reads", readRoutes);
+app.use("/api/reads/:read_id/collections", readRoutes);
 
 app.listen(3000, function () {
     console.log("App on port 3000");
