@@ -2,6 +2,7 @@
 
 const express = require("express");
 const router = new express.Router();
+const db = require("../../db");
 
 router.get("/", function getAllUserBadges(req, res, next) {
     try {
