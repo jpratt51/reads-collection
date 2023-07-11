@@ -1,5 +1,6 @@
 const express = require("express");
 
+// user routers
 const userRoutes = require("./routes/users/userRoutes");
 const userCollectionsRoutes = require("./routes/users/userCollectionsRoutes");
 const userReadsRoutes = require("./routes/users/userReadsRoutes");
@@ -8,6 +9,9 @@ const userJournalsRoutes = require("./routes/users/userJournalsRoutes.js");
 const userFollowersRoutes = require("./routes/users/userFollowersRoutes.js");
 const userFollowedRoutes = require("./routes/users/userFollowedRoutes.js");
 const userRecommendationsRoutes = require("./routes/users/userRecommendationsRoutes.js");
+
+// read routers
+const readRoutes = require("./routes/reads/readRoutes.js");
 
 const app = express();
 
@@ -22,6 +26,7 @@ const app = express();
 // PUT / PATCH	/snacks/[id]	Update snack
 // DELETE	/snacks/[id]	Delete snack
 
+// app.use users
 app.use("/api/users", userRoutes);
 app.use("/api/users/:user_id/collections", userCollectionsRoutes);
 app.use("/api/users/:user_id/reads", userReadsRoutes);
@@ -30,6 +35,9 @@ app.use("/api/users/:user_id/journals", userJournalsRoutes);
 app.use("/api/users/:user_id/followers", userFollowersRoutes);
 app.use("/api/users/:user_id/followed", userFollowedRoutes);
 app.use("/api/users/:user_id/recommendations", userRecommendationsRoutes);
+
+// app.use reads
+app.use("/api/reads", readRoutes);
 
 app.listen(3000, function () {
     console.log("App on port 3000");
