@@ -15,10 +15,6 @@ router.post("/", function createUserFollowed(req, res) {
     return res.send("Mock create user followed user request");
 });
 
-router.patch("/:followed_id", function updateUserFollowed(req, res) {
-    return res.send("Mock update user followed user request");
-});
-
 router.delete("/:followed_id", function deleteUserFollowed(req, res) {
     return res.send("Mock delete user followed user request");
 });
