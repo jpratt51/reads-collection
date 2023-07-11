@@ -3,12 +3,20 @@
 const express = require("express");
 const router = new express.Router();
 
-router.get("/", function getAllBadges(req, res) {
-    return res.status(200).json({ msg: "Mock get all badges request" });
+router.get("/", function getAllBadges(req, res, next) {
+    try {
+        return res.status(200).json({ msg: "Mock get all badges request" });
+    } catch (error) {
+        return next(error);
+    }
 });
 
-router.get("/:badge_id", function getOneBadge(req, res) {
-    return res.status(200).json({ msg: "Mock get one badge request" });
+router.get("/:badge_id", function getOneBadge(req, res, next) {
+    try {
+        return res.status(200).json({ msg: "Mock get one badge request" });
+    } catch (error) {
+        return next(error);
+    }
 });
 
 module.exports = router;
