@@ -3,7 +3,7 @@
 const express = require("express");
 const router = new express.Router();
 
-router.get("/", function getAllUserReads(req, res) {
+router.get("/", function getAllUserReads(req, res, next) {
     try {
         return res
             .status(200)
@@ -13,7 +13,7 @@ router.get("/", function getAllUserReads(req, res) {
     }
 });
 
-router.get("/:users_reads_id", function getOneUserRead(req, res) {
+router.get("/:users_reads_id", function getOneUserRead(req, res, next) {
     try {
         return res
             .status(200)
@@ -23,7 +23,7 @@ router.get("/:users_reads_id", function getOneUserRead(req, res) {
     }
 });
 
-router.post("/", function createUserRead(req, res) {
+router.post("/", function createUserRead(req, res, next) {
     try {
         return res
             .status(201)
@@ -33,7 +33,7 @@ router.post("/", function createUserRead(req, res) {
     }
 });
 
-router.delete("/:collection_id", function deleteUserRead(req, res) {
+router.delete("/:collection_id", function deleteUserRead(req, res, next) {
     try {
         return res
             .status(200)
