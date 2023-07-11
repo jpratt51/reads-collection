@@ -41,6 +41,7 @@ CREATE TABLE users_reads
     id SERIAL PRIMARY KEY,
     rating INTEGER,
     review_text VARCHAR(7500),
+    review_date DATE,
     user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
     read_id INTEGER NOT NULL REFERENCES reads ON DELETE CASCADE
 );
