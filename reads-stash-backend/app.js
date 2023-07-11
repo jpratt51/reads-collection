@@ -5,6 +5,7 @@ const userCollectionsRoutes = require("./routes/users/userCollectionsRoutes");
 const userReadsRoutes = require("./routes/users/userReadsRoutes");
 const userBadgesRoutes = require("./routes/users/userBadgesRoutes.js");
 const userJournalsRoutes = require("./routes/users/userJournalsRoutes.js");
+const userFollowersRoutes = require("./routes/users/userFollowersRoutes.js");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/users/:user_id/collections", userCollectionsRoutes);
 app.use("/api/users/:user_id/reads", userReadsRoutes);
 app.use("/api/users/:user_id/badges", userBadgesRoutes);
 app.use("/api/users/:user_id/journals", userJournalsRoutes);
+app.use("/api/users/:user_id/followers", userFollowersRoutes);
 
 app.listen(3000, function () {
     console.log("App on port 3000");
