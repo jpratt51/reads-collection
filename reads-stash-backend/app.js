@@ -10,12 +10,14 @@ const userFollowersRoutes = require("./routes/users/userFollowersRoutes.js");
 const userFollowedRoutes = require("./routes/users/userFollowedRoutes.js");
 const userRecommendationsRoutes = require("./routes/users/userRecommendationsRoutes.js");
 
-// read routers
+// reads routers
 const readRoutes = require("./routes/reads/readRoutes.js");
 const readCollectionsRoutes = require("./routes/reads/readCollectionsRoutes.js");
 const readAuthorsRoutes = require("./routes/reads/readAuthorsRoutes.js");
 
+// other routers
 const authorRoutes = require("./routes/authors.js");
+const badgeRoutes = require("./routes/badges.js");
 
 const app = express();
 
@@ -30,7 +32,7 @@ const app = express();
 // PUT / PATCH	/snacks/[id]	Update snack
 // DELETE	/snacks/[id]	Delete snack
 
-// app.use users
+// users
 app.use("/api/users", userRoutes);
 app.use("/api/users/:user_id/collections", userCollectionsRoutes);
 app.use("/api/users/:user_id/reads", userReadsRoutes);
@@ -40,12 +42,14 @@ app.use("/api/users/:user_id/followers", userFollowersRoutes);
 app.use("/api/users/:user_id/followed", userFollowedRoutes);
 app.use("/api/users/:user_id/recommendations", userRecommendationsRoutes);
 
-// app.use reads
+// reads
 app.use("/api/reads", readRoutes);
 app.use("/api/reads/:read_id/collections", readCollectionsRoutes);
 app.use("/api/reads/:read_id/authors", readAuthorsRoutes);
 
+// other
 app.use("/api/authors", authorRoutes);
+app.use("/api/badges", badgeRoutes);
 
 app.listen(3000, function () {
     console.log("App on port 3000");
