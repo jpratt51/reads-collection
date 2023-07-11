@@ -54,7 +54,9 @@ app.use("/api/authors", authorRoutes);
 app.use("/api/badges", badgeRoutes);
 
 app.use(function expressErrorHandler(error, req, res, next) {
-    return res.status(error.status).send(error.msg);
+    let status = error.status || 500;
+    let message = error.msg || "Internal Server Error";
+    return res.status(status).send(message);
 });
 
 app.listen(3000, () => {
