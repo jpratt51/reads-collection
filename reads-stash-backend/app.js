@@ -61,7 +61,7 @@ app.use(function notFoundErrorHandler(req, res, next) {
 app.use(function expressErrorHandler(error, req, res, next) {
     let status = error.status || 500;
     let message = error.msg || "Internal Server Error";
-    return res.status(status).send(message);
+    return res.status(status).json({ error: { message, status } });
 });
 
 app.listen(3000, () => {
