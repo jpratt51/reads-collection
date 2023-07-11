@@ -15,6 +15,8 @@ const readRoutes = require("./routes/reads/readRoutes.js");
 const readCollectionsRoutes = require("./routes/reads/readCollectionsRoutes.js");
 const readAuthorsRoutes = require("./routes/reads/readAuthorsRoutes.js");
 
+const authorRoutes = require("./routes/authors.js");
+
 const app = express();
 
 // for a RESTful api, put api in front of all routes, return 200 status code for all successfully requested routes except post requests (return 201 status code), returns should be in json object format, return json, and follow this naming conventions:
@@ -42,6 +44,8 @@ app.use("/api/users/:user_id/recommendations", userRecommendationsRoutes);
 app.use("/api/reads", readRoutes);
 app.use("/api/reads/:read_id/collections", readCollectionsRoutes);
 app.use("/api/reads/:read_id/authors", readAuthorsRoutes);
+
+app.use("/api/authors", authorRoutes);
 
 app.listen(3000, function () {
     console.log("App on port 3000");
