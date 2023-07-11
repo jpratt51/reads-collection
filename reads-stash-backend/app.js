@@ -58,7 +58,7 @@ app.use(function notFoundErrorHandler(req, res, next) {
     next(e);
 });
 
-app.use(function expressErrorHandler(error, req, res, next) {
+app.use(function globalErrorHandler(error, req, res, next) {
     let status = error.status || 500;
     let message = error.msg || "Internal Server Error";
     return res.status(status).json({ error: { message, status } });
