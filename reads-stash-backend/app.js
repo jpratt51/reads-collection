@@ -1,7 +1,8 @@
 const express = require("express");
 
 const userRoutes = require("./routes/users/userRoutes");
-const userCollectionRoutes = require("./routes/users/userCollectionRoutes");
+const userCollectionsRoutes = require("./routes/users/userCollectionsRoutes");
+const userReadsRoutes = require("./routes/users/userReadsRoutes");
 
 const app = express();
 
@@ -17,7 +18,8 @@ const app = express();
 // DELETE	/snacks/[id]	Delete snack
 
 app.use("/api/users", userRoutes);
-app.use("/api/users/collections", userCollectionRoutes);
+app.use("/api/users/:user_id/collections", userCollectionsRoutes);
+app.use("/api/users/:user_id/reads", userReadsRoutes);
 
 app.listen(3000, function () {
     console.log("App on port 3000");
