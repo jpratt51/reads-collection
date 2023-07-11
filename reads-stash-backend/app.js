@@ -1,4 +1,5 @@
 const express = require("express");
+const ExpressError = require("./expressError");
 
 // user routers
 const userRoutes = require("./routes/users/userRoutes");
@@ -52,6 +53,10 @@ app.use("/api/reads/:read_id/authors", readAuthorsRoutes);
 app.use("/api/authors", authorRoutes);
 app.use("/api/badges", badgeRoutes);
 
-app.listen(3000, function () {
+app.use(function expressErrorHandler(error, req, res, next) {
+    return res.status(error.status).send(error.msg);
+});
+
+app.listen(3000, () => {
     console.log("App on port 3000");
 });
