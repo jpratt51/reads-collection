@@ -20,9 +20,14 @@ router.get("/:user_id", function getOneUser(req, res, next) {
     }
 });
 
-router.post("/", function createUser(req, res, next) {
+router.post("/", async function createUser(req, res, next) {
     try {
-        return res.status(201).json({ msg: "Dummy created user result" });
+        const { username, fname, lname, email, password } = req.body;
+        const results = await db.query(
+            "INSERT INTO users (username, fname, lname, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            [username, fname, lname, email, password]
+        );
+        return res.status(201).json(results.rows);
     } catch (error) {
         return next(error);
     }
