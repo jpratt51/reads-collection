@@ -21,6 +21,7 @@ const badgeRoutes = require("./routes/badgeRoutes.js");
 
 const app = express();
 
+app.use(express.json());
 // for a RESTful api, put api in front of all routes, return 200 status code for all successfully requested routes except post requests (return 201 status code), returns should be in json object format, return json, and follow this naming conventions:
 
 // RESTful routes for a resource called snacks:
