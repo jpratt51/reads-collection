@@ -15,4 +15,8 @@ router.post("/", function createUserBadge(req, res) {
     return res.send("Mock create user badge request");
 });
 
+router.delete("/:badge_id", function deleteUserBadge(req, res) {
+    return res.send("Mock delete user badge request");
+});
+
 module.exports = router;
