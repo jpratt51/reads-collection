@@ -16,8 +16,8 @@ const readCollectionsRoutes = require("./routes/reads/readCollectionsRoutes.js")
 const readAuthorsRoutes = require("./routes/reads/readAuthorsRoutes.js");
 
 // other routers
-const authorRoutes = require("./routes/authors.js");
-const badgeRoutes = require("./routes/badges.js");
+const authorRoutes = require("./routes/authorRoutes.js");
+const badgeRoutes = require("./routes/badgeRoutes.js");
 
 const app = express();
 
