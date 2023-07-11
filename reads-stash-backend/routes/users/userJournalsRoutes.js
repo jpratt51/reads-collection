@@ -8,7 +8,7 @@ router.get("/", function getAllUserJournals(req, res) {
 });
 
 router.get("/:journal_id", function getOneUserJournal(req, res) {
-    return res.send("Mock get one user collection request");
+    return res.send("Mock get one user journal request");
 });
 
 router.post("/", function createUserJournal(req, res) {

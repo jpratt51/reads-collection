@@ -16,7 +16,7 @@ router.post("/", function createUserRead(req, res) {
 });
 
 router.delete("/:collection_id", function deleteUserRead(req, res) {
-    return res.send("Mock delete user collection request");
+    return res.send("Mock delete user read request");
 });
 
 module.exports = router;
