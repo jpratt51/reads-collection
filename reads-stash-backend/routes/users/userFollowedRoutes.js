@@ -28,7 +28,7 @@ router.post("/", async function createUserFollowed(req, res, next) {
     try {
         const { followed_id, user_id } = req.body;
         const results = await db.query(
-            "INSERT INTO users_followed (followed_id, user_id) VALUES ($1, $2)",
+            "INSERT INTO users_followed (followed_id, user_id) VALUES ($1, $2) RETURNING * ;",
             [followed_id, user_id]
         );
         return res.status(201).json(results.rows);
