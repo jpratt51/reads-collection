@@ -24,11 +24,14 @@ router.get("/:collection_id", function getOneUserCollection(req, res, next) {
     }
 });
 
-router.post("/", function createUserCollection(req, res, next) {
+router.post("/", async function createUserCollection(req, res, next) {
     try {
-        return res
-            .status(201)
-            .json({ msg: "Mock create user collection request" });
+        const { name, user_id } = req.body;
+        const results = await db.query(
+            "INSERT INTO collections (name, user_id) VALUES ($1, $2) RETURNING * ;",
+            [name, user_id]
+        );
+        return res.status(201).json(results.rows);
     } catch (error) {
         return next(error);
     }
