@@ -24,11 +24,14 @@ router.get("/:followed_id", function getOneUserFollowed(req, res, next) {
     }
 });
 
-router.post("/", function createUserFollowed(req, res, next) {
+router.post("/", async function createUserFollowed(req, res, next) {
     try {
-        return res
-            .status(201)
-            .json({ msg: "Mock create user followed user request" });
+        const { followed_id, user_id } = req.body;
+        const results = await db.query(
+            "INSERT INTO users_followed (followed_id, user_id) VALUES ($1, $2)",
+            [followed_id, user_id]
+        );
+        return res.status(201).json(results.rows);
     } catch (error) {
         return next(error);
     }

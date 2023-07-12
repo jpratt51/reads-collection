@@ -59,19 +59,19 @@ VALUES
     ('test2journal', '2023-07-09', 'test2journalEntry', 2);
 
 INSERT INTO followed
-    (followed_id, user_id)
+    (followed_username, user_id)
 VALUES
-    (1, 2),
-    (2, 1);
+    ('test1user', 2),
+    ('test2user', 1);
 
 INSERT INTO followers
-    (follower_id, user_id)
+    (follower_username, user_id)
 VALUES
-    (1,2),
-    (2,1);
+    ('test1user',2),
+    ('test2user',1);
 
 INSERT INTO recommendations
-    (recommendation, friend_id, user_id)
+    (recommendation, friend_username, user_id)
 VALUES
-    ('test1message', 2, 1),
-    ('test2message', 1, 2);
+    ('test1message', 'test2user', 1),
+    ('test2message', 'test1user', 2);

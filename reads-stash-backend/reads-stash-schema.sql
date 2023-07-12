@@ -82,14 +82,14 @@ CREATE TABLE journals
     user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE
 );
 
-CREATE TABLE followed
+CREATE TABLE users_followed
 (
     id SERIAL PRIMARY KEY,
     followed_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
     user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE
 );
 
-CREATE TABLE followers
+CREATE TABLE users_followers
 (
     id SERIAL PRIMARY KEY,
     follower_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
@@ -100,7 +100,7 @@ CREATE TABLE recommendations
 (
     id SERIAL PRIMARY KEY,
     recommendation VARCHAR(1000) NOT NULL,
-    friend_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+    followed_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
     user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE
 );
 
@@ -142,12 +142,6 @@ CREATE TABLE recommendations
 --     ('test1author'),
 --     ('test2author');
 
--- INSERT INTO publishers
---     (name)
--- VALUES
---     ('test1publisher'),
---     ('test2publisher');
-
 -- INSERT INTO users_badges
 --     (user_id, badge_id)
 -- VALUES
@@ -173,13 +167,13 @@ CREATE TABLE recommendations
 --     ('test2journal', '2023-07-09', 'test2journalEntry', 2);
 
 -- INSERT INTO followed
---     (followed_id, user_id)
+--     (followed_username, user_id)
 -- VALUES
 --     (1, 2),
 --     (2, 1);
 
 -- INSERT INTO followers
---     (follower_id, user_id)
+--     (follower_username, user_id)
 -- VALUES
 --     (1,2),
 --     (2,1);
