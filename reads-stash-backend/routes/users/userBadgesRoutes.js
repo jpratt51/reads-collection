@@ -22,9 +22,14 @@ router.get("/:badge_id", function getOneUserBadge(req, res, next) {
     }
 });
 
-router.post("/", function createUserBadge(req, res, next) {
+router.post("/", async function createUserBadge(req, res, next) {
     try {
-        return res.status(201).json({ msg: "Mock create user badge request" });
+        const { user_id, badge_id } = req.body;
+        const results = await db.query(
+            "INSERT INTO users_badges (user_id, badge_id) VALUES ($1, $2) RETURNING * ;",
+            [user_id, badge_id]
+        );
+        return res.status(201).json(results.rows);
     } catch (error) {
         return next(error);
     }
