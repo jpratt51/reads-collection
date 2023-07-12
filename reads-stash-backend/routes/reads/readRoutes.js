@@ -20,9 +20,30 @@ router.get("/:read_id", function getOneRead(req, res, next) {
     }
 });
 
-router.post("/", function createRead(req, res, next) {
+router.post("/", async function createRead(req, res, next) {
     try {
-        return res.status(201).json({ msg: "Mock create read request" });
+        const {
+            thumbnail,
+            title,
+            description,
+            isbn,
+            average_rating,
+            print_type,
+            publisher,
+        } = req.body;
+        const results = await db.query(
+            "INSERT INTO reads (thumbnail, title, description, isbn, average_rating, print_type, publisher) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING * ;",
+            [
+                thumbnail,
+                title,
+                description,
+                isbn,
+                average_rating,
+                print_type,
+                publisher,
+            ]
+        );
+        return res.status(201).json(results.rows);
     } catch (error) {
         return next(error);
     }
