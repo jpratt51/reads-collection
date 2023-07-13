@@ -21,11 +21,13 @@ router.get(
 
 router.get(
     "/:user_id/journals/:journal_id",
-    function getOneUserJournal(req, res, next) {
+    async function getOneUserJournal(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "get one user journal response" });
+            const { user_id, journal_id } = req.params;
+            const results = await db.query(
+                `SELECT * FROM journals WHERE id = ${journal_id} AND user_id = ${user_id};`
+            );
+            return res.status(200).json(results.rows);
         } catch (error) {
             return next(error);
         }
