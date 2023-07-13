@@ -21,11 +21,13 @@ router.get(
 
 router.get(
     "/:user_id/collections/:collection_id",
-    function getOneUserCollection(req, res, next) {
+    async function getOneUserCollection(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "Mock get one user collection request" });
+            const { user_id, collection_id } = req.params;
+            const results = await db.query(
+                `SELECT * FROM collections WHERE id = ${collection_id} AND user_id = ${user_id};`
+            );
+            return res.status(200).json(results.rows);
         } catch (error) {
             return next(error);
         }
