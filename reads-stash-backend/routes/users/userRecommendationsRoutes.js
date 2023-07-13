@@ -8,7 +8,7 @@ router.get(
     "/:user_id/recommendations",
     async function getAllUserRecommendations(req, res, next) {
         try {
-            const user_id = req.params.user_id;
+            const { user_id } = req.params;
             const results = await db.query(
                 `SELECT * FROM recommendations WHERE receiver_id = ${user_id} OR sender_id = ${user_id};`
             );
