@@ -25,7 +25,8 @@ router.get(
         try {
             const { recommendation_id, user_id } = req.params;
             const results = await db.query(
-                `SELECT * FROM recommendations WHERE id = ${recommendation_id} AND sender_id = ${user_id} OR id = ${recommendation_id} AND receiver_id = ${user_id};`
+                `SELECT * FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $3 AND receiver_id = $4;`,
+                [recommendation_id, user_id, recommendation_id, user_id]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
