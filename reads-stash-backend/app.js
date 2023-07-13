@@ -14,10 +14,8 @@ const userRecommendationsRoutes = require("./routes/users/userRecommendationsRou
 // reads routers
 const readRoutes = require("./routes/reads/readRoutes.js");
 const readCollectionsRoutes = require("./routes/reads/readCollectionsRoutes.js");
-const readAuthorsRoutes = require("./routes/reads/readAuthorsRoutes.js");
 
 // other routers
-const authorRoutes = require("./routes/authorRoutes.js");
 const badgeRoutes = require("./routes/badgeRoutes.js");
 
 const app = express();
@@ -47,10 +45,8 @@ app.use("/api/users/:user_id/recommendations", userRecommendationsRoutes);
 // reads
 app.use("/api/reads", readRoutes);
 app.use("/api/reads/:read_id/collections", readCollectionsRoutes);
-app.use("/api/reads/:read_id/authors", readAuthorsRoutes);
 
 // other
-app.use("/api/authors", authorRoutes);
 app.use("/api/badges", badgeRoutes);
 
 app.use(function notFoundErrorHandler(req, res, next) {

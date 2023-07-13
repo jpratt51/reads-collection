@@ -103,3 +103,97 @@ CREATE TABLE recommendations
     receiver_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
     sender_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE
 );
+
+-- test inserts
+
+INSERT INTO users (username, fname, lname, email, password) VALUES 
+('t1u', 't1fname', 't1lname', 't1email', 't1password'),
+('t2u', 't2fname', 't2lname', 't2email', 't2password'),
+('t3u', 't3fname', 't3lname', 't3email', 't3password'),
+('t4u', 't4fname', 't4lname', 't4email', 't4password'),
+('t5u', 't5fname', 't5lname', 't5email', 't5password');
+
+INSERT INTO reads (title) VALUES 
+('t1read'),
+('t2read'),
+('t3read'),
+('t4read'),
+('t5read');
+
+INSERT INTO collections (name, user_id) VALUES 
+('t1ucollection', 1),
+('t2ucollection', 2),
+('t3ucollection', 3),
+('t4ucollection', 4),
+('t5ucollection', 5);
+
+INSERT INTO badges (name, thumbnail) VALUES
+('t1badge', 't1thumbnail'),
+('t2badge', 't2thumbnail'),
+('t3badge', 't3thumbnail'),
+('t4badge', 't4thumbnail'),
+('t5badge', 't5thumbnail');
+
+INSERT INTO users_reads (user_id, read_id) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
+
+INSERT INTO authors (name) VALUES 
+('t1author'),
+('t2author'),
+('t3author'),
+('t4author'),
+('t5author');
+
+INSERT INTO users_badges (user_id, badge_id) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
+
+INSERT INTO reads_collections (read_id, collection_id) VALUES
+(1,1),
+(2,2),
+(3,3),
+(4,4),
+(5,5);
+
+INSERT INTO reads_authors (read_id, author_id) VALUES
+(1,1),
+(2,2),
+(3,3),
+(4,4),
+(5,5);
+
+INSERT INTO journals (title, date, user_id) VALUES
+('t1journal', '2023-07-12', 1),
+('t2journal', '2023-07-12', 2),
+('t3journal', '2023-07-12', 3),
+('t4journal', '2023-07-12', 4),
+('t5journal', '2023-07-12', 5);
+
+INSERT INTO users_followed (followed_id, user_id) VALUES
+(2, 1),
+(3, 2),
+(4, 3),
+(5, 4),
+(1, 5);
+
+INSERT INTO users_followers (follower_id, user_id) VALUES
+(1,2),
+(2,3),
+(3,4),
+(4,5),
+(5,1);
+
+INSERT INTO recommendations (recommendation, receiver_id, sender_id) VALUES
+('t1recommendation', 2, 1),
+('t2recommendation', 3, 2),
+('t3recommendation', 4, 3),
+('t4recommendation', 5, 4),
+('t5recommendation', 1, 5);
+

@@ -4,9 +4,10 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 
-router.get("/", function getAllUsers(req, res, next) {
+router.get("/", async function getAllUsers(req, res, next) {
     try {
-        return res.status(200).json({ msg: "Dummy all users result" });
+        const results = await db.query("SELECT * FROM users;");
+        return res.status(200).json(results.rows);
     } catch (error) {
         return next(error);
     }
