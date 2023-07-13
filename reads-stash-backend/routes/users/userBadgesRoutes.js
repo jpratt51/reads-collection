@@ -18,11 +18,13 @@ router.get("/:user_id/badges", async function getAllUserBadges(req, res, next) {
 
 router.get(
     "/:user_id/badges/:badge_id",
-    function getOneUserBadge(req, res, next) {
+    async function getOneUserBadge(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "Mock get one user badge request" });
+            const { user_id, badge_id } = req.params;
+            const results = await db.query(
+                `SELECT * FROM users_badges WHERE id = ${badge_id} AND user_id = ${user_id};`
+            );
+            return res.status(200).json(results.rows);
         } catch (error) {
             return next(error);
         }
