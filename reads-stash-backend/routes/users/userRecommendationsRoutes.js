@@ -10,7 +10,8 @@ router.get(
         try {
             const { user_id } = req.params;
             const results = await db.query(
-                `SELECT * FROM recommendations WHERE receiver_id = ${user_id} OR sender_id = ${user_id};`
+                `SELECT * FROM recommendations WHERE receiver_id = $1 OR sender_id = $1;`,
+                [user_id]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
@@ -25,8 +26,8 @@ router.get(
         try {
             const { recommendation_id, user_id } = req.params;
             const results = await db.query(
-                `SELECT * FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $3 AND receiver_id = $4;`,
-                [recommendation_id, user_id, recommendation_id, user_id]
+                `SELECT * FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $1 AND receiver_id = $2;`,
+                [recommendation_id, user_id]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
