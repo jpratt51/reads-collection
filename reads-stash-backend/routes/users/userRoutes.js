@@ -13,9 +13,13 @@ router.get("/", async function getAllUsers(req, res, next) {
     }
 });
 
-router.get("/:user_id", function getOneUser(req, res, next) {
+router.get("/:user_id", async function getOneUser(req, res, next) {
     try {
-        return res.status(200).json({ msg: "Dummy one user result" });
+        const { user_id } = req.params;
+        const results = await db.query("SELECT * FROM users WHERE id = $1", [
+            user_id,
+        ]);
+        return res.status(200).json(results.rows);
     } catch (error) {
         return next(error);
     }
