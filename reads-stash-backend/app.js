@@ -39,7 +39,7 @@ app.use("/api/users", userReadsRoutes);
 app.use("/api/users/:user_id/badges", userBadgesRoutes);
 app.use("/api/users", userJournalsRoutes);
 app.use("/api/users", userFollowersRoutes);
-app.use("/api/users/:user_id/followed", userFollowedRoutes);
+app.use("/api/users", userFollowedRoutes);
 app.use("/api/users", userRecommendationsRoutes);
 
 // reads
