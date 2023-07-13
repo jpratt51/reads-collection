@@ -4,27 +4,32 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 
-router.get("/", function getAllUserReads(req, res, next) {
+router.get("/:user_id/reads", async function getAllUserReads(req, res, next) {
     try {
-        return res
-            .status(200)
-            .json({ msg: "Dummy get all user reads response" });
+        const { user_id } = req.params;
+        const results = await db.query(
+            `SELECT * FROM users_reads WHERE user_id = ${user_id};`
+        );
+        return res.status(200).json(results.rows);
     } catch (error) {
         return next(error);
     }
 });
 
-router.get("/:users_reads_id", function getOneUserRead(req, res, next) {
-    try {
-        return res
-            .status(200)
-            .json({ msg: "Dummy get one user read response" });
-    } catch (error) {
-        return next(error);
+router.get(
+    "/:user_id/reads/:users_reads_id",
+    function getOneUserRead(req, res, next) {
+        try {
+            return res
+                .status(200)
+                .json({ msg: "Dummy get one user read response" });
+        } catch (error) {
+            return next(error);
+        }
     }
-});
+);
 
-router.post("/", function createUserRead(req, res, next) {
+router.post("/:user_id/reads", function createUserRead(req, res, next) {
     try {
         return res
             .status(201)
@@ -34,14 +39,17 @@ router.post("/", function createUserRead(req, res, next) {
     }
 });
 
-router.delete("/:collection_id", function deleteUserRead(req, res, next) {
-    try {
-        return res
-            .status(200)
-            .json({ msg: "Dummy deleted user read response" });
-    } catch (error) {
-        return next(error);
+router.delete(
+    "/:user_id/reads/:collection_id",
+    function deleteUserRead(req, res, next) {
+        try {
+            return res
+                .status(200)
+                .json({ msg: "Dummy deleted user read response" });
+        } catch (error) {
+            return next(error);
+        }
     }
-});
+);
 
 module.exports = router;

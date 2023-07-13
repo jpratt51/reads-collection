@@ -35,7 +35,7 @@ app.use(express.json());
 // users
 app.use("/api/users", userRoutes);
 app.use("/api/users/:user_id/collections", userCollectionsRoutes);
-app.use("/api/users/:user_id/reads", userReadsRoutes);
+app.use("/api/users", userReadsRoutes);
 app.use("/api/users/:user_id/badges", userBadgesRoutes);
 app.use("/api/users/:user_id/journals", userJournalsRoutes);
 app.use("/api/users/:user_id/followers", userFollowersRoutes);
