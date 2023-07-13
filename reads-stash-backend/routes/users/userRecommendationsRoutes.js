@@ -21,11 +21,13 @@ router.get(
 
 router.get(
     "/:user_id/recommendations/:recommendation_id",
-    function getOneUserRecommendation(req, res, next) {
+    async function getOneUserRecommendation(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "Dummy get one user recommendation response" });
+            const { recommendation_id, user_id } = req.params;
+            const results = await db.query(
+                `SELECT * FROM recommendations WHERE id = ${recommendation_id} AND sender_id = ${user_id} OR id = ${recommendation_id} AND receiver_id = ${user_id};`
+            );
+            return res.status(200).json(results.rows);
         } catch (error) {
             return next(error);
         }
