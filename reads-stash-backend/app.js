@@ -40,7 +40,7 @@ app.use("/api/users/:user_id/badges", userBadgesRoutes);
 app.use("/api/users/:user_id/journals", userJournalsRoutes);
 app.use("/api/users/:user_id/followers", userFollowersRoutes);
 app.use("/api/users/:user_id/followed", userFollowedRoutes);
-app.use("/api/users/:user_id/recommendations", userRecommendationsRoutes);
+app.use("/api/users", userRecommendationsRoutes);
 
 // reads
 app.use("/api/reads", readRoutes);

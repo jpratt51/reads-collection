@@ -4,18 +4,23 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 
-router.get("/", function getAllUserRecommendations(req, res, next) {
-    try {
-        return res
-            .status(200)
-            .json({ msg: "Dummy get all user recommendations response" });
-    } catch (error) {
-        return next(error);
+router.get(
+    "/:user_id/recommendations",
+    async function getAllUserRecommendations(req, res, next) {
+        try {
+            const user_id = req.params.user_id;
+            const results = await db.query(
+                `SELECT * FROM recommendations WHERE receiver_id = ${user_id} OR sender_id = ${user_id};`
+            );
+            return res.status(200).json(results.rows);
+        } catch (error) {
+            return next(error);
+        }
     }
-});
+);
 
 router.get(
-    "/:recommendation_id",
+    "/:user_id/recommendations/:recommendation_id",
     function getOneUserRecommendation(req, res, next) {
         try {
             return res
@@ -27,21 +32,24 @@ router.get(
     }
 );
 
-router.post("/", async function createUserRecommendation(req, res, next) {
-    try {
-        const { message, friend_id, user_id } = req.body;
-        const results = await db.query(
-            "INSERT INTO recommendations (recommendation, friend_id, user_id) VALUES ($1, $2, $3) RETURNING *",
-            [message, friend_id, user_id]
-        );
-        return res.status(201).json(results.rows);
-    } catch (error) {
-        return next(error);
+router.post(
+    "/:user_id/recommendations",
+    async function createUserRecommendation(req, res, next) {
+        try {
+            const { recommendation, receiver_id, sender_id } = req.body;
+            const results = await db.query(
+                "INSERT INTO recommendations (recommendation, receiver_id, sender_id) VALUES ($1, $2, $3) RETURNING *",
+                [recommendation, receiver_id, sender_id]
+            );
+            return res.status(201).json(results.rows);
+        } catch (error) {
+            return next(error);
+        }
     }
-});
+);
 
 router.patch(
-    "/:recommendation_id",
+    "/:user_id/recommendations/:recommendation_id",
     function updateUserRecommendation(req, res, next) {
         try {
             return res
@@ -54,7 +62,7 @@ router.patch(
 );
 
 router.delete(
-    "/:recommendation_id",
+    "/:user_id/recommendations/:recommendation_id",
     function deleteUserRecommendation(req, res, next) {
         try {
             return res
