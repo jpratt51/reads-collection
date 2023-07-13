@@ -21,11 +21,13 @@ router.get(
 
 router.get(
     "/:user_id/followers/:follower_id",
-    function getOneUserFollower(req, res, next) {
+    async function getOneUserFollower(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "Mock get one user follower request" });
+            const { user_id, follower_id } = req.params;
+            const results = await db.query(
+                `SELECT * FROM users_followers WHERE id = ${follower_id} AND user_id = ${user_id};`
+            );
+            return res.status(200).json(results.rows);
         } catch (error) {
             return next(error);
         }
