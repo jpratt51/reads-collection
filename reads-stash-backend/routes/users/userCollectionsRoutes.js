@@ -67,11 +67,16 @@ router.patch(
 
 router.delete(
     "/:user_id/collections/:collection_id",
-    function deleteUserCollection(req, res, next) {
+    async function deleteUserCollection(req, res, next) {
         try {
+            const { user_id, collection_id } = req.params;
+            await db.query(
+                "DELETE FROM collections WHERE id = $1 AND user_id = $2;",
+                [collection_id, user_id]
+            );
             return res
                 .status(200)
-                .json({ msg: "Mock delete user collection request" });
+                .json({ msg: `Deleted user collection ${collection_id}` });
         } catch (error) {
             return next(error);
         }
