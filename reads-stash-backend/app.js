@@ -44,7 +44,7 @@ app.use("/api/users", userRecommendationsRoutes);
 
 // reads
 app.use("/api/reads", readRoutes);
-app.use("/api/reads/:read_id/collections", readCollectionsRoutes);
+app.use("/api/reads", readCollectionsRoutes);
 
 // other
 app.use("/api/badges", badgeRoutes);
