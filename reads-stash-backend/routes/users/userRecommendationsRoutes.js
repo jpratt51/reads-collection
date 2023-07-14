@@ -67,11 +67,16 @@ router.patch(
 
 router.delete(
     "/:user_id/recommendations/:recommendation_id",
-    function deleteUserRecommendation(req, res, next) {
+    async function deleteUserRecommendation(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "Dummy deleted user recommendation response" });
+            const { user_id, recommendation_id } = req.params;
+            await db.query(
+                "DELETE FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $1 AND receiver_id = $2",
+                [recommendation_id, user_id]
+            );
+            return res.status(200).json({
+                msg: `Deleted user recommendation ${recommendation_id}`,
+            });
         } catch (error) {
             return next(error);
         }
