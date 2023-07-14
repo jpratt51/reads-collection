@@ -44,12 +44,17 @@ router.post("/:user_id/reads", function createUserRead(req, res, next) {
 });
 
 router.delete(
-    "/:user_id/reads/:collection_id",
-    function deleteUserRead(req, res, next) {
+    "/:user_id/reads/:users_reads_id",
+    async function deleteUserRead(req, res, next) {
         try {
+            const { user_id, users_reads_id } = req.params;
+            await db.query(
+                "DELETE FROM users_reads WHERE id = $1 AND user_id = $2;",
+                [users_reads_id, user_id]
+            );
             return res
                 .status(200)
-                .json({ msg: "Dummy deleted user read response" });
+                .json({ msg: `Deleted user read ${users_reads_id}` });
         } catch (error) {
             return next(error);
         }
