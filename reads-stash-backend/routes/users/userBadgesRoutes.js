@@ -46,12 +46,17 @@ router.post("/:user_id/badges", async function createUserBadge(req, res, next) {
 });
 
 router.delete(
-    "/:user_id/badges/:badge_id",
-    function deleteUserBadge(req, res, next) {
+    "/:user_id/badges/:users_badge_id",
+    async function deleteUserBadge(req, res, next) {
         try {
+            const { user_id, users_badge_id } = req.params;
+            await db.query(
+                "DELETE FROM users_badges WHERE id = $1 AND user_id = $2;",
+                [users_badge_id, user_id]
+            );
             return res
                 .status(200)
-                .json({ msg: "Mock delete user badge request" });
+                .json({ msg: `Deleted user's badge ${users_badge_id}` });
         } catch (error) {
             return next(error);
         }
