@@ -10,7 +10,8 @@ router.get(
         try {
             const { user_id } = req.params;
             const results = await db.query(
-                `SELECT * FROM users_followers WHERE user_id = ${user_id};`
+                `SELECT * FROM users_followers WHERE user_id = $1;`,
+                [user_id]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
@@ -25,7 +26,8 @@ router.get(
         try {
             const { user_id, follower_id } = req.params;
             const results = await db.query(
-                `SELECT * FROM users_followers WHERE id = ${follower_id} AND user_id = ${user_id};`
+                `SELECT * FROM users_followers WHERE id = $1 AND user_id = $2;`,
+                [follower_id, user_id]
             );
             return res.status(200).json(results.rows);
         } catch (error) {

@@ -22,7 +22,8 @@ router.get(
         try {
             const { user_id, badge_id } = req.params;
             const results = await db.query(
-                `SELECT * FROM users_badges WHERE id = ${badge_id} AND user_id = ${user_id};`
+                `SELECT * FROM users_badges WHERE id = $1 AND user_id = $2;`,
+                [badge_id, user_id]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
