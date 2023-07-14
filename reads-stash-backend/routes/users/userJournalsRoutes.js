@@ -67,11 +67,16 @@ router.patch(
 
 router.delete(
     "/:user_id/journals/:journal_id",
-    function deleteUserJournal(req, res, next) {
+    async function deleteUserJournal(req, res, next) {
         try {
+            const { user_id, journal_id } = req.params;
+            await db.query(
+                "DELETE FROM journals WHERE id = $1 AND user_id = $2;",
+                [journal_id, user_id]
+            );
             return res
                 .status(200)
-                .json({ msg: "Mock delete user journal request" });
+                .json({ msg: `Deleted journal ${journal_id}` });
         } catch (error) {
             return next(error);
         }
