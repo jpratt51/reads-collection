@@ -46,9 +46,11 @@ router.patch("/:user_id", function updateUser(req, res, next) {
     }
 });
 
-router.delete("/:user_id", function deleteUser(req, res, next) {
+router.delete("/:user_id", async function deleteUser(req, res, next) {
     try {
-        return res.status(200).json({ msg: "Dummy deleted user result" });
+        const { user_id } = req.params;
+        await db.query("DELETE FROM users WHERE id = $1", [user_id]);
+        return res.status(200).json({ msg: `Deleted user ${user_id}` });
     } catch (error) {
         return next(error);
     }
