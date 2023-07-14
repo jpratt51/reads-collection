@@ -54,11 +54,18 @@ router.post(
 
 router.delete(
     "/:user_id/followed/:followed_id",
-    function deleteUserFollowed(req, res, next) {
+    async function deleteUserFollowed(req, res, next) {
         try {
+            const { user_id, followed_id } = req.params;
+            await db.query(
+                "DELETE FROM users_followed WHERE followed_id = $1 AND user_id = $2;",
+                [followed_id, user_id]
+            );
             return res
                 .status(200)
-                .json({ msg: "Mock delete user followed user request" });
+                .json({
+                    msg: `User ${user_id} stopped following user ${followed_id}`,
+                });
         } catch (error) {
             return next(error);
         }
