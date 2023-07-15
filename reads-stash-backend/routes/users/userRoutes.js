@@ -15,11 +15,11 @@ router.get("/", async function getAllUsers(req, res, next) {
     }
 });
 
-router.get("/:user_id", async function getOneUser(req, res, next) {
+router.get("/:userId", async function getOneUser(req, res, next) {
     try {
-        const { user_id } = req.params;
+        const { userId } = req.params;
         const results = await db.query("SELECT * FROM users WHERE id = $1", [
-            user_id,
+            userId,
         ]);
         return res.status(200).json(results.rows);
     } catch (error) {
@@ -40,15 +40,15 @@ router.post("/", async function createUser(req, res, next) {
     }
 });
 
-router.patch("/:user_id", async function updateUser(req, res, next) {
+router.patch("/:userId", async function updateUser(req, res, next) {
     try {
         const { columns, values } = dataToSql(req.body);
-        const { user_id } = req.params;
+        const { userId } = req.params;
         const results = await db.query(
             `UPDATE users SET ${columns}
             WHERE id=$${values.length + 1}
             RETURNING username, fname, lname, email`,
-            [...values, user_id]
+            [...values, userId]
         );
         return res.status(200).json(results.rows);
     } catch (error) {
@@ -56,11 +56,11 @@ router.patch("/:user_id", async function updateUser(req, res, next) {
     }
 });
 
-router.delete("/:user_id", async function deleteUser(req, res, next) {
+router.delete("/:userId", async function deleteUser(req, res, next) {
     try {
-        const { user_id } = req.params;
-        await db.query("DELETE FROM users WHERE id = $1", [user_id]);
-        return res.status(200).json({ msg: `Deleted user ${user_id}` });
+        const { userId } = req.params;
+        await db.query("DELETE FROM users WHERE id = $1", [userId]);
+        return res.status(200).json({ msg: `Deleted user ${userId}` });
     } catch (error) {
         return next(error);
     }
