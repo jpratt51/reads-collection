@@ -14,11 +14,11 @@ router.get("/", async function getAllBadges(req, res, next) {
     }
 });
 
-router.get("/:badge_id", async function getOneBadge(req, res, next) {
+router.get("/:badgeId", async function getOneBadge(req, res, next) {
     try {
-        const { badge_id } = req.params;
+        const { badgeId } = req.params;
         const results = await db.query(`SELECT * FROM badges WHERE id = $1;`, [
-            badge_id,
+            badgeId,
         ]);
         return res.status(200).json(results.rows);
     } catch (error) {
