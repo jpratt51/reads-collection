@@ -13,11 +13,11 @@ router.get("/", async function getAllReads(req, res, next) {
     }
 });
 
-router.get("/:read_id", async function getOneRead(req, res, next) {
+router.get("/:readId", async function getOneRead(req, res, next) {
     try {
-        const { read_id } = req.params;
+        const { readId } = req.params;
         const results = await db.query(`SELECT * FROM reads WHERE id = $1;`, [
-            read_id,
+            readId,
         ]);
         return res.status(200).json(results.rows);
     } catch (error) {
@@ -32,8 +32,8 @@ router.post("/", async function createRead(req, res, next) {
             title,
             description,
             isbn,
-            average_rating,
-            print_type,
+            averageRating,
+            printType,
             publisher,
         } = req.body;
         const results = await db.query(
@@ -43,8 +43,8 @@ router.post("/", async function createRead(req, res, next) {
                 title,
                 description,
                 isbn,
-                average_rating,
-                print_type,
+                averageRating,
+                printType,
                 publisher,
             ]
         );
