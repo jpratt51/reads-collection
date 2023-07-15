@@ -5,13 +5,13 @@ const router = new express.Router();
 const db = require("../../db");
 
 router.get(
-    "/:user_id/followers",
+    "/:userId/followers",
     async function getAllUserFollowers(req, res, next) {
         try {
-            const { user_id } = req.params;
+            const { userId } = req.params;
             const results = await db.query(
                 `SELECT * FROM users_followers WHERE user_id = $1;`,
-                [user_id]
+                [userId]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
@@ -21,13 +21,13 @@ router.get(
 );
 
 router.get(
-    "/:user_id/followers/:follower_id",
+    "/:userId/followers/:followerId",
     async function getOneUserFollower(req, res, next) {
         try {
-            const { user_id, follower_id } = req.params;
+            const { userId, followerId } = req.params;
             const results = await db.query(
                 `SELECT * FROM users_followers WHERE id = $1 AND user_id = $2;`,
-                [follower_id, user_id]
+                [followerId, userId]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
