@@ -3,11 +3,12 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../db");
+const Badge = require("../models/badge");
 
 router.get("/", async function getAllBadges(req, res, next) {
     try {
-        const results = await db.query("SELECT * FROM badges;");
-        return res.status(200).json(results.rows);
+        let badges = await Badge.getAll();
+        return res.status(200).json(badges);
     } catch (error) {
         return next(error);
     }
