@@ -5,7 +5,7 @@ const db = require("../db");
 class UserCollection {
     constructor(id, name, userId) {
         this.id = id;
-        this.title = name;
+        this.name = name;
         this.userId = userId;
     }
 

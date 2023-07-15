@@ -3,14 +3,13 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
+const UserBadge = require("../../models/userBadge");
 
 router.get("/:userId/badges", async function getAllUserBadges(req, res, next) {
     try {
         const { userId } = req.params;
-        const results = await db.query(
-            `SELECT * FROM users_badges WHERE user_id = ${userId};`
-        );
-        return res.status(200).json(results.rows);
+        const userBadges = await UserBadge.getAll(userId);
+        return res.status(200).json(userBadges);
     } catch (error) {
         return next(error);
     }
