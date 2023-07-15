@@ -20,11 +20,8 @@ router.get(
     async function getOneUserRead(req, res, next) {
         try {
             const { userId, usersReadsId } = req.params;
-            const results = await db.query(
-                `SELECT * FROM users_reads WHERE id = $1 AND user_id = $2;`,
-                [usersReadsId, userId]
-            );
-            return res.status(200).json(results.rows);
+            let userRead = await UserRead.getById(userId, usersReadsId);
+            return res.status(200).json(userRead);
         } catch (error) {
             return next(error);
         }
