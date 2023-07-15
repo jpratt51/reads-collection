@@ -6,11 +6,11 @@ const db = require("../../db");
 const UserCollection = require("../../models/userCollection");
 
 router.get(
-    "/:user_id/collections",
+    "/:userId/collections",
     async function getAllUserCollections(req, res, next) {
         try {
-            const { user_id } = req.params;
-            const collections = await UserCollection.getAll(user_id);
+            const { userId } = req.params;
+            const collections = await UserCollection.getAll(userId);
             return res.status(200).json(collections);
         } catch (error) {
             return next(error);
@@ -19,13 +19,13 @@ router.get(
 );
 
 router.get(
-    "/:user_id/collections/:collection_id",
+    "/:userId/collections/:collectionId",
     async function getOneUserCollection(req, res, next) {
         try {
-            const { user_id, collection_id } = req.params;
+            const { userId, collectionId } = req.params;
             const results = await db.query(
                 `SELECT * FROM collections WHERE id = $1 AND user_id = $2;`,
-                [collection_id, user_id]
+                [collectionId, userId]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
@@ -35,13 +35,13 @@ router.get(
 );
 
 router.post(
-    "/:user_id/collections",
+    "/:userId/collections",
     async function createUserCollection(req, res, next) {
         try {
-            const { name, user_id } = req.body;
+            const { name, userId } = req.body;
             const results = await db.query(
                 "INSERT INTO collections (name, user_id) VALUES ($1, $2) RETURNING * ;",
-                [name, user_id]
+                [name, userId]
             );
             return res.status(201).json(results.rows);
         } catch (error) {
@@ -51,16 +51,16 @@ router.post(
 );
 
 router.patch(
-    "/:user_id/collections/:collection_id",
+    "/:userId/collections/:collectionId",
     async function updateUserCollection(req, res, next) {
         try {
-            const { user_id, collection_id } = req.params;
+            const { userId, collectionId } = req.params;
             const { name } = req.body;
             const results = await db.query(
                 `UPDATE collections SET name = $1 
                 WHERE id = $2 AND user_id = $3 
                 RETURNING *;`,
-                [name, collection_id, user_id]
+                [name, collectionId, userId]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
@@ -70,17 +70,17 @@ router.patch(
 );
 
 router.delete(
-    "/:user_id/collections/:collection_id",
+    "/:userId/collections/:collectionId",
     async function deleteUserCollection(req, res, next) {
         try {
-            const { user_id, collection_id } = req.params;
+            const { userId, collectionId } = req.params;
             await db.query(
                 "DELETE FROM collections WHERE id = $1 AND user_id = $2;",
-                [collection_id, user_id]
+                [collectionId, userId]
             );
             return res
                 .status(200)
-                .json({ msg: `Deleted user collection ${collection_id}` });
+                .json({ msg: `Deleted user collection ${collectionId}` });
         } catch (error) {
             return next(error);
         }
