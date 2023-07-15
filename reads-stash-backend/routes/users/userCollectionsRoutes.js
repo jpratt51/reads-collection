@@ -3,17 +3,15 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
+const UserCollection = require("../../models/userCollection");
 
 router.get(
     "/:user_id/collections",
     async function getAllUserCollections(req, res, next) {
         try {
             const { user_id } = req.params;
-            const results = await db.query(
-                `SELECT * FROM collections WHERE user_id = $1;`,
-                [user_id]
-            );
-            return res.status(200).json(results.rows);
+            const collections = await UserCollection.getAll(user_id);
+            return res.status(200).json(collections);
         } catch (error) {
             return next(error);
         }
