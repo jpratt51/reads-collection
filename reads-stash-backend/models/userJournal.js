@@ -16,10 +16,10 @@ class UserJournal {
             `SELECT * FROM journals WHERE user_id = $1;`,
             [userId]
         );
-        const journals = results.rows.map(
+        const userJournals = results.rows.map(
             (r) => new UserJournal(r.id, r.title, r.date, r.text, r.userId)
         );
-        return journals;
+        return userJournals;
     }
 }
 
