@@ -10,8 +10,8 @@ class User {
         lname,
         email,
         exp,
-        total_books,
-        total_pages
+        totalBooks,
+        totalPages
     ) {
         this.id = id;
         this.username = username;
@@ -19,8 +19,8 @@ class User {
         this.lname = lname;
         this.email = email;
         this.exp = exp;
-        this.total_books = total_books;
-        this.total_pages = total_pages;
+        this.totalBooks = totalBooks;
+        this.totalPages = totalPages;
     }
 
     static async getAll() {
@@ -34,8 +34,8 @@ class User {
                     u.lname,
                     u.emai,
                     u.exp,
-                    u.total_books,
-                    u.total_pages
+                    u.totalBooks,
+                    u.totalPages
                 )
         );
         return users;
