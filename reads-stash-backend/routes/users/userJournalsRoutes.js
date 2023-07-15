@@ -24,11 +24,8 @@ router.get(
     async function getOneUserJournal(req, res, next) {
         try {
             const { userId, journalId } = req.params;
-            const results = await db.query(
-                `SELECT * FROM journals WHERE id = $1 AND user_id = $2;`,
-                [journalId, userId]
-            );
-            return res.status(200).json(results.rows);
+            let journal = await UserJournal.getById(userId, journalId);
+            return res.status(200).json(journal);
         } catch (error) {
             return next(error);
         }

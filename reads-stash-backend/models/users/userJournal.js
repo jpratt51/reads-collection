@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("../../db");
+const ExpressError = require("../../expressError");
 
 class UserJournal {
     constructor(id, title, date, text, user_id) {
@@ -17,9 +18,21 @@ class UserJournal {
             [userId]
         );
         const userJournals = results.rows.map(
-            (r) => new UserJournal(r.id, r.title, r.date, r.text, r.user_id)
+            (j) => new UserJournal(j.id, j.title, j.date, j.text, j.user_id)
         );
         return userJournals;
+    }
+
+    static async getById(userId, journalId) {
+        const results = await db.query(
+            `SELECT * FROM journals WHERE id = $1 AND user_id = $2;`,
+            [journalId, userId]
+        );
+        const j = results.rows[0];
+        if (!j) {
+            throw new ExpressError(`User's journal ${journalId} not found`);
+        }
+        return new UserJournal(j.id, j.title, j.date, j.text, j.user_id);
     }
 }
 
