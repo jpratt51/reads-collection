@@ -4,11 +4,11 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 
-router.get("/:user_id/badges", async function getAllUserBadges(req, res, next) {
+router.get("/:userId/badges", async function getAllUserBadges(req, res, next) {
     try {
-        const { user_id } = req.params;
+        const { userId } = req.params;
         const results = await db.query(
-            `SELECT * FROM users_badges WHERE user_id = ${user_id};`
+            `SELECT * FROM users_badges WHERE user_id = ${userId};`
         );
         return res.status(200).json(results.rows);
     } catch (error) {
@@ -17,13 +17,13 @@ router.get("/:user_id/badges", async function getAllUserBadges(req, res, next) {
 });
 
 router.get(
-    "/:user_id/badges/:badge_id",
+    "/:userId/badges/:badgeId",
     async function getOneUserBadge(req, res, next) {
         try {
-            const { user_id, badge_id } = req.params;
+            const { userId, badgeId } = req.params;
             const results = await db.query(
                 `SELECT * FROM users_badges WHERE id = $1 AND user_id = $2;`,
-                [badge_id, user_id]
+                [badgeId, userId]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
@@ -32,12 +32,12 @@ router.get(
     }
 );
 
-router.post("/:user_id/badges", async function createUserBadge(req, res, next) {
+router.post("/:userId/badges", async function createUserBadge(req, res, next) {
     try {
-        const { user_id, badge_id } = req.body;
+        const { userId, badgeId } = req.body;
         const results = await db.query(
             "INSERT INTO users_badges (user_id, badge_id) VALUES ($1, $2) RETURNING * ;",
-            [user_id, badge_id]
+            [userId, badgeId]
         );
         return res.status(201).json(results.rows);
     } catch (error) {
@@ -46,17 +46,17 @@ router.post("/:user_id/badges", async function createUserBadge(req, res, next) {
 });
 
 router.delete(
-    "/:user_id/badges/:users_badge_id",
+    "/:userId/badges/:users_badgeId",
     async function deleteUserBadge(req, res, next) {
         try {
-            const { user_id, users_badge_id } = req.params;
+            const { userId, usersBadgeId } = req.params;
             await db.query(
                 "DELETE FROM users_badges WHERE id = $1 AND user_id = $2;",
-                [users_badge_id, user_id]
+                [usersBadgeId, userId]
             );
             return res
                 .status(200)
-                .json({ msg: `Deleted user's badge ${users_badge_id}` });
+                .json({ msg: `Deleted user's badge ${usersBadgeId}` });
         } catch (error) {
             return next(error);
         }
