@@ -54,11 +54,18 @@ router.post(
 
 router.patch(
     "/:user_id/recommendations/:recommendation_id",
-    function updateUserRecommendation(req, res, next) {
+    async function updateUserRecommendation(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "Dummy updated user recommendation response" });
+            const { recommendation } = req.body;
+            const { user_id, recommendation_id } = req.params;
+            const results = await db.query(
+                `UPDATE recommendations
+                        SET recommendation = $1
+                        WHERE id = $2 AND sender_id = $3
+                        RETURNING recommendation, sender_id, receiver_id`,
+                [recommendation, recommendation_id, user_id]
+            );
+            return res.status(200).json(results.rows);
         } catch (error) {
             return next(error);
         }
