@@ -3,6 +3,7 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
+const { dataToSql } = require("../../helpers/sql.js");
 
 router.get(
     "/:user_id/journals",
@@ -54,11 +55,23 @@ router.post(
 
 router.patch(
     "/:user_id/journals/:journal_id",
-    function updateUserJournal(req, res, next) {
+    async function updateUserJournal(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "Mock update user journal request" });
+            let date = new Date().toJSON().slice(0, 10);
+            const { columns, values } = dataToSql(req.body);
+            const { user_id, journal_id } = req.params;
+            // const query = `UPDATE journals SET ${columns}, date = $${values.length + 1}
+            // WHERE id = $${values.length + 2} AND user_id = $${values.length + 3}
+            // RETURNING *`;
+            const results = await db.query(
+                `UPDATE journals SET ${columns}, date = $${values.length + 1}
+                WHERE id = $${values.length + 2} AND user_id = $${
+                    values.length + 3
+                }
+                RETURNING *`,
+                [...values, date, journal_id, user_id]
+            );
+            return res.status(200).send(results.rows);
         } catch (error) {
             return next(error);
         }
