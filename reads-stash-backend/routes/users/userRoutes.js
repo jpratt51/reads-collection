@@ -18,10 +18,8 @@ router.get("/", async function getAllUsers(req, res, next) {
 router.get("/:userId", async function getOneUser(req, res, next) {
     try {
         const { userId } = req.params;
-        const results = await db.query("SELECT * FROM users WHERE id = $1", [
-            userId,
-        ]);
-        return res.status(200).json(results.rows);
+        let user = await User.getById(userId);
+        return res.status(200).json(user);
     } catch (error) {
         return next(error);
     }

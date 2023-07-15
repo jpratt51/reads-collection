@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("../../db");
+const ExpressError = require("../../expressError");
 
 class User {
     constructor(
@@ -39,6 +40,26 @@ class User {
                 )
         );
         return users;
+    }
+
+    static async getById(userId) {
+        const results = await db.query("SELECT * FROM users WHERE id = $1", [
+            userId,
+        ]);
+        const u = results.rows[0];
+        if (!u) {
+            throw new ExpressError(`User ${userId} not found`);
+        }
+        return new User(
+            u.id,
+            u.username,
+            u.fname,
+            u.lname,
+            u.emai,
+            u.exp,
+            u.total_books,
+            u.total_pages
+        );
     }
 }
 
