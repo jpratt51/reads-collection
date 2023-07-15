@@ -8,7 +8,7 @@ class UserJournal {
         this.title = title;
         this.date = date;
         this.text = text;
-        this.user_id = userId;
+        this.userId = userId;
     }
 
     static async getAll(userId) {
