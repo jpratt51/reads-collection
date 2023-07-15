@@ -7,11 +7,11 @@ const { dataToSql } = require("../../helpers/sql.js");
 const UserJournal = require("../../models/userJournal");
 
 router.get(
-    "/:user_id/journals",
+    "/:userId/journals",
     async function getAllUserJournals(req, res, next) {
         try {
-            const { user_id } = req.params;
-            let journals = await UserJournal.getAll(user_id);
+            const { userId } = req.params;
+            let journals = await UserJournal.getAll(userId);
             return res.status(200).json(journals);
         } catch (error) {
             return next(error);
@@ -20,13 +20,13 @@ router.get(
 );
 
 router.get(
-    "/:user_id/journals/:journal_id",
+    "/:userId/journals/:journalId",
     async function getOneUserJournal(req, res, next) {
         try {
-            const { user_id, journal_id } = req.params;
+            const { userId, journalId } = req.params;
             const results = await db.query(
                 `SELECT * FROM journals WHERE id = $1 AND user_id = $2;`,
-                [journal_id, user_id]
+                [journalId, userId]
             );
             return res.status(200).json(results.rows);
         } catch (error) {
@@ -36,13 +36,13 @@ router.get(
 );
 
 router.post(
-    "/:user_id/journals",
+    "/:userId/journals",
     async function createUserJournal(req, res, next) {
         try {
-            const { title, date, text, user_id } = req.body;
+            const { title, date, text, userId } = req.body;
             const results = await db.query(
                 "INSERT INTO journals (title, date, text, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
-                [title, date, text, user_id]
+                [title, date, text, userId]
             );
             return res.status(201).json(results.rows);
         } catch (error) {
@@ -52,19 +52,19 @@ router.post(
 );
 
 router.patch(
-    "/:user_id/journals/:journal_id",
+    "/:userId/journals/:journalId",
     async function updateUserJournal(req, res, next) {
         try {
             let date = new Date().toJSON().slice(0, 10);
             const { columns, values } = dataToSql(req.body);
-            const { user_id, journal_id } = req.params;
+            const { userId, journalId } = req.params;
             const results = await db.query(
                 `UPDATE journals SET ${columns}, date = $${values.length + 1}
                 WHERE id = $${values.length + 2} AND user_id = $${
                     values.length + 3
                 }
                 RETURNING *`,
-                [...values, date, journal_id, user_id]
+                [...values, date, journalId, userId]
             );
             return res.status(200).send(results.rows);
         } catch (error) {
@@ -74,17 +74,17 @@ router.patch(
 );
 
 router.delete(
-    "/:user_id/journals/:journal_id",
+    "/:userId/journals/:journalId",
     async function deleteUserJournal(req, res, next) {
         try {
-            const { user_id, journal_id } = req.params;
+            const { userId, journalId } = req.params;
             await db.query(
                 "DELETE FROM journals WHERE id = $1 AND user_id = $2;",
-                [journal_id, user_id]
+                [journalId, userId]
             );
             return res
                 .status(200)
-                .json({ msg: `Deleted journal ${journal_id}` });
+                .json({ msg: `Deleted journal ${journalId}` });
         } catch (error) {
             return next(error);
         }
