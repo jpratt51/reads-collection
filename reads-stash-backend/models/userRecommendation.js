@@ -2,7 +2,7 @@
 
 const db = require("../db");
 
-class Recommendation {
+class UserRecommendation {
     constructor(id, recommendation, senderId, receiverId) {
         this.id = id;
         this.recommendation = recommendation;
@@ -15,17 +15,17 @@ class Recommendation {
             `SELECT * FROM recommendations WHERE receiver_id = $1 OR sender_id = $1;`,
             [userId]
         );
-        const recommendations = results.rows.map(
+        const userRecommendations = results.rows.map(
             (r) =>
-                new Recommendation(
+                new UserRecommendation(
                     r.id,
                     r.recommendation,
                     r.senderId,
                     r.receiverId
                 )
         );
-        return recommendations;
+        return userRecommendations;
     }
 }
 
-module.exports = Recommendation;
+module.exports = UserRecommendation;
