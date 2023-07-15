@@ -3,6 +3,7 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
+const { dataToSql } = require("../../helpers/sql.js");
 
 router.get("/", async function getAllUsers(req, res, next) {
     try {
@@ -38,9 +39,17 @@ router.post("/", async function createUser(req, res, next) {
     }
 });
 
-router.patch("/:user_id", function updateUser(req, res, next) {
+router.patch("/:user_id", async function updateUser(req, res, next) {
     try {
-        return res.status(200).json({ msg: "Dummy updated user result" });
+        const { columns, values } = dataToSql(req.body);
+        const { user_id } = req.params;
+        const results = await db.query(
+            `UPDATE users SET ${columns}
+            WHERE id=$${values.length + 1}
+            RETURNING username, fname, lname, email`,
+            [...values, user_id]
+        );
+        return res.status(200).json(results.rows);
     } catch (error) {
         return next(error);
     }

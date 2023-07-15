@@ -19,6 +19,4 @@ function dataToSql(data) {
     };
 }
 
-const data = { username: "bigDeal100", fname: "Big", lname: "Deal" };
-
-dataToSql(data);
+module.exports = { dataToSql };
