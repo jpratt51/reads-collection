@@ -3,21 +3,21 @@
 const db = require("../db");
 
 class UserCollection {
-    constructor(id, name, user_id) {
+    constructor(id, name, userId) {
         this.id = id;
         this.title = name;
-        this.user_id = user_id;
+        this.userId = userId;
     }
 
-    static async getAll(user_id) {
+    static async getAll(userId) {
         const results = await db.query(
             `SELECT * FROM collections WHERE user_id = $1;`,
-            [user_id]
+            [userId]
         );
-        const collections = results.rows.map(
-            (c) => new UserCollection(c.id, c.name, c.user_id)
+        const userCollections = results.rows.map(
+            (c) => new UserCollection(c.id, c.name, c.userId)
         );
-        return collections;
+        return userCollections;
     }
 }
 
