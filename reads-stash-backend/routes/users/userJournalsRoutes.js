@@ -4,17 +4,15 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const { dataToSql } = require("../../helpers/sql.js");
+const UserJournal = require("../../models/userJournal");
 
 router.get(
     "/:user_id/journals",
     async function getAllUserJournals(req, res, next) {
         try {
             const { user_id } = req.params;
-            const results = await db.query(
-                `SELECT * FROM journals WHERE user_id = $1;`,
-                [user_id]
-            );
-            return res.status(200).json(results.rows);
+            let journals = await UserJournal.getAll(user_id);
+            return res.status(200).json(journals);
         } catch (error) {
             return next(error);
         }
