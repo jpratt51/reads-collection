@@ -3,17 +3,15 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
+const Recommendation = require("../../models/recommendation");
 
 router.get(
     "/:user_id/recommendations",
     async function getAllUserRecommendations(req, res, next) {
         try {
             const { user_id } = req.params;
-            const results = await db.query(
-                `SELECT * FROM recommendations WHERE receiver_id = $1 OR sender_id = $1;`,
-                [user_id]
-            );
-            return res.status(200).json(results.rows);
+            let recommendations = await Recommendation.getAll(user_id);
+            return res.status(200).json(recommendations);
         } catch (error) {
             return next(error);
         }
