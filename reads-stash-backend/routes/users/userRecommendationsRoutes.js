@@ -3,14 +3,14 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
-const Recommendation = require("../../models/users/userRecommendation");
+const UserRecommendation = require("../../models/users/userRecommendation");
 
 router.get(
     "/:userId/recommendations",
     async function getAllUserRecommendations(req, res, next) {
         try {
             const { userId } = req.params;
-            let recommendations = await Recommendation.getAll(userId);
+            let recommendations = await UserRecommendation.getAll(userId);
             return res.status(200).json(recommendations);
         } catch (error) {
             return next(error);
@@ -23,11 +23,11 @@ router.get(
     async function getOneUserRecommendation(req, res, next) {
         try {
             const { recommendationId, userId } = req.params;
-            const results = await db.query(
-                `SELECT * FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $1 AND receiver_id = $2;`,
-                [recommendationId, userId]
+            let recommendation = await UserRecommendation.getById(
+                recommendationId,
+                userId
             );
-            return res.status(200).json(results.rows);
+            return res.status(200).json(recommendation);
         } catch (error) {
             return next(error);
         }
