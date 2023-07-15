@@ -54,11 +54,17 @@ router.post(
 
 router.patch(
     "/:user_id/collections/:collection_id",
-    function updateUserCollection(req, res, next) {
+    async function updateUserCollection(req, res, next) {
         try {
-            return res
-                .status(200)
-                .json({ msg: "Mock update user collection request" });
+            const { user_id, collection_id } = req.params;
+            const { name } = req.body;
+            const results = await db.query(
+                `UPDATE collections SET name = $1 
+                WHERE id = $2 AND user_id = $3 
+                RETURNING *;`,
+                [name, collection_id, user_id]
+            );
+            return res.status(200).json(results.rows);
         } catch (error) {
             return next(error);
         }
