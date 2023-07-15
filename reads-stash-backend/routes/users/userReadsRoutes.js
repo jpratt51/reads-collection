@@ -3,7 +3,7 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
-const UserRead = require("../../models/userRead");
+const UserRead = require("../../models/users/userRead");
 
 router.get("/:userId/reads", async function getAllUserReads(req, res, next) {
     try {

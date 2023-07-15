@@ -1,12 +1,12 @@
 "use strict";
 
-const db = require("../db");
+const db = require("../../db");
 
 class UserCollection {
-    constructor(id, name, userId) {
+    constructor(id, name, user_id) {
         this.id = id;
         this.name = name;
-        this.userId = userId;
+        this.userId = user_id;
     }
 
     static async getAll(userId) {
@@ -15,7 +15,7 @@ class UserCollection {
             [userId]
         );
         const userCollections = results.rows.map(
-            (c) => new UserCollection(c.id, c.name, c.userId)
+            (c) => new UserCollection(c.id, c.name, c.user_id)
         );
         return userCollections;
     }

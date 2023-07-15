@@ -4,7 +4,7 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const { dataToSql } = require("../../helpers/sql.js");
-const User = require("../../models/user");
+const User = require("../../models/users/user");
 
 router.get("/", async function getAllUsers(req, res, next) {
     try {

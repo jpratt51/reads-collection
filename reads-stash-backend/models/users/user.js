@@ -1,6 +1,6 @@
 "use strict";
 
-const db = require("../db");
+const db = require("../../db");
 
 class User {
     constructor(
@@ -10,8 +10,8 @@ class User {
         lname,
         email,
         exp,
-        totalBooks,
-        totalPages
+        total_books,
+        total_pages
     ) {
         this.id = id;
         this.username = username;
@@ -19,8 +19,8 @@ class User {
         this.lname = lname;
         this.email = email;
         this.exp = exp;
-        this.totalBooks = totalBooks;
-        this.totalPages = totalPages;
+        this.totalBooks = total_books;
+        this.totalPages = total_pages;
     }
 
     static async getAll() {
@@ -34,8 +34,8 @@ class User {
                     u.lname,
                     u.emai,
                     u.exp,
-                    u.totalBooks,
-                    u.totalPages
+                    u.total_books,
+                    u.total_pages
                 )
         );
         return users;

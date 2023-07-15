@@ -1,6 +1,6 @@
 "use strict";
 
-const db = require("../db");
+const db = require("../../db");
 
 class UserBadge {
     constructor(id, user_id, badge_id) {

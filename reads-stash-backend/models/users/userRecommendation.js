@@ -1,13 +1,13 @@
 "use strict";
 
-const db = require("../db");
+const db = require("../../db");
 
 class UserRecommendation {
-    constructor(id, recommendation, senderId, receiverId) {
+    constructor(id, recommendation, sender_id, receiver_id) {
         this.id = id;
         this.recommendation = recommendation;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
+        this.senderId = sender_id;
+        this.receiverId = receiver_id;
     }
 
     static async getAll(userId) {
@@ -20,8 +20,8 @@ class UserRecommendation {
                 new UserRecommendation(
                     r.id,
                     r.recommendation,
-                    r.senderId,
-                    r.receiverId
+                    r.sender_id,
+                    r.receiver_id
                 )
         );
         return userRecommendations;
