@@ -3,11 +3,12 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
+const Read = require("../../models/reads/read");
 
 router.get("/", async function getAllReads(req, res, next) {
     try {
-        const results = await db.query("SELECT * FROM reads;");
-        return res.status(200).json(results.rows);
+        const reads = await Read.getAll();
+        return res.status(200).json(reads);
     } catch (error) {
         return next(error);
     }
