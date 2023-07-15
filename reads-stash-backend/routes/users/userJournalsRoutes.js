@@ -60,9 +60,6 @@ router.patch(
             let date = new Date().toJSON().slice(0, 10);
             const { columns, values } = dataToSql(req.body);
             const { user_id, journal_id } = req.params;
-            // const query = `UPDATE journals SET ${columns}, date = $${values.length + 1}
-            // WHERE id = $${values.length + 2} AND user_id = $${values.length + 3}
-            // RETURNING *`;
             const results = await db.query(
                 `UPDATE journals SET ${columns}, date = $${values.length + 1}
                 WHERE id = $${values.length + 2} AND user_id = $${
