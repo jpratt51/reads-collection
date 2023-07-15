@@ -6,8 +6,8 @@ class Recommendation {
     constructor(id, recommendation, senderId, receiverId) {
         this.id = id;
         this.recommendation = recommendation;
-        this.sender_id = senderId;
-        this.receiver_id = receiverId;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
     }
 
     static async getAll(userId) {
