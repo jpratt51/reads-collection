@@ -62,6 +62,16 @@ class UserRecommendation {
         );
     }
 
+    async update(userId) {
+        const results = await db.query(
+            `UPDATE recommendations
+                    SET recommendation = $1
+                    WHERE id = $2 AND sender_id = $3
+                    RETURNING recommendation, sender_id, receiver_id`,
+            [this.recommendation, this.id, userId]
+        );
+    }
+
     async delete(userId) {
         await db.query(
             "DELETE FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $1 AND receiver_id = $2",

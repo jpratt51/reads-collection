@@ -23,7 +23,7 @@ router.get(
     async function getOneUserRecommendation(req, res, next) {
         try {
             const { recommendationId, userId } = req.params;
-            let recommendation = await UserRecommendation.getById(
+            const recommendation = await UserRecommendation.getById(
                 recommendationId,
                 userId
             );
@@ -55,16 +55,17 @@ router.patch(
     "/:userId/recommendations/:recommendationId",
     async function updateUserRecommendation(req, res, next) {
         try {
-            const { recommendation } = req.body;
             const { userId, recommendationId } = req.params;
-            const results = await db.query(
-                `UPDATE recommendations
-                        SET recommendation = $1
-                        WHERE id = $2 AND sender_id = $3
-                        RETURNING recommendation, sender_id, receiver_id`,
-                [recommendation, recommendationId, userId]
+            const { recommendation } = req.body;
+            const getRecommendation = await UserRecommendation.getById(
+                recommendationId,
+                userId
             );
-            return res.status(200).json(results.rows);
+            recommendation
+                ? (getRecommendation.recommendation = recommendation)
+                : null;
+            await getRecommendation.update(userId);
+            return res.status(200).json(getRecommendation);
         } catch (error) {
             return next(error);
         }

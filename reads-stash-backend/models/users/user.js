@@ -73,8 +73,6 @@ class User {
     }
 
     async update() {
-        console.log("hi");
-        console.log(this.username, this.fname, this.lname, this.email, this.id);
         await db.query(
             `UPDATE users
             SET username = $1,
