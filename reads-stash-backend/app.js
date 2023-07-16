@@ -17,6 +17,7 @@ const readCollectionsRoutes = require("./routes/reads/collections");
 
 // other routers
 const badgeRoutes = require("./routes/badges");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use("/api/reads", readCollectionsRoutes);
 
 // other
 app.use("/api/badges", badgeRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use(function notFoundErrorHandler(req, res, next) {
     const e = new ExpressError("Page Not Found", 404);

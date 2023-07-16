@@ -62,13 +62,34 @@ class User {
         );
     }
 
+    static async getByUsername(username) {
+        const results = await db.query(
+            "SELECT * FROM users WHERE username = $1",
+            [username]
+        );
+        const u = results.rows[0];
+        if (!u) {
+            throw new ExpressError(`User ${username} not found`);
+        }
+        return new User(
+            u.id,
+            u.username,
+            u.fname,
+            u.lname,
+            u.email,
+            u.exp,
+            u.total_books,
+            u.total_pages
+        );
+    }
+
     static async create(username, fname, lname, email, password) {
         const results = await db.query(
             "INSERT INTO users (username, fname, lname, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING *",
             [username, fname, lname, email, password]
         );
         const u = results.rows[0];
-
+        console.log(u);
         return new User(u.id, u.username, u.fname, u.lname, u.email);
     }
 

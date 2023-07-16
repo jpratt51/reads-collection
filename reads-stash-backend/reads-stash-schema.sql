@@ -5,7 +5,7 @@ CREATE TABLE users
     fname VARCHAR(30) NOT NULL,
     lname VARCHAR(30) NOT NULL,
     email VARCHAR(50) NOT NULL,
-    password VARCHAR(50) NOT NULL,
+    password TEXT NOT NULL,
     exp INTEGER,
     total_books INTEGER,
     total_pages INTEGER
