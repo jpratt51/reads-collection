@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("../../db");
+const ExpressError = require("../../expressError");
 
 class UserCollection {
     constructor(id, name, user_id) {
@@ -18,6 +19,20 @@ class UserCollection {
             (c) => new UserCollection(c.id, c.name, c.user_id)
         );
         return userCollections;
+    }
+
+    static async getById(userId, collectionId) {
+        const results = await db.query(
+            `SELECT * FROM collections WHERE id = $1 AND user_id = $2;`,
+            [collectionId, userId]
+        );
+        const c = results.rows[0];
+        if (!c) {
+            throw new ExpressError(
+                `User's collection ${collectionId} not found`
+            );
+        }
+        return new UserCollection(c.id, c.name, c.user_id);
     }
 }
 

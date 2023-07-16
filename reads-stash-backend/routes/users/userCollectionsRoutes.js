@@ -23,11 +23,11 @@ router.get(
     async function getOneUserCollection(req, res, next) {
         try {
             const { userId, collectionId } = req.params;
-            const results = await db.query(
-                `SELECT * FROM collections WHERE id = $1 AND user_id = $2;`,
-                [collectionId, userId]
+            const collection = await UserCollection.getById(
+                userId,
+                collectionId
             );
-            return res.status(200).json(results.rows);
+            return res.status(200).json(collection);
         } catch (error) {
             return next(error);
         }
