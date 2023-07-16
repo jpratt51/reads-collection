@@ -39,17 +39,15 @@ router.post("/:userId/badges", async function createUserBadge(req, res, next) {
 });
 
 router.delete(
-    "/:userId/badges/:users_badgeId",
+    "/:userId/badges/:userBadgeId",
     async function deleteUserBadge(req, res, next) {
         try {
-            const { userId, usersBadgeId } = req.params;
-            await db.query(
-                "DELETE FROM users_badges WHERE id = $1 AND user_id = $2;",
-                [usersBadgeId, userId]
-            );
+            const { userId, userBadgeId } = req.params;
+            const userBadge = await UserBadge.getById(userId, userBadgeId);
+            await userBadge.delete(userId);
             return res
                 .status(200)
-                .json({ msg: `Deleted user's badge ${usersBadgeId}` });
+                .json({ msg: `Deleted user's badge ${userBadgeId}` });
         } catch (error) {
             return next(error);
         }

@@ -42,6 +42,13 @@ class UserBadge {
 
         return new UserBadge(b.id, b.user_id, b.badge_id);
     }
+
+    async delete(userId) {
+        await db.query(
+            "DELETE FROM users_badges WHERE id = $1 AND user_id = $2;",
+            [this.id, userId]
+        );
+    }
 }
 
 module.exports = UserBadge;
