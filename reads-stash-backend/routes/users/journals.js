@@ -50,17 +50,14 @@ router.patch(
     async function updateUserJournal(req, res, next) {
         try {
             let date = new Date().toJSON().slice(0, 10);
-            const { columns, values } = dataToSql(req.body);
             const { userId, journalId } = req.params;
-            const results = await db.query(
-                `UPDATE journals SET ${columns}, date = $${values.length + 1}
-                WHERE id = $${values.length + 2} AND user_id = $${
-                    values.length + 3
-                }
-                RETURNING *`,
-                [...values, date, journalId, userId]
-            );
-            return res.status(200).send(results.rows);
+            const inputs = req.body;
+            const journal = await UserJournal.getById(userId, journalId);
+            journal.date = date;
+            inputs.title ? (journal.title = inputs.title) : null;
+            inputs.text ? (journal.text = inputs.text) : null;
+            await journal.update();
+            return res.status(200).json(journal);
         } catch (error) {
             return next(error);
         }

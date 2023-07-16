@@ -45,6 +45,17 @@ class UserJournal {
         return new UserJournal(j.id, j.title, j.date, j.text, j.user_id);
     }
 
+    async update() {
+        const results = await db.query(
+            `UPDATE journals
+                    SET title = $1,
+                    text = $2
+                    WHERE id = $3 AND user_id = $4
+                    RETURNING *`,
+            [this.title, this.text, this.id, this.user_id]
+        );
+    }
+
     async delete(userId) {
         await db.query("DELETE FROM journals WHERE id = $1 AND user_id = $2;", [
             this.id,
