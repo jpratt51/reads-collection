@@ -71,10 +71,11 @@ router.delete(
     async function deleteUserCollection(req, res, next) {
         try {
             const { userId, collectionId } = req.params;
-            await db.query(
-                "DELETE FROM collections WHERE id = $1 AND user_id = $2;",
-                [collectionId, userId]
+            const userCollection = await UserCollection.getById(
+                userId,
+                collectionId
             );
+            await userCollection.delete(userId);
             return res
                 .status(200)
                 .json({ msg: `Deleted user collection ${collectionId}` });

@@ -44,6 +44,13 @@ class UserCollection {
 
         return new UserCollection(c.id, c.name, c.user_id);
     }
+
+    async delete(userId) {
+        await db.query(
+            "DELETE FROM collections WHERE id = $1 AND user_id = $2;",
+            [this.id, userId]
+        );
+    }
 }
 
 module.exports = UserCollection;
