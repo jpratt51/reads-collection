@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("../../db");
+const ExpressError = require("../../expressError");
 
 class Read {
     constructor(
@@ -30,12 +31,31 @@ class Read {
                     r.title,
                     r.description,
                     r.isbn,
-                    r.avgRating,
-                    r.printType,
+                    r.avg_rating,
+                    r.print_type,
                     r.publisher
                 )
         );
         return reads;
+    }
+
+    static async getById(readId) {
+        const results = await db.query(`SELECT * FROM reads WHERE id = $1;`, [
+            readId,
+        ]);
+        const r = results.rows[0];
+        if (!r) {
+            throw new ExpressError(`Read ${readId} not found`);
+        }
+        return new Read(
+            r.id,
+            r.title,
+            r.description,
+            r.isbn,
+            r.avg_rating,
+            r.print_type,
+            r.publisher
+        );
     }
 }
 

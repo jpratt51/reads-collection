@@ -17,10 +17,8 @@ router.get("/", async function getAllReads(req, res, next) {
 router.get("/:readId", async function getOneRead(req, res, next) {
     try {
         const { readId } = req.params;
-        const results = await db.query(`SELECT * FROM reads WHERE id = $1;`, [
-            readId,
-        ]);
-        return res.status(200).json(results.rows);
+        const read = await Read.getById(readId);
+        return res.status(200).json(read);
     } catch (error) {
         return next(error);
     }
