@@ -20,7 +20,7 @@ router.get(
     async function getOneUserRead(req, res, next) {
         try {
             const { userId, usersReadsId } = req.params;
-            let userRead = await UserRead.getById(userId, usersReadsId);
+            const userRead = await UserRead.getById(userId, usersReadsId);
             return res.status(200).json(userRead);
         } catch (error) {
             return next(error);
@@ -28,11 +28,12 @@ router.get(
     }
 );
 
-router.post("/:userId/reads", function createUserRead(req, res, next) {
+router.post("/:userId/reads", async function createUserRead(req, res, next) {
     try {
-        return res
-            .status(201)
-            .json({ msg: "Dummy created user read response" });
+        const { userId } = req.params;
+        const { readId } = req.body;
+        const userRead = await UserRead.create(userId, readId);
+        return res.status(201).json(userRead);
     } catch (error) {
         return next(error);
     }

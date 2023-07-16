@@ -50,6 +50,23 @@ class UserRead {
             r.read_id
         );
     }
+
+    static async create(userId, readId) {
+        const results = await db.query(
+            "INSERT INTO users_reads (user_id, read_id) VALUES ($1, $2) RETURNING id, user_id, read_id",
+            [userId, readId]
+        );
+        const r = results.rows[0];
+
+        return new UserRead(
+            r.id,
+            r.rating,
+            r.review_text,
+            r.review_date,
+            r.user_id,
+            r.read_id
+        );
+    }
 }
 
 module.exports = UserRead;
