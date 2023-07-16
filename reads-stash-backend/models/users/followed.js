@@ -43,10 +43,10 @@ class UserFollowed {
         return new UserFollowed(f.id, f.followed_id, f.user_id);
     }
 
-    async delete(userId) {
+    async delete() {
         await db.query(
             "DELETE FROM users_followed WHERE followed_id = $1 AND user_id = $2;",
-            [this.id, userId]
+            [this.followedId, this.userId]
         );
     }
 }

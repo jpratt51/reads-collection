@@ -50,7 +50,7 @@ router.delete(
         try {
             const { userId, followedId } = req.params;
             const followed = await UserFollowed.getById(userId, followedId);
-            await followed.delete(userId);
+            await followed.delete();
             return res.status(200).json({
                 msg: `User ${userId} stopped following user ${followedId}`,
             });
