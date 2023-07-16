@@ -61,6 +61,13 @@ class UserRecommendation {
             r.receiver_id
         );
     }
+
+    async delete(userId) {
+        await db.query(
+            "DELETE FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $1 AND receiver_id = $2",
+            [this.id, userId]
+        );
+    }
 }
 
 module.exports = UserRecommendation;

@@ -76,10 +76,11 @@ router.delete(
     async function deleteUserRecommendation(req, res, next) {
         try {
             const { userId, recommendationId } = req.params;
-            await db.query(
-                "DELETE FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $1 AND receiver_id = $2",
-                [recommendationId, userId]
+            const recommendation = await UserRecommendation.getById(
+                recommendationId,
+                userId
             );
+            await recommendation.delete(userId);
             return res.status(200).json({
                 msg: `Deleted user recommendation ${recommendationId}`,
             });
