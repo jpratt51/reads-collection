@@ -34,6 +34,16 @@ class UserCollection {
         }
         return new UserCollection(c.id, c.name, c.user_id);
     }
+
+    static async create(name, userId) {
+        const results = await db.query(
+            "INSERT INTO collections (name, user_id) VALUES ($1, $2) RETURNING * ;",
+            [name, userId]
+        );
+        const c = results.rows[0];
+
+        return new UserCollection(c.id, c.name, c.user_id);
+    }
 }
 
 module.exports = UserCollection;

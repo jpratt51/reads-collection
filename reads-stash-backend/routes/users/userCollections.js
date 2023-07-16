@@ -39,11 +39,8 @@ router.post(
     async function createUserCollection(req, res, next) {
         try {
             const { name, userId } = req.body;
-            const results = await db.query(
-                "INSERT INTO collections (name, user_id) VALUES ($1, $2) RETURNING * ;",
-                [name, userId]
-            );
-            return res.status(201).json(results.rows);
+            const collection = await UserCollection.create(name, userId);
+            return res.status(201).json(collection);
         } catch (error) {
             return next(error);
         }
