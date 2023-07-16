@@ -67,6 +67,13 @@ class UserRead {
             r.read_id
         );
     }
+
+    async delete(userId) {
+        await db.query(
+            "DELETE FROM users_reads WHERE id = $1 AND user_id = $2;",
+            [this.id, userId]
+        );
+    }
 }
 
 module.exports = UserRead;

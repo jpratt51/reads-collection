@@ -44,10 +44,8 @@ router.delete(
     async function deleteUserRead(req, res, next) {
         try {
             const { userId, usersReadsId } = req.params;
-            await db.query(
-                "DELETE FROM users_reads WHERE id = $1 AND user_id = $2;",
-                [usersReadsId, userId]
-            );
+            const read = await UserRead.getById(userId, usersReadsId);
+            await read.delete(userId);
             return res
                 .status(200)
                 .json({ msg: `Deleted user read ${usersReadsId}` });
