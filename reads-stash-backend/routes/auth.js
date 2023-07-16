@@ -4,6 +4,7 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../db");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/users/user");
 
 router.post("/register", async function registerUser(req, res, next) {
@@ -32,7 +33,6 @@ router.post("/login", async function loginUser(req, res, next) {
         if (!username || !password) {
             throw new ExpressError("Username and password required", 400);
         }
-        const hashedPw = await bcrypt.hash(password, 12);
         const user = await User.getByUsername(username);
         if (await bcrypt.compare(password, user.password)) {
             return res.json({ message: "Successfully logged in!" });
