@@ -72,6 +72,20 @@ class User {
         return new User(u.id, u.username, u.fname, u.lname, u.email);
     }
 
+    async update() {
+        console.log("hi");
+        console.log(this.username, this.fname, this.lname, this.email, this.id);
+        await db.query(
+            `UPDATE users
+            SET username = $1,
+            fname = $2,
+            lname = $3,
+            email = $4
+            WHERE id = $5;`,
+            [this.username, this.fname, this.lname, this.email, this.id]
+        );
+    }
+
     async delete() {
         await db.query(`DELETE FROM users WHERE id = $1;`, [this.id]);
     }

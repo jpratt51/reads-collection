@@ -37,15 +37,15 @@ router.post("/", async function createUser(req, res, next) {
 
 router.patch("/:userId", async function updateUser(req, res, next) {
     try {
-        const { columns, values } = dataToSql(req.body);
         const { userId } = req.params;
-        const results = await db.query(
-            `UPDATE users SET ${columns}
-            WHERE id=$${values.length + 1}
-            RETURNING username, fname, lname, email`,
-            [...values, userId]
-        );
-        return res.status(200).json(results.rows);
+        const inputs = req.body;
+        const user = await User.getById(userId);
+        inputs.username ? (user.username = inputs.username) : null;
+        inputs.fname ? (user.fname = inputs.fname) : null;
+        inputs.lname ? (user.lname = inputs.lname) : null;
+        inputs.email ? (user.email = inputs.email) : null;
+        await user.update();
+        return res.status(200).json(user);
     } catch (error) {
         return next(error);
     }
