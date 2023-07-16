@@ -49,10 +49,8 @@ router.delete(
     async function deleteUserFollowed(req, res, next) {
         try {
             const { userId, followedId } = req.params;
-            await db.query(
-                "DELETE FROM users_followed WHERE followed_id = $1 AND user_id = $2;",
-                [followedId, userId]
-            );
+            const followed = await UserFollowed.getById(userId, followedId);
+            await followed.delete(userId);
             return res.status(200).json({
                 msg: `User ${userId} stopped following user ${followedId}`,
             });
