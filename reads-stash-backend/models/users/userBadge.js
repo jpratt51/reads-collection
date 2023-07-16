@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("../../db");
+const ExpressError = require("../../expressError");
 
 class UserBadge {
     constructor(id, user_id, badge_id) {
@@ -15,9 +16,21 @@ class UserBadge {
             [userId]
         );
         const userBadges = results.rows.map(
-            (c) => new UserBadge(c.id, c.user_id, c.badge_id)
+            (b) => new UserBadge(b.id, b.user_id, b.badge_id)
         );
         return userBadges;
+    }
+
+    static async getById(userId, badgeId) {
+        const results = await db.query(
+            `SELECT * FROM users_badges WHERE id = $1 AND user_id = $2;`,
+            [badgeId, userId]
+        );
+        const b = results.rows[0];
+        if (!b) {
+            throw new ExpressError(`User's badge ${badgeId} not found`);
+        }
+        return new UserBadge(b.id, b.user_id, b.badge_id);
     }
 }
 
