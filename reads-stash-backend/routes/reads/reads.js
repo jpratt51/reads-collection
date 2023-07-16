@@ -31,7 +31,7 @@ router.post("/", async function createRead(req, res, next) {
             title,
             description,
             isbn,
-            averageRating,
+            avgRating,
             printType,
             publisher,
         } = req.body;
@@ -40,7 +40,7 @@ router.post("/", async function createRead(req, res, next) {
             title,
             description,
             isbn,
-            averageRating,
+            avgRating,
             printType,
             publisher
         );
