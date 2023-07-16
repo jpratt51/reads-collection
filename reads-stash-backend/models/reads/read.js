@@ -57,6 +57,40 @@ class Read {
             r.publisher
         );
     }
+
+    static async create(
+        thumbnail,
+        title,
+        description,
+        isbn,
+        avgRating,
+        printType,
+        publisher
+    ) {
+        const results = await db.query(
+            "INSERT INTO reads (thumbnail, title, description, isbn, average_rating, print_type, publisher) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING * ;",
+            [
+                thumbnail,
+                title,
+                description,
+                isbn,
+                avgRating,
+                printType,
+                publisher,
+            ]
+        );
+        const r = results.rows[0];
+
+        return new Read(
+            r.id,
+            r.title,
+            r.description,
+            r.isbn,
+            r.avg_rating,
+            r.print_type,
+            r.publisher
+        );
+    }
 }
 
 module.exports = Read;
