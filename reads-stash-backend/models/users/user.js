@@ -71,6 +71,10 @@ class User {
 
         return new User(u.id, u.username, u.fname, u.lname, u.email);
     }
+
+    async delete() {
+        await db.query(`DELETE FROM users WHERE id = $1;`, [this.id]);
+    }
 }
 
 module.exports = User;

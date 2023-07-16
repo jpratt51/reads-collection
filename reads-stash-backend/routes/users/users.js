@@ -54,7 +54,8 @@ router.patch("/:userId", async function updateUser(req, res, next) {
 router.delete("/:userId", async function deleteUser(req, res, next) {
     try {
         const { userId } = req.params;
-        await db.query("DELETE FROM users WHERE id = $1", [userId]);
+        const user = await User.getById(userId);
+        await user.delete();
         return res.status(200).json({ msg: `Deleted user ${userId}` });
     } catch (error) {
         return next(error);
