@@ -37,11 +37,8 @@ router.post(
     async function createUserJournal(req, res, next) {
         try {
             const { title, date, text, userId } = req.body;
-            const results = await db.query(
-                "INSERT INTO journals (title, date, text, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
-                [title, date, text, userId]
-            );
-            return res.status(201).json(results.rows);
+            const journal = await UserJournal.create(title, date, text, userId);
+            return res.status(201).json(journal);
         } catch (error) {
             return next(error);
         }

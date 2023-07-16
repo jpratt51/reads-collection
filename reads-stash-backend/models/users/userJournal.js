@@ -34,6 +34,16 @@ class UserJournal {
         }
         return new UserJournal(j.id, j.title, j.date, j.text, j.user_id);
     }
+
+    static async create(title, date, text, userId) {
+        const results = await db.query(
+            "INSERT INTO journals (title, date, text, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
+            [title, date, text, userId]
+        );
+        const j = results.rows[0];
+
+        return new UserJournal(j.id, j.title, j.date, j.text, j.user_id);
+    }
 }
 
 module.exports = UserJournal;
