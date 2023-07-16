@@ -44,6 +44,13 @@ class UserJournal {
 
         return new UserJournal(j.id, j.title, j.date, j.text, j.user_id);
     }
+
+    async delete(userId) {
+        await db.query("DELETE FROM journals WHERE id = $1 AND user_id = $2;", [
+            this.id,
+            userId,
+        ]);
+    }
 }
 
 module.exports = UserJournal;
