@@ -32,6 +32,16 @@ class UserBadge {
         }
         return new UserBadge(b.id, b.user_id, b.badge_id);
     }
+
+    static async create(userId, badgeId) {
+        const results = await db.query(
+            "INSERT INTO users_badges (user_id, badge_id) VALUES ($1, $2) RETURNING * ;",
+            [userId, badgeId]
+        );
+        const b = results.rows[0];
+
+        return new UserBadge(b.id, b.user_id, b.badge_id);
+    }
 }
 
 module.exports = UserBadge;

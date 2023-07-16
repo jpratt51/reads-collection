@@ -31,11 +31,8 @@ router.get(
 router.post("/:userId/badges", async function createUserBadge(req, res, next) {
     try {
         const { userId, badgeId } = req.body;
-        const results = await db.query(
-            "INSERT INTO users_badges (user_id, badge_id) VALUES ($1, $2) RETURNING * ;",
-            [userId, badgeId]
-        );
-        return res.status(201).json(results.rows);
+        const badge = await UserBadge.create(userId, badgeId);
+        return res.status(201).json(badge);
     } catch (error) {
         return next(error);
     }
