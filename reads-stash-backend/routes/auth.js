@@ -16,6 +16,9 @@ route.post("/register", async function registerUser(req, res, next) {
         const user = await User.create(username, fname, lname, email, hashedPw);
         return res.status(201).json(user);
     } catch (error) {
+        if (error.code === "23505") {
+            throw new ExpressError("Username taken. Please pick another.", 400);
+        }
         return next(e);
     }
 });
