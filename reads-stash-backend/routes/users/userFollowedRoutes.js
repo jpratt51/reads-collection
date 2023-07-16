@@ -3,17 +3,15 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
+const UserFollowed = require("../../models/users/userFollowed");
 
 router.get(
     "/:userId/followed",
     async function getAllUserFollowed(req, res, next) {
         try {
             const { userId } = req.params;
-            const results = await db.query(
-                `SELECT * FROM users_followed WHERE user_id = $1;`,
-                [userId]
-            );
-            return res.status(200).json(results.rows);
+            let followed = await UserFollowed.getAll(userId);
+            return res.status(200).json(followed);
         } catch (error) {
             return next(error);
         }
@@ -25,11 +23,8 @@ router.get(
     async function getOneUserFollowed(req, res, next) {
         try {
             const { userId, followedId } = req.params;
-            const results = await db.query(
-                `SELECT * FROM users_followed WHERE id = $1 AND user_id = $2;`,
-                [followedId, userId]
-            );
-            return res.status(200).json(results.rows);
+            let followed = await UserFollowed.getById(userId, followedId);
+            return res.status(200).json(followed);
         } catch (error) {
             return next(error);
         }
