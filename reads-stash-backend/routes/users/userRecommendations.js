@@ -39,11 +39,12 @@ router.post(
     async function createUserRecommendation(req, res, next) {
         try {
             const { recommendation, receiverId, senderId } = req.body;
-            const results = await db.query(
-                "INSERT INTO recommendations (recommendation, receiver_id, sender_id) VALUES ($1, $2, $3) RETURNING *",
-                [recommendation, receiverId, senderId]
+            const newRecommendation = await UserRecommendation.create(
+                recommendation,
+                receiverId,
+                senderId
             );
-            return res.status(201).json(results.rows);
+            return res.status(201).json(newRecommendation);
         } catch (error) {
             return next(error);
         }

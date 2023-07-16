@@ -46,6 +46,21 @@ class UserRecommendation {
             r.receiver_id
         );
     }
+
+    static async create(recommendation, receiverId, senderId) {
+        const results = await db.query(
+            "INSERT INTO recommendations (recommendation, receiver_id, sender_id) VALUES ($1, $2, $3) RETURNING *",
+            [recommendation, receiverId, senderId]
+        );
+        const r = results.rows[0];
+
+        return new UserRecommendation(
+            r.id,
+            r.recommendation,
+            r.sender_id,
+            r.receiver_id
+        );
+    }
 }
 
 module.exports = UserRecommendation;
