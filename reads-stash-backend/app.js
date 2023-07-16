@@ -2,21 +2,21 @@ const express = require("express");
 const ExpressError = require("./expressError");
 
 // user routers
-const userRoutes = require("./routes/users/userRoutes");
-const userCollectionsRoutes = require("./routes/users/userCollectionsRoutes");
-const userReadsRoutes = require("./routes/users/userReadsRoutes");
-const userBadgesRoutes = require("./routes/users/userBadgesRoutes.js");
-const userJournalsRoutes = require("./routes/users/userJournalsRoutes.js");
-const userFollowersRoutes = require("./routes/users/userFollowersRoutes.js");
-const userFollowedRoutes = require("./routes/users/userFollowedRoutes.js");
-const userRecommendationsRoutes = require("./routes/users/userRecommendationsRoutes.js");
+const userRoutes = require("./routes/users/users");
+const userCollectionsRoutes = require("./routes/users/userCollections");
+const userReadsRoutes = require("./routes/users/userReads");
+const userBadgesRoutes = require("./routes/users/userBadges.js");
+const userJournalsRoutes = require("./routes/users/userJournals.js");
+const userFollowersRoutes = require("./routes/users/userFollowers.js");
+const userFollowedRoutes = require("./routes/users/userFollowed.js");
+const userRecommendationsRoutes = require("./routes/users/userRecommendations.js");
 
 // reads routers
-const readRoutes = require("./routes/reads/readRoutes.js");
-const readCollectionsRoutes = require("./routes/reads/readCollectionsRoutes.js");
+const readRoutes = require("./routes/reads/reads.js");
+const readCollectionsRoutes = require("./routes/reads/readCollections.js");
 
 // other routers
-const badgeRoutes = require("./routes/badgeRoutes.js");
+const badgeRoutes = require("./routes/badges.js");
 
 const app = express();
 
