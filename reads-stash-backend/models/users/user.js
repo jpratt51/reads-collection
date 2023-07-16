@@ -55,11 +55,21 @@ class User {
             u.username,
             u.fname,
             u.lname,
-            u.emai,
+            u.email,
             u.exp,
             u.total_books,
             u.total_pages
         );
+    }
+
+    static async create(username, fname, lname, email, password) {
+        const results = await db.query(
+            "INSERT INTO users (username, fname, lname, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            [username, fname, lname, email, password]
+        );
+        const u = results.rows[0];
+
+        return new User(u.id, u.username, u.fname, u.lname, u.email);
     }
 }
 

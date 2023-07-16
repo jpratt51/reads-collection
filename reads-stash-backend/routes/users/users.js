@@ -28,11 +28,8 @@ router.get("/:userId", async function getOneUser(req, res, next) {
 router.post("/", async function createUser(req, res, next) {
     try {
         const { username, fname, lname, email, password } = req.body;
-        const results = await db.query(
-            "INSERT INTO users (username, fname, lname, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-            [username, fname, lname, email, password]
-        );
-        return res.status(201).json(results.rows);
+        const user = await User.create(username, fname, lname, email, password);
+        return res.status(201).json(user);
     } catch (error) {
         return next(error);
     }
