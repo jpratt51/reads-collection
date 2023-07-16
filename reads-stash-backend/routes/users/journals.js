@@ -4,7 +4,7 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const { dataToSql } = require("../../helpers/sql.js");
-const UserJournal = require("../../models/users/userJournal");
+const UserJournal = require("../../models/users/journal");
 
 router.get(
     "/:userId/journals",

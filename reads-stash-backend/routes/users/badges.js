@@ -3,7 +3,7 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
-const UserBadge = require("../../models/users/userBadge");
+const UserBadge = require("../../models/users/badge");
 
 router.get("/:userId/badges", async function getAllUserBadges(req, res, next) {
     try {

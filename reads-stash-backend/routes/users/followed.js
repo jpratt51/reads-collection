@@ -3,7 +3,7 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
-const UserFollowed = require("../../models/users/userFollowed");
+const UserFollowed = require("../../models/users/followed");
 
 router.get(
     "/:userId/followed",

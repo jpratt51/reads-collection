@@ -3,7 +3,7 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
-const UserRecommendation = require("../../models/users/userRecommendation");
+const UserRecommendation = require("../../models/users/recommendation");
 
 router.get(
     "/:userId/recommendations",

@@ -3,7 +3,7 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
-const UserCollection = require("../../models/users/userCollection");
+const UserCollection = require("../../models/users/collection");
 
 router.get(
     "/:userId/collections",
