@@ -32,6 +32,16 @@ class UserFollowed {
         }
         return new UserFollowed(f.id, f.followed_id, f.user_id);
     }
+
+    static async create(followedId, userId) {
+        const results = await db.query(
+            "INSERT INTO users_followed (followed_id, user_id) VALUES ($1, $2) RETURNING * ;",
+            [followedId, userId]
+        );
+        const f = results.rows[0];
+
+        return new UserFollowed(f.id, f.followed_id, f.user_id);
+    }
 }
 
 module.exports = UserFollowed;

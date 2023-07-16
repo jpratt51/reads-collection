@@ -36,11 +36,8 @@ router.post(
     async function createUserFollowed(req, res, next) {
         try {
             const { followedId, userId } = req.body;
-            const results = await db.query(
-                "INSERT INTO users_followed (followed_id, user_id) VALUES ($1, $2) RETURNING * ;",
-                [followedId, userId]
-            );
-            return res.status(201).json(results.rows);
+            const followed = await UserFollowed.create(followedId, userId);
+            return res.status(201).json(followed);
         } catch (error) {
             return next(error);
         }
