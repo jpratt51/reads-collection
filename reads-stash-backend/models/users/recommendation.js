@@ -63,7 +63,7 @@ class UserRecommendation {
     }
 
     async update(userId) {
-        const results = await db.query(
+        await db.query(
             `UPDATE recommendations
                     SET recommendation = $1
                     WHERE id = $2 AND sender_id = $3

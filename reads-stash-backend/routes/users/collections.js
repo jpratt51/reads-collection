@@ -53,13 +53,13 @@ router.patch(
         try {
             const { userId, collectionId } = req.params;
             const { name } = req.body;
-            const results = await db.query(
-                `UPDATE collections SET name = $1 
-                WHERE id = $2 AND user_id = $3 
-                RETURNING *;`,
-                [name, collectionId, userId]
+            const collection = await UserCollection.getById(
+                userId,
+                collectionId
             );
-            return res.status(200).json(results.rows);
+            name ? (collection.name = name) : null;
+            await collection.update();
+            return res.status(200).json(collection);
         } catch (error) {
             return next(error);
         }

@@ -45,6 +45,16 @@ class UserCollection {
         return new UserCollection(c.id, c.name, c.user_id);
     }
 
+    async update() {
+        await db.query(
+            `UPDATE collections
+                    SET name = $1
+                    WHERE id = $2 AND user_id = $3
+                    RETURNING *`,
+            [this.name, this.id, this.user_id]
+        );
+    }
+
     async delete(userId) {
         await db.query(
             "DELETE FROM collections WHERE id = $1 AND user_id = $2;",

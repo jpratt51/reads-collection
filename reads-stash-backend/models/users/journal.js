@@ -46,7 +46,7 @@ class UserJournal {
     }
 
     async update() {
-        const results = await db.query(
+        await db.query(
             `UPDATE journals
                     SET title = $1,
                     text = $2
