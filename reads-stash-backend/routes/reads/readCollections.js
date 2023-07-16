@@ -3,17 +3,19 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
+const ReadCollection = require("../../models/reads/collection");
 
 router.post(
     "/:readId/collections",
     async function createReadCollection(req, res, next) {
         try {
-            const { readId, collectionId } = req.body;
-            const results = await db.query(
-                "INSERT INTO reads_collections (read_id, collection_id) VALUES ($1, $2) RETURNING * ;",
-                [readId, collectionId]
+            const { readId } = req.params;
+            const { collectionId } = req.body;
+            const collection = await ReadCollection.create(
+                readId,
+                collectionId
             );
-            return res.status(201).json(results.rows);
+            return res.status(201).json(collection);
         } catch (error) {
             return next(error);
         }
