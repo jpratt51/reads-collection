@@ -52,6 +52,12 @@ class UserRead {
     }
 
     static async create(userId, readId) {
+        const readCheck = await db.query("SELECT * FROM reads WHERE id = $1", [
+            readId,
+        ]);
+
+        if (!readCheck.rows[0]) return { message: "Read not found" };
+
         const results = await db.query(
             "INSERT INTO users_reads (user_id, read_id) VALUES ($1, $2) RETURNING id, user_id, read_id",
             [userId, readId]

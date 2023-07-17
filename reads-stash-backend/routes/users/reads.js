@@ -5,6 +5,9 @@ const router = new express.Router();
 const db = require("../../db");
 const UserRead = require("../../models/users/read");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const jsonschema = require("jsonschema");
+const createUserReadSchema = require("../../schemas/createUserRead.json");
+const ExpressError = require("../../expressError");
 
 router.get(
     "/:userId/reads",
@@ -41,6 +44,16 @@ router.post(
         try {
             const { userId } = req.params;
             const { readId } = req.body;
+            const validator = jsonschema.validate(
+                req.body,
+                createUserReadSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
+
             const userRead = await UserRead.create(userId, readId);
             return res.status(201).json(userRead);
         } catch (error) {
