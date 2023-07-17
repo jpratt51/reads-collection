@@ -1,5 +1,6 @@
 const express = require("express");
 const ExpressError = require("./expressError");
+const { authenticateJWT } = require("./middleware/auth");
 
 // user routers
 const userRoutes = require("./routes/users/users");
@@ -22,6 +23,7 @@ const authRoutes = require("./routes/auth");
 const app = express();
 
 app.use(express.json());
+app.use(authenticateJWT);
 // for a RESTful api, put api in front of all routes, return 200 status code for all successfully requested routes except post requests (return 201 status code), returns should be in json object format, return json, and follow this naming conventions:
 
 // RESTful routes for a resource called snacks:
