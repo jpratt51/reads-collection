@@ -4,9 +4,11 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const UserCollection = require("../../models/users/collection");
+const { ensureLoggedIn } = require("../../middleware/auth");
 
 router.get(
     "/:userId/collections",
+    ensureLoggedIn,
     async function getAllUserCollections(req, res, next) {
         try {
             const { userId } = req.params;
@@ -20,6 +22,7 @@ router.get(
 
 router.get(
     "/:userId/collections/:collectionId",
+    ensureLoggedIn,
     async function getOneUserCollection(req, res, next) {
         try {
             const { userId, collectionId } = req.params;
@@ -36,6 +39,7 @@ router.get(
 
 router.post(
     "/:userId/collections",
+    ensureLoggedIn,
     async function createUserCollection(req, res, next) {
         try {
             const { name, userId } = req.body;
@@ -49,6 +53,7 @@ router.post(
 
 router.patch(
     "/:userId/collections/:collectionId",
+    ensureLoggedIn,
     async function updateUserCollection(req, res, next) {
         try {
             const { userId, collectionId } = req.params;
@@ -68,6 +73,7 @@ router.patch(
 
 router.delete(
     "/:userId/collections/:collectionId",
+    ensureLoggedIn,
     async function deleteUserCollection(req, res, next) {
         try {
             const { userId, collectionId } = req.params;
