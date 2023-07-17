@@ -37,7 +37,6 @@ router.post("/login", async function loginUser(req, res, next) {
         const user = await User.getByUsername(username);
         console.log(user);
         if (await bcrypt.compare(password, user.password)) {
-            console.log("hashed password passed bcrypt comparison");
             const token = jwt.sign({ username }, SECRET_KEY);
             return res.json({
                 message: "Successfully logged in!",
