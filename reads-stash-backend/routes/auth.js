@@ -15,9 +15,9 @@ router.post("/register", async function registerUser(req, res, next) {
             throw new ExpressError("Username and password required", 400);
         }
         const hashedPw = await bcrypt.hash(password, 12);
-        const user = await User.create(username, fname, lname, email, hashedPw);
-        console.log(user);
-        return res.status(201).json(user);
+        await User.create(username, fname, lname, email, hashedPw);
+        const token = jwt.sign({ username }, SECRET_KEY);
+        return res.status(201).json({ token });
     } catch (error) {
         if (error.code === "23505") {
             return next(
