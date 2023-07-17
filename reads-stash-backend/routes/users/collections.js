@@ -45,6 +45,15 @@ router.post(
     ensureLoggedIn,
     async function createUserCollection(req, res, next) {
         try {
+            const validator = jsonschema.validate(
+                req.body,
+                createUserCollectionSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
             const { name, userId } = req.body;
             const collection = await UserCollection.create(name, userId);
             return res.status(201).json(collection);
