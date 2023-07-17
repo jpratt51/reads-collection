@@ -113,12 +113,12 @@ INSERT INTO users (username, fname, lname, email, password) VALUES
 ('t4u', 't4fname', 't4lname', 't4email', 't4password'),
 ('t5u', 't5fname', 't5lname', 't5email', 't5password');
 
-INSERT INTO reads (title) VALUES 
-('t1read'),
-('t2read'),
-('t3read'),
-('t4read'),
-('t5read');
+INSERT INTO reads (title, isbn) VALUES 
+('t1read', 1234567891011),
+('t2read', 1234567891012),
+('t3read', 1234567891013),
+('t4read', 1234567891014),
+('t5read', 1234567891015);
 
 INSERT INTO collections (name, user_id) VALUES 
 ('t1ucollection', 1),
