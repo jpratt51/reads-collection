@@ -42,6 +42,7 @@
             "minLength" : 10,
             "maxLength" : 13,
             "title": "The isbn Schema",
+            "pattern" : "^[0-9]+$",
             "examples": [
                 "9780156030304"
             ]

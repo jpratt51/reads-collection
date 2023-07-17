@@ -20,4 +20,18 @@ function dataToSql(data) {
     };
 }
 
-module.exports = { dataToSql };
+function dataToSqlForCreate(data) {
+    const keys = Object.keys(data);
+    if (keys.length === 0) return { error: "No data" };
+
+    const columns = keys.map((name, idx) => `$${idx + 1}`);
+    const values = Object.values(data);
+
+    return {
+        columns: columns.join(", "),
+        values: values,
+        keys: keys.join(", "),
+    };
+}
+
+module.exports = { dataToSql, dataToSqlForCreate };

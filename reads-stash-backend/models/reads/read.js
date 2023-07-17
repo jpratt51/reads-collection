@@ -2,6 +2,7 @@
 
 const db = require("../../db");
 const ExpressError = require("../../expressError");
+const { dataToSqlForCreate } = require("../../helpers/sql");
 
 class Read {
     constructor(
@@ -58,33 +59,20 @@ class Read {
         );
     }
 
-    static async create(
-        thumbnail,
-        title,
-        description,
-        isbn,
-        avgRating,
-        printType,
-        publisher
-    ) {
+    static async create(inputs) {
         const duplicateReadCheck = await db.query(
             "SELECT * FROM reads WHERE isbn = $1",
-            [isbn]
+            [inputs.isbn]
         );
+
         if (duplicateReadCheck.rows[0])
             return { message: "Read already in database." };
 
+        const { columns, values, keys } = dataToSqlForCreate(inputs);
+
         const results = await db.query(
-            "INSERT INTO reads (thumbnail, title, description, isbn, average_rating, print_type, publisher) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING * ;",
-            [
-                thumbnail,
-                title,
-                description,
-                isbn,
-                avgRating,
-                printType,
-                publisher,
-            ]
+            `INSERT INTO reads (${keys}) VALUES (${columns}) RETURNING * `,
+            values
         );
         const r = results.rows[0];
 
