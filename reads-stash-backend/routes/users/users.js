@@ -3,8 +3,8 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
-const { dataToSql } = require("../../helpers/sql.js");
 const User = require("../../models/users/user");
+const { ensureLoggedIn } = require("../../middleware/auth");
 
 router.get("/", async function getAllUsers(req, res, next) {
     try {
@@ -15,15 +15,19 @@ router.get("/", async function getAllUsers(req, res, next) {
     }
 });
 
-router.get("/:userId", async function getOneUser(req, res, next) {
-    try {
-        const { userId } = req.params;
-        let user = await User.getById(userId);
-        return res.status(200).json(user);
-    } catch (error) {
-        return next(error);
+router.get(
+    "/:userId",
+    ensureLoggedIn,
+    async function getOneUser(req, res, next) {
+        try {
+            const { userId } = req.params;
+            let user = await User.getById(userId);
+            return res.status(200).json(user);
+        } catch (error) {
+            return next(error);
+        }
     }
-});
+);
 
 router.post("/", async function createUser(req, res, next) {
     try {
