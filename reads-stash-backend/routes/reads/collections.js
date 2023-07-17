@@ -5,6 +5,9 @@ const router = new express.Router();
 const db = require("../../db");
 const ReadCollection = require("../../models/reads/collection");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const jsonschema = require("jsonschema");
+const createReadCollectionSchema = require("../../schemas/createReadCollection.json");
+const ExpressError = require("../../expressError");
 
 router.get(
     "/:readId/collections/:collectionId",
@@ -28,6 +31,15 @@ router.post(
     ensureLoggedIn,
     async function createReadCollection(req, res, next) {
         try {
+            const validator = jsonschema.validate(
+                req.body,
+                createReadCollectionSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
             const { readId } = req.params;
             const { collectionId } = req.body;
             const collection = await ReadCollection.create(

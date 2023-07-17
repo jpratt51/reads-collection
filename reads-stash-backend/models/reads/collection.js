@@ -24,6 +24,13 @@ class ReadCollection {
     }
 
     static async create(readId, collectionId) {
+        const duplicateReadCollectionCheck = await db.query(
+            "SELECT * FROM reads_collections WHERE read_id = $1 AND collection_id = $2",
+            [readId, collectionId]
+        );
+        if (duplicateReadCollectionCheck.rows)
+            return { message: "Read collection already exists." };
+
         const results = await db.query(
             "INSERT INTO reads_collections (read_id, collection_id) VALUES ($1, $2) RETURNING * ;",
             [readId, collectionId]

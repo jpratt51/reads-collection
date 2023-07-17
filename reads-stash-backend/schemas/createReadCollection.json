@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "readId",
+        "collectionId"
+    ],
+    "properties": {
+        "readId": {
+            "type": "integer",
+            "default": 0,
+            "title": "The readId Schema",
+            "examples": [
+                1
+            ]
+        },
+        "collectionId": {
+            "type": "integer",
+            "default": 0,
+            "title": "The collectionId Schema",
+            "examples": [
+                2
+            ]
+        }
+    },
+    "examples": [{
+        "readId": 1,
+        "collectionId": 2
+    }]
+}
