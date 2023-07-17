@@ -6,6 +6,9 @@ const db = require("../../db");
 const { dataToSql } = require("../../helpers/sql.js");
 const UserJournal = require("../../models/users/journal");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const jsonschema = require("jsonschema");
+const createUserJournalSchema = require("../../schemas/createUserJournal.json");
+const ExpressError = require("../../expressError");
 
 router.get(
     "/:userId/journals",
@@ -40,7 +43,17 @@ router.post(
     ensureLoggedIn,
     async function createUserJournal(req, res, next) {
         try {
-            const { title, date, text, userId } = req.body;
+            const validator = jsonschema.validate(
+                req.body,
+                createUserJournalSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
+            const date = new Date().toJSON().slice(0, 10);
+            const { title, text, userId } = req.body;
             const journal = await UserJournal.create(title, date, text, userId);
             return res.status(201).json(journal);
         } catch (error) {

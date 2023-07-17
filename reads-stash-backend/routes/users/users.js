@@ -50,7 +50,6 @@ router.patch(
             const { userId } = req.params;
             const inputs = req.body;
             const validator = jsonschema.validate(inputs, updateUserSchema);
-            console.log(validator);
             if (!validator.valid) {
                 const listOfErrors = validator.errors.map((e) => e.stack);
                 const errors = new ExpressError(listOfErrors, 400);
