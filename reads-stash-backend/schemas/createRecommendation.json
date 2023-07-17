@@ -1,0 +1,44 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "recommendation",
+        "receiverId",
+        "senderId"
+    ],
+    "properties": {
+        "recommendation": {
+            "type": "string",
+            "default": "",
+            "title": "The recommendation Schema",
+            "examples": [
+                "test recommendation"
+            ],
+            "maxLength": 1000
+        },
+        "receiverId": {
+            "type": "integer",
+            "default": 0,
+            "title": "The receiverId Schema",
+            "examples": [
+                1
+            ]
+        },
+        "senderId": {
+            "type": "integer",
+            "default": 0,
+            "title": "The senderId Schema",
+            "examples": [
+                2
+            ]
+        }
+    },
+    "examples": [{
+        "recommendation": "test recommendation",
+        "receiverId": 1,
+        "senderId": 2
+    }]
+}

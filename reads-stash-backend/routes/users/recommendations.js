@@ -5,6 +5,9 @@ const router = new express.Router();
 const db = require("../../db");
 const UserRecommendation = require("../../models/users/recommendation");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const jsonschema = require("jsonschema");
+const createRecommendationSchema = require("../../schemas/createRecommendation.json");
+const ExpressError = require("../../expressError");
 
 router.get(
     "/:userId/recommendations",
@@ -43,6 +46,15 @@ router.post(
     async function createUserRecommendation(req, res, next) {
         try {
             const { recommendation, receiverId, senderId } = req.body;
+            const validator = jsonschema.validate(
+                req.body,
+                createRecommendationSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
             const newRecommendation = await UserRecommendation.create(
                 recommendation,
                 receiverId,
