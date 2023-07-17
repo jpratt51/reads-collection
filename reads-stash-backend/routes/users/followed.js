@@ -5,6 +5,9 @@ const router = new express.Router();
 const db = require("../../db");
 const UserFollowed = require("../../models/users/followed");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const jsonschema = require("jsonschema");
+const createUserFollowedSchema = require("../../schemas/createUserFollowed.json");
+const ExpressError = require("../../expressError");
 
 router.get(
     "/:userId/followed",
@@ -39,6 +42,15 @@ router.post(
     ensureLoggedIn,
     async function createUserFollowed(req, res, next) {
         try {
+            const validator = jsonschema.validate(
+                req.body,
+                createUserFollowedSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
             const { followedId, userId } = req.body;
             const followed = await UserFollowed.create(followedId, userId);
             return res.status(201).json(followed);
