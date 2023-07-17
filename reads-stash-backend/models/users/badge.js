@@ -23,7 +23,7 @@ class UserBadge {
 
     static async getById(userId, badgeId) {
         const results = await db.query(
-            `SELECT * FROM users_badges WHERE id = $1 AND user_id = $2;`,
+            "SELECT * FROM users_badges WHERE id = $1 AND user_id = $2;",
             [badgeId, userId]
         );
         const b = results.rows[0];
@@ -34,6 +34,14 @@ class UserBadge {
     }
 
     static async create(userId, badgeId) {
+        const userBadgeCheck = await db.query(
+            "SELECT * FROM users_badges WHERE id = $1 AND user_id = $2;",
+            [userId, badgeId]
+        );
+
+        if (userBadgeCheck.rows)
+            return { message: "User badge already exists." };
+
         const results = await db.query(
             "INSERT INTO users_badges (user_id, badge_id) VALUES ($1, $2) RETURNING * ;",
             [userId, badgeId]
