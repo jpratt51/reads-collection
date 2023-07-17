@@ -7,6 +7,7 @@ const UserCollection = require("../../models/users/collection");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const jsonschema = require("jsonschema");
 const createUserCollectionSchema = require("../../schemas/createUserCollection.json");
+const updateUserCollectionSchema = require("../../schemas/updateUserCollection.json");
 const ExpressError = require("../../expressError");
 
 router.get(
