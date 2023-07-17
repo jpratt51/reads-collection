@@ -12,7 +12,8 @@ class User {
         email,
         exp,
         total_books,
-        total_pages
+        total_pages,
+        password
     ) {
         this.id = id;
         this.username = username;
@@ -22,6 +23,7 @@ class User {
         this.exp = exp;
         this.totalBooks = total_books;
         this.totalPages = total_pages;
+        this.password = password;
     }
 
     static async getAll() {
@@ -79,7 +81,8 @@ class User {
             u.email,
             u.exp,
             u.total_books,
-            u.total_pages
+            u.total_pages,
+            u.password
         );
     }
 
