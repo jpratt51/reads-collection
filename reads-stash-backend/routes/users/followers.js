@@ -4,9 +4,11 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const UserFollower = require("../../models/users/follower");
+const { ensureLoggedIn } = require("../../middleware/auth");
 
 router.get(
     "/:userId/followers",
+    ensureLoggedIn,
     async function getAllUserFollowers(req, res, next) {
         try {
             const { userId } = req.params;
@@ -20,6 +22,7 @@ router.get(
 
 router.get(
     "/:userId/followers/:followerId",
+    ensureLoggedIn,
     async function getOneUserFollower(req, res, next) {
         try {
             const { userId, followerId } = req.params;
