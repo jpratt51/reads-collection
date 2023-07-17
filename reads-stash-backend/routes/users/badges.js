@@ -5,6 +5,9 @@ const router = new express.Router();
 const db = require("../../db");
 const UserBadge = require("../../models/users/badge");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const jsonschema = require("jsonschema");
+const createUserBadgeSchema = require("../../schemas/createUserBadge.json");
+const ExpressError = require("../../expressError");
 
 router.get(
     "/:userId/badges",
