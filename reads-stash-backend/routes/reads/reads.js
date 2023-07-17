@@ -38,14 +38,14 @@ router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
         }
         const { title, description, isbn, avgRating, printType, publisher } =
             req.body;
-        const validInputs = {
-            title,
-            description: description || null,
-            isbn,
-            avgRating: avgRating || null,
-            printType: printType || null,
-            publisher: publisher || null,
-        };
+        const validInputs = {};
+        validInputs["title"] = title;
+        validInputs["isbn"] = isbn;
+        description ? (validInputs["description"] = description) : null;
+        avgRating ? (validInputs["avgRating"] = avgRating) : null;
+        printType ? (validInputs["printType"] = printType) : null;
+        publisher ? (validInputs["publisher"] = publisher) : null;
+
         const read = await Read.create(validInputs);
         return res.status(201).json(read);
     } catch (error) {
