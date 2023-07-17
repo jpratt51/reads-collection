@@ -5,9 +5,11 @@ const router = new express.Router();
 const db = require("../../db");
 const { dataToSql } = require("../../helpers/sql.js");
 const UserJournal = require("../../models/users/journal");
+const { ensureLoggedIn } = require("../../middleware/auth");
 
 router.get(
     "/:userId/journals",
+    ensureLoggedIn,
     async function getAllUserJournals(req, res, next) {
         try {
             const { userId } = req.params;
@@ -21,6 +23,7 @@ router.get(
 
 router.get(
     "/:userId/journals/:journalId",
+    ensureLoggedIn,
     async function getOneUserJournal(req, res, next) {
         try {
             const { userId, journalId } = req.params;
@@ -34,6 +37,7 @@ router.get(
 
 router.post(
     "/:userId/journals",
+    ensureLoggedIn,
     async function createUserJournal(req, res, next) {
         try {
             const { title, date, text, userId } = req.body;
@@ -47,6 +51,7 @@ router.post(
 
 router.patch(
     "/:userId/journals/:journalId",
+    ensureLoggedIn,
     async function updateUserJournal(req, res, next) {
         try {
             let date = new Date().toJSON().slice(0, 10);
@@ -66,6 +71,7 @@ router.patch(
 
 router.delete(
     "/:userId/journals/:journalId",
+    ensureLoggedIn,
     async function deleteUserJournal(req, res, next) {
         try {
             const { userId, journalId } = req.params;
