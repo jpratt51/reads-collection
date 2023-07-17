@@ -4,6 +4,7 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const Read = require("../../models/reads/read");
+const { ensureLoggedIn } = require("../../middleware/auth");
 
 router.get("/", async function getAllReads(req, res, next) {
     try {
@@ -24,7 +25,7 @@ router.get("/:readId", async function getOneRead(req, res, next) {
     }
 });
 
-router.post("/", async function createRead(req, res, next) {
+router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
     try {
         const {
             thumbnail,
