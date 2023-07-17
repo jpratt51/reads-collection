@@ -2,6 +2,7 @@
 
 const db = require("../../db");
 const ExpressError = require("../../expressError");
+const { checkForUser } = require("../../helpers/checkForUser");
 
 class UserJournal {
     constructor(id, title, date, text, user_id) {
@@ -36,12 +37,8 @@ class UserJournal {
     }
 
     static async create(title, date, text, userId) {
-        const userCheck = await db.query("SELECT * FROM users WHERE id = $1", [
-            userId,
-        ]);
-
-        if (!userCheck.rows[0]) return { message: "User not found" };
-
+        const userCheck = await checkForUser(userId);
+        if (userCheck) return userCheck;
         const results = await db.query(
             "INSERT INTO journals (title, date, text, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
             [title, date, text, userId]
