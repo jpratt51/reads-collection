@@ -7,6 +7,7 @@ const UserRecommendation = require("../../models/users/recommendation");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const jsonschema = require("jsonschema");
 const createRecommendationSchema = require("../../schemas/createRecommendation.json");
+const updateRecommendationSchema = require("../../schemas/updateRecommendation.json");
 const ExpressError = require("../../expressError");
 
 router.get(
@@ -74,6 +75,15 @@ router.patch(
         try {
             const { userId, recommendationId } = req.params;
             const { recommendation } = req.body;
+            const validator = jsonschema.validate(
+                req.body,
+                updateRecommendationSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
             const getRecommendation = await UserRecommendation.getById(
                 recommendationId,
                 userId
