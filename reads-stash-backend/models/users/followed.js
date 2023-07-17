@@ -2,6 +2,7 @@
 
 const db = require("../../db");
 const ExpressError = require("../../expressError");
+const { checkForUser } = require("../../helpers/checkForUser");
 
 class UserFollowed {
     constructor(id, followed_id, user_id) {
@@ -34,6 +35,10 @@ class UserFollowed {
     }
 
     static async create(followedId, userId) {
+        const userCheck = await checkForUser(userId);
+        const followedCheck = await checkForUser(followedId);
+        if (userCheck) return userCheck;
+        if (followedCheck) return followedCheck;
         const results = await db.query(
             "INSERT INTO users_followed (followed_id, user_id) VALUES ($1, $2) RETURNING * ;",
             [followedId, userId]
