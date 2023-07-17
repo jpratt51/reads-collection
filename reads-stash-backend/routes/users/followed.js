@@ -4,9 +4,11 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const UserFollowed = require("../../models/users/followed");
+const { ensureLoggedIn } = require("../../middleware/auth");
 
 router.get(
     "/:userId/followed",
+    ensureLoggedIn,
     async function getAllUserFollowed(req, res, next) {
         try {
             const { userId } = req.params;
@@ -20,6 +22,7 @@ router.get(
 
 router.get(
     "/:userId/followed/:followedId",
+    ensureLoggedIn,
     async function getOneUserFollowed(req, res, next) {
         try {
             const { userId, followedId } = req.params;
@@ -33,6 +36,7 @@ router.get(
 
 router.post(
     "/:userId/followed",
+    ensureLoggedIn,
     async function createUserFollowed(req, res, next) {
         try {
             const { followedId, userId } = req.body;
@@ -46,6 +50,7 @@ router.post(
 
 router.delete(
     "/:userId/followed/:followedId",
+    ensureLoggedIn,
     async function deleteUserFollowed(req, res, next) {
         try {
             const { userId, followedId } = req.params;
