@@ -4,6 +4,7 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const ReadCollection = require("../../models/reads/collection");
+const { ensureLoggedIn } = require("../../middleware/auth");
 
 router.get(
     "/:readId/collections/:collectionId",
@@ -24,6 +25,7 @@ router.get(
 
 router.post(
     "/:readId/collections",
+    ensureLoggedIn,
     async function createReadCollection(req, res, next) {
         try {
             const { readId } = req.params;
@@ -41,6 +43,7 @@ router.post(
 
 router.delete(
     "/:readId/collections/:collectionId",
+    ensureLoggedIn,
     async function deleteReadCollection(req, res, next) {
         try {
             const { readId, collectionId } = req.params;
