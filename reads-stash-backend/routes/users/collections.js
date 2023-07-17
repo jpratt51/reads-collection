@@ -69,6 +69,15 @@ router.patch(
     ensureLoggedIn,
     async function updateUserCollection(req, res, next) {
         try {
+            const validator = jsonschema.validate(
+                req.body,
+                updateUserCollectionSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
             const { userId, collectionId } = req.params;
             const { name } = req.body;
             const collection = await UserCollection.getById(
