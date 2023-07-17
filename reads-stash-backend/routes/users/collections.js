@@ -5,6 +5,9 @@ const router = new express.Router();
 const db = require("../../db");
 const UserCollection = require("../../models/users/collection");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const jsonschema = require("jsonschema");
+const createUserCollectionSchema = require("../../schemas/createUserCollection.json");
+const ExpressError = require("../../expressError");
 
 router.get(
     "/:userId/collections",
