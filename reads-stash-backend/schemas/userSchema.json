@@ -1,0 +1,63 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "username",
+        "fname",
+        "lname",
+        "email",
+        "password"
+    ],
+    "properties": {
+        "username": {
+            "type": "string",
+            "default": "",
+            "title": "The username Schema",
+            "examples": [
+                "testUsername"
+            ]
+        },
+        "fname": {
+            "type": "string",
+            "default": "",
+            "title": "The fname Schema",
+            "examples": [
+                "testfname"
+            ]
+        },
+        "lname": {
+            "type": "string",
+            "default": "",
+            "title": "The lname Schema",
+            "examples": [
+                "testlname"
+            ]
+        },
+        "email": {
+            "type": "string",
+            "default": "",
+            "title": "The email Schema",
+            "examples": [
+                "test@email.com"
+            ]
+        },
+        "password": {
+            "type": "string",
+            "default": "",
+            "title": "The password Schema",
+            "examples": [
+                "testPassword"
+            ]
+        }
+    },
+    "examples": [{
+        "username": "testUsername",
+        "fname": "testfname",
+        "lname": "testlname",
+        "email": "test@email.com",
+        "password": "testPassword"
+    }]
+}
