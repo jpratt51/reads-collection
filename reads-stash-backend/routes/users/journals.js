@@ -8,6 +8,7 @@ const UserJournal = require("../../models/users/journal");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const jsonschema = require("jsonschema");
 const createUserJournalSchema = require("../../schemas/createUserJournal.json");
+const updateUserJournalSchema = require("../../schemas/updateUserJournal.json");
 const ExpressError = require("../../expressError");
 
 router.get(
@@ -67,6 +68,15 @@ router.patch(
     ensureLoggedIn,
     async function updateUserJournal(req, res, next) {
         try {
+            const validator = jsonschema.validate(
+                req.body,
+                updateUserJournalSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
             let date = new Date().toJSON().slice(0, 10);
             const { userId, journalId } = req.params;
             const inputs = req.body;
