@@ -67,6 +67,13 @@ class Read {
         printType,
         publisher
     ) {
+        const duplicateReadCheck = await db.query(
+            "SELECT * FROM reads WHERE isbn = $1",
+            [isbn]
+        );
+        if (duplicateReadCheck.rows[0])
+            return { message: "Read already in database." };
+
         const results = await db.query(
             "INSERT INTO reads (thumbnail, title, description, isbn, average_rating, print_type, publisher) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING * ;",
             [
