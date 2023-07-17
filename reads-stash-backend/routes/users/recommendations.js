@@ -4,9 +4,11 @@ const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
 const UserRecommendation = require("../../models/users/recommendation");
+const { ensureLoggedIn } = require("../../middleware/auth");
 
 router.get(
     "/:userId/recommendations",
+    ensureLoggedIn,
     async function getAllUserRecommendations(req, res, next) {
         try {
             const { userId } = req.params;
@@ -20,6 +22,7 @@ router.get(
 
 router.get(
     "/:userId/recommendations/:recommendationId",
+    ensureLoggedIn,
     async function getOneUserRecommendation(req, res, next) {
         try {
             const { recommendationId, userId } = req.params;
@@ -36,6 +39,7 @@ router.get(
 
 router.post(
     "/:userId/recommendations",
+    ensureLoggedIn,
     async function createUserRecommendation(req, res, next) {
         try {
             const { recommendation, receiverId, senderId } = req.body;
@@ -53,6 +57,7 @@ router.post(
 
 router.patch(
     "/:userId/recommendations/:recommendationId",
+    ensureLoggedIn,
     async function updateUserRecommendation(req, res, next) {
         try {
             const { userId, recommendationId } = req.params;
@@ -74,6 +79,7 @@ router.patch(
 
 router.delete(
     "/:userId/recommendations/:recommendationId",
+    ensureLoggedIn,
     async function deleteUserRecommendation(req, res, next) {
         try {
             const { userId, recommendationId } = req.params;
