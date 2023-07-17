@@ -46,7 +46,7 @@ router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
             printType: printType || null,
             publisher: publisher || null,
         };
-        const read = await Read.create(req.body);
+        const read = await Read.create(validInputs);
         return res.status(201).json(read);
     } catch (error) {
         return next(error);
