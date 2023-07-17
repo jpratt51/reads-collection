@@ -5,7 +5,8 @@
     "default": {},
     "title": "Root Schema",
     "required": [
-        "title"
+        "title",
+        "isbn"
     ],
     "properties": {
         "title": {
