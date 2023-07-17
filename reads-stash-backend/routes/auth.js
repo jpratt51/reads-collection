@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/users/user");
 const SECRET_KEY = require("../config");
 const jsonschema = require("jsonschema");
-const registerSchema = require("../schemas/userSchema.json");
+const registerSchema = require("../schemas/registerSchema.json");
 const ExpressError = require("../expressError");
 
 router.post("/register", async function registerUser(req, res, next) {
