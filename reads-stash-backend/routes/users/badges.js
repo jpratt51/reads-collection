@@ -42,6 +42,15 @@ router.post(
     ensureLoggedIn,
     async function createUserBadge(req, res, next) {
         try {
+            const validator = jsonschema.validate(
+                req.body,
+                createUserBadgeSchema
+            );
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
             const { userId, badgeId } = req.body;
             const badge = await UserBadge.create(userId, badgeId);
             return res.status(201).json(badge);
