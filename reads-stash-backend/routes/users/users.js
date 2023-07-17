@@ -6,7 +6,8 @@ const db = require("../../db");
 const User = require("../../models/users/user");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const jsonschema = require("jsonschema");
-const userSchema = require("../../schemas/userSchema.json");
+const updateUserSchema = require("../../schemas/updateUser.json");
+const ExpressError = require("../../expressError");
 
 router.get("/", ensureLoggedIn, async function getAllUsers(req, res, next) {
     try {
@@ -48,9 +49,12 @@ router.patch(
         try {
             const { userId } = req.params;
             const inputs = req.body;
-            const validator = jsonschema.validate(inputs, userSchema);
+            const validator = jsonschema.validate(inputs, updateUserSchema);
+            console.log(validator);
             if (!validator.valid) {
-                return res.json({ message: "Invalid user data" });
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
             }
             const user = await User.getById(userId);
             inputs.username ? (user.username = inputs.username) : null;
