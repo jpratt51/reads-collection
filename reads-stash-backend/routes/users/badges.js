@@ -15,6 +15,13 @@ router.get(
     async function getAllUserBadges(req, res, next) {
         try {
             const { userId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Badges",
+                    403
+                );
+                return next(invalidUser);
+            }
             const userBadges = await UserBadge.getAll(userId);
             return res.status(200).json(userBadges);
         } catch (error) {
@@ -29,6 +36,13 @@ router.get(
     async function getOneUserBadge(req, res, next) {
         try {
             const { userId, badgeId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Badges",
+                    403
+                );
+                return next(invalidUser);
+            }
             const userBadge = await UserBadge.getById(userId, badgeId);
             return res.status(200).json(userBadge);
         } catch (error) {
@@ -42,6 +56,14 @@ router.post(
     ensureLoggedIn,
     async function createUserBadge(req, res, next) {
         try {
+            const { userId, badgeId } = req.body;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Create Badges For Other Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const validator = jsonschema.validate(
                 req.body,
                 createUserBadgeSchema
@@ -51,7 +73,6 @@ router.post(
                 const errors = new ExpressError(listOfErrors, 400);
                 return next(errors);
             }
-            const { userId, badgeId } = req.body;
             const badge = await UserBadge.create(userId, badgeId);
             return res.status(201).json(badge);
         } catch (error) {
@@ -66,6 +87,13 @@ router.delete(
     async function deleteUserBadge(req, res, next) {
         try {
             const { userId, userBadgeId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Delete Other User's Badges",
+                    403
+                );
+                return next(invalidUser);
+            }
             const userBadge = await UserBadge.getById(userId, userBadgeId);
             await userBadge.delete(userId);
             return res
