@@ -15,6 +15,13 @@ router.get(
     async function getAllUserReads(req, res, next) {
         try {
             const { userId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Reads",
+                    403
+                );
+                return next(invalidUser);
+            }
             let userReads = await UserRead.getAll(userId);
             return res.status(200).json(userReads);
         } catch (error) {
@@ -29,6 +36,13 @@ router.get(
     async function getOneUserRead(req, res, next) {
         try {
             const { userId, usersReadsId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Reads",
+                    403
+                );
+                return next(invalidUser);
+            }
             const userRead = await UserRead.getById(userId, usersReadsId);
             return res.status(200).json(userRead);
         } catch (error) {
@@ -44,6 +58,13 @@ router.post(
         try {
             const { userId } = req.params;
             const { readId } = req.body;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Create Reads For Other Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const validator = jsonschema.validate(
                 req.body,
                 createUserReadSchema
@@ -68,6 +89,13 @@ router.delete(
     async function deleteUserRead(req, res, next) {
         try {
             const { userId, usersReadsId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Delete Other User's Reads",
+                    403
+                );
+                return next(invalidUser);
+            }
             const read = await UserRead.getById(userId, usersReadsId);
             await read.delete(userId);
             return res
