@@ -48,7 +48,6 @@ router.patch(
     async function updateUser(req, res, next) {
         try {
             const { userId } = req.params;
-            console.log(req.user.id, userId);
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot Update Other Users",
@@ -82,6 +81,13 @@ router.delete(
     async function deleteUser(req, res, next) {
         try {
             const { userId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Delete Other Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const user = await User.getById(userId);
             await user.delete();
             return res.status(200).json({ msg: `Deleted user ${userId}` });
