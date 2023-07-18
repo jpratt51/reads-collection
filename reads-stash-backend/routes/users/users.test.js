@@ -12,14 +12,16 @@ const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
 let testUserId;
+let test2UserId;
 
 beforeAll(async () => {
     const hashedPassword = await bcrypt.hash("secret", 1);
     const res = await db.query(
-        `INSERT INTO users (username, fname, lname, email, password) VALUES ('test1', 'tfn', 'tln', 'test@email.com', $1) RETURNING username, id`,
+        `INSERT INTO users (username, fname, lname, email, password) VALUES ('test1', 'tfn', 'tln', 'test@email.com', $1), ('test2', 'tfn', 'tln', 'test@email.com', $1) RETURNING username, id`,
         [hashedPassword]
     );
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
+    test2UserId = res.rows[1].id;
     testUserId = res.rows[0].id;
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
@@ -44,6 +46,15 @@ describe("GET /api/users", () => {
                 totalBooks: null,
                 totalPages: null,
                 username: "test1",
+            },
+            {
+                exp: null,
+                fname: "tfn",
+                id: expect.any(Number),
+                lname: "tln",
+                totalBooks: null,
+                totalPages: null,
+                username: "test2",
             },
         ]);
     });
@@ -190,5 +201,45 @@ describe("PATCH /api/users/:userId", () => {
                 status: 400,
             },
         });
+    });
+});
+
+describe("DELETE /api/users", () => {
+    test("get error message and 403 status code if valid token and other user's id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${test2UserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: { message: "Cannot Delete Other Users", status: 403 },
+        });
+    });
+
+    test("get error message and 401 status code if invalid token and current user's id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 403 status code if valid token and bad data type user id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/bad_type`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: { message: "Cannot Delete Other Users", status: 403 },
+        });
+    });
+
+    test("get deleted user message and 200 status code if valid token and valid user id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({ msg: expect.stringContaining("Deleted") });
     });
 });
