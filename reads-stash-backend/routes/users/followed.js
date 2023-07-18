@@ -15,6 +15,13 @@ router.get(
     async function getAllUserFollowed(req, res, next) {
         try {
             const { userId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Followed Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             let followed = await UserFollowed.getAll(userId);
             return res.status(200).json(followed);
         } catch (error) {
@@ -29,6 +36,13 @@ router.get(
     async function getOneUserFollowed(req, res, next) {
         try {
             const { userId, followedId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Followed Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             let followed = await UserFollowed.getById(userId, followedId);
             return res.status(200).json(followed);
         } catch (error) {
@@ -42,6 +56,14 @@ router.post(
     ensureLoggedIn,
     async function createUserFollowed(req, res, next) {
         try {
+            const { followedId, userId } = req.body;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Followed Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const validator = jsonschema.validate(
                 req.body,
                 createUserFollowedSchema
@@ -51,7 +73,6 @@ router.post(
                 const errors = new ExpressError(listOfErrors, 400);
                 return next(errors);
             }
-            const { followedId, userId } = req.body;
             const followed = await UserFollowed.create(followedId, userId);
             return res.status(201).json(followed);
         } catch (error) {
@@ -66,6 +87,13 @@ router.delete(
     async function deleteUserFollowed(req, res, next) {
         try {
             const { userId, followedId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Followed Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const followed = await UserFollowed.getById(userId, followedId);
             await followed.delete();
             return res.status(200).json({
