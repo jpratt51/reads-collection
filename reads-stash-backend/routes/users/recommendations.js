@@ -16,6 +16,13 @@ router.get(
     async function getAllUserRecommendations(req, res, next) {
         try {
             const { userId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Recommendations",
+                    403
+                );
+                return next(invalidUser);
+            }
             let recommendations = await UserRecommendation.getAll(userId);
             return res.status(200).json(recommendations);
         } catch (error) {
@@ -30,6 +37,13 @@ router.get(
     async function getOneUserRecommendation(req, res, next) {
         try {
             const { recommendationId, userId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Recommendations",
+                    403
+                );
+                return next(invalidUser);
+            }
             const recommendation = await UserRecommendation.getById(
                 recommendationId,
                 userId
@@ -47,6 +61,13 @@ router.post(
     async function createUserRecommendation(req, res, next) {
         try {
             const { recommendation, receiverId, senderId } = req.body;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Create Recommendations From Other Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const validator = jsonschema.validate(
                 req.body,
                 createRecommendationSchema
@@ -74,6 +95,13 @@ router.patch(
     async function updateUserRecommendation(req, res, next) {
         try {
             const { userId, recommendationId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Update Recommendations From Other Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const { recommendation } = req.body;
             const validator = jsonschema.validate(
                 req.body,
@@ -105,6 +133,13 @@ router.delete(
     async function deleteUserRecommendation(req, res, next) {
         try {
             const { userId, recommendationId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Delete Recommendations From Other Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const recommendation = await UserRecommendation.getById(
                 recommendationId,
                 userId
