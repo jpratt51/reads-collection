@@ -29,7 +29,7 @@ afterAll(async () => {
     await db.end();
 });
 
-describe("POST /register", () => {
+describe("POST /api/auth/register", () => {
     test("returns token and 201 status when sent valid information", async () => {
         const res = await request(app).post("/api/auth/register").send({
             username: "test2",
@@ -95,7 +95,7 @@ describe("POST /register", () => {
     });
 });
 
-describe("POST /login", () => {
+describe("POST /api/auth/login", () => {
     test("returns success message, token and 200 status with correct credentials", async () => {
         const res = await request(app).post("/api/auth/login").send({
             username: "test1",
