@@ -59,4 +59,14 @@ describe("GET /api/badges", () => {
             error: { message: "Unauthorized", status: 401 },
         });
     });
+
+    test("get error and 401 status code when sending fake token", async () => {
+        const res = await request(app)
+            .get("/api/badges")
+            .set({ _token: "faketoken" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 });
