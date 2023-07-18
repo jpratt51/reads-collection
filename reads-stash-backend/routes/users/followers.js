@@ -20,7 +20,7 @@ router.get(
                 return next(invalidUser);
             }
             let followers = await UserFollower.getAll(userId);
-            return res.status(200).json(followers);
+            return res.json(followers);
         } catch (error) {
             return next(error);
         }
@@ -41,7 +41,7 @@ router.get(
                 return next(invalidUser);
             }
             let follower = await UserFollower.getById(userId, followerId);
-            return res.status(200).json(follower);
+            return res.json(follower);
         } catch (error) {
             return next(error);
         }

@@ -19,7 +19,7 @@ router.get(
                 collectionId
             );
             console.log(readCollection);
-            return res.status(200).json(readCollection);
+            return res.json(readCollection);
         } catch (error) {
             return next(error);
         }
@@ -64,7 +64,7 @@ router.delete(
                 collectionId
             );
             await readCollection.delete();
-            return res.status(200).json({
+            return res.json({
                 msg: `Deleted read ${readId} from collection ${collectionId}`,
             });
         } catch (error) {

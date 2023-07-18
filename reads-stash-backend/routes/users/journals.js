@@ -24,7 +24,7 @@ router.get(
                 return next(invalidUser);
             }
             let journals = await UserJournal.getAll(userId);
-            return res.status(200).json(journals);
+            return res.json(journals);
         } catch (error) {
             return next(error);
         }
@@ -45,7 +45,7 @@ router.get(
                 return next(invalidUser);
             }
             let journal = await UserJournal.getById(userId, journalId);
-            return res.status(200).json(journal);
+            return res.json(journal);
         } catch (error) {
             return next(error);
         }
@@ -112,7 +112,7 @@ router.patch(
             inputs.title ? (journal.title = inputs.title) : null;
             inputs.text ? (journal.text = inputs.text) : null;
             await journal.update();
-            return res.status(200).json(journal);
+            return res.json(journal);
         } catch (error) {
             return next(error);
         }
@@ -134,9 +134,7 @@ router.delete(
             }
             const journal = await UserJournal.getById(userId, journalId);
             await journal.delete(userId);
-            return res
-                .status(200)
-                .json({ msg: `Deleted journal ${journalId}` });
+            return res.json({ msg: `Deleted journal ${journalId}` });
         } catch (error) {
             return next(error);
         }

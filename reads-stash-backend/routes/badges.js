@@ -9,7 +9,7 @@ const { ensureLoggedIn } = require("../middleware/auth");
 router.get("/", ensureLoggedIn, async function getAllBadges(req, res, next) {
     try {
         let badges = await Badge.getAll();
-        return res.status(200).json(badges);
+        return res.json(badges);
     } catch (error) {
         return next(error);
     }
@@ -22,7 +22,7 @@ router.get(
         try {
             const { badgeId } = req.params;
             let badge = await Badge.getById(badgeId);
-            return res.status(200).json(badge);
+            return res.json(badge);
         } catch (error) {
             return next(error);
         }

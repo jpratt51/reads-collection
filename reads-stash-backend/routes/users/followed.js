@@ -23,7 +23,7 @@ router.get(
                 return next(invalidUser);
             }
             let followed = await UserFollowed.getAll(userId);
-            return res.status(200).json(followed);
+            return res.json(followed);
         } catch (error) {
             return next(error);
         }
@@ -44,7 +44,7 @@ router.get(
                 return next(invalidUser);
             }
             let followed = await UserFollowed.getById(userId, followedId);
-            return res.status(200).json(followed);
+            return res.json(followed);
         } catch (error) {
             return next(error);
         }
@@ -96,7 +96,7 @@ router.delete(
             }
             const followed = await UserFollowed.getById(userId, followedId);
             await followed.delete();
-            return res.status(200).json({
+            return res.json({
                 msg: `User ${userId} stopped following user ${followedId}`,
             });
         } catch (error) {

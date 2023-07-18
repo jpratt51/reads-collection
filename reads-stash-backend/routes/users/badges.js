@@ -23,7 +23,7 @@ router.get(
                 return next(invalidUser);
             }
             const userBadges = await UserBadge.getAll(userId);
-            return res.status(200).json(userBadges);
+            return res.json(userBadges);
         } catch (error) {
             return next(error);
         }
@@ -44,7 +44,7 @@ router.get(
                 return next(invalidUser);
             }
             const userBadge = await UserBadge.getById(userId, badgeId);
-            return res.status(200).json(userBadge);
+            return res.json(userBadge);
         } catch (error) {
             return next(error);
         }
@@ -96,9 +96,7 @@ router.delete(
             }
             const userBadge = await UserBadge.getById(userId, userBadgeId);
             await userBadge.delete(userId);
-            return res
-                .status(200)
-                .json({ msg: `Deleted user's badge ${userBadgeId}` });
+            return res.json({ msg: `Deleted user's badge ${userBadgeId}` });
         } catch (error) {
             return next(error);
         }

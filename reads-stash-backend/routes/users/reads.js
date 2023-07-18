@@ -23,7 +23,7 @@ router.get(
                 return next(invalidUser);
             }
             let userReads = await UserRead.getAll(userId);
-            return res.status(200).json(userReads);
+            return res.json(userReads);
         } catch (error) {
             return next(error);
         }
@@ -44,7 +44,7 @@ router.get(
                 return next(invalidUser);
             }
             const userRead = await UserRead.getById(userId, usersReadsId);
-            return res.status(200).json(userRead);
+            return res.json(userRead);
         } catch (error) {
             return next(error);
         }
@@ -98,9 +98,7 @@ router.delete(
             }
             const read = await UserRead.getById(userId, usersReadsId);
             await read.delete(userId);
-            return res
-                .status(200)
-                .json({ msg: `Deleted user read ${usersReadsId}` });
+            return res.json({ msg: `Deleted user read ${usersReadsId}` });
         } catch (error) {
             return next(error);
         }

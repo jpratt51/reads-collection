@@ -12,7 +12,7 @@ const ExpressError = require("../../expressError");
 router.get("/", ensureLoggedIn, async function getAllUsers(req, res, next) {
     try {
         let users = await User.getAll();
-        return res.status(200).json(users);
+        return res.json(users);
     } catch (error) {
         return next(error);
     }
@@ -25,7 +25,7 @@ router.get(
         try {
             const { userId } = req.params;
             let user = await User.getById(userId);
-            return res.status(200).json(user);
+            return res.json(user);
         } catch (error) {
             return next(error);
         }
@@ -68,7 +68,7 @@ router.patch(
             inputs.lname ? (user.lname = inputs.lname) : null;
             inputs.email ? (user.email = inputs.email) : null;
             await user.update();
-            return res.status(200).json(user);
+            return res.json(user);
         } catch (error) {
             return next(error);
         }
@@ -90,7 +90,7 @@ router.delete(
             }
             const user = await User.getById(userId);
             await user.delete();
-            return res.status(200).json({ msg: `Deleted user ${userId}` });
+            return res.json({ msg: `Deleted user ${userId}` });
         } catch (error) {
             return next(error);
         }

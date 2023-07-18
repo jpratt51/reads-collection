@@ -12,7 +12,7 @@ const ExpressError = require("../../expressError");
 router.get("/", async function getAllReads(req, res, next) {
     try {
         const reads = await Read.getAll();
-        return res.status(200).json(reads);
+        return res.json(reads);
     } catch (error) {
         return next(error);
     }
@@ -22,7 +22,7 @@ router.get("/:readId", async function getOneRead(req, res, next) {
     try {
         const { readId } = req.params;
         const read = await Read.getById(readId);
-        return res.status(200).json(read);
+        return res.json(read);
     } catch (error) {
         return next(error);
     }

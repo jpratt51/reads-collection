@@ -24,7 +24,7 @@ router.get(
                 return next(invalidUser);
             }
             const collections = await UserCollection.getAll(userId);
-            return res.status(200).json(collections);
+            return res.json(collections);
         } catch (error) {
             return next(error);
         }
@@ -48,7 +48,7 @@ router.get(
                 userId,
                 collectionId
             );
-            return res.status(200).json(collection);
+            return res.json(collection);
         } catch (error) {
             return next(error);
         }
@@ -114,7 +114,7 @@ router.patch(
             );
             name ? (collection.name = name) : null;
             await collection.update();
-            return res.status(200).json(collection);
+            return res.json(collection);
         } catch (error) {
             return next(error);
         }
@@ -139,9 +139,7 @@ router.delete(
                 collectionId
             );
             await userCollection.delete(userId);
-            return res
-                .status(200)
-                .json({ msg: `Deleted user collection ${collectionId}` });
+            return res.json({ msg: `Deleted user collection ${collectionId}` });
         } catch (error) {
             return next(error);
         }

@@ -24,7 +24,7 @@ router.get(
                 return next(invalidUser);
             }
             let recommendations = await UserRecommendation.getAll(userId);
-            return res.status(200).json(recommendations);
+            return res.json(recommendations);
         } catch (error) {
             return next(error);
         }
@@ -48,7 +48,7 @@ router.get(
                 recommendationId,
                 userId
             );
-            return res.status(200).json(recommendation);
+            return res.json(recommendation);
         } catch (error) {
             return next(error);
         }
@@ -120,7 +120,7 @@ router.patch(
                 ? (getRecommendation.recommendation = recommendation)
                 : null;
             await getRecommendation.update(userId);
-            return res.status(200).json(getRecommendation);
+            return res.json(getRecommendation);
         } catch (error) {
             return next(error);
         }
@@ -145,7 +145,7 @@ router.delete(
                 userId
             );
             await recommendation.delete(userId);
-            return res.status(200).json({
+            return res.json({
                 msg: `Deleted user recommendation ${recommendationId}`,
             });
         } catch (error) {
