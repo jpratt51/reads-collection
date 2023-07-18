@@ -48,6 +48,14 @@ router.patch(
     async function updateUser(req, res, next) {
         try {
             const { userId } = req.params;
+            console.log(req.user.id, userId);
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Update Other Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const inputs = req.body;
             const validator = jsonschema.validate(inputs, updateUserSchema);
             if (!validator.valid) {
