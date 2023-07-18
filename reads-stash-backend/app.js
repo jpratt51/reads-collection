@@ -3,6 +3,7 @@
 const express = require("express");
 const ExpressError = require("./expressError");
 const { authenticateJWT } = require("./middleware/auth");
+const morgan = require("morgan");
 
 // user routers
 const userRoutes = require("./routes/users/users");
@@ -26,6 +27,7 @@ const app = express();
 
 app.use(express.json());
 app.use(authenticateJWT);
+app.use(morgan("dev"));
 
 app.use("/api/users", userRoutes);
 app.use("/api/users", userCollectionsRoutes);
