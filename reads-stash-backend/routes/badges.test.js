@@ -101,7 +101,7 @@ describe("GET /api/badges/:badgeId", () => {
 
     test("get error message and 404 status code with correct token and incorrect data type for badge id request parameter", async () => {
         const res = await request(app)
-            .get(`/api/badges/bad_type`)
+            .get(`/api/badges/badType`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(400);
         expect(res.body).toEqual({

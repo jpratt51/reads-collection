@@ -52,7 +52,7 @@ class User {
         ]);
         const u = results.rows[0];
         if (!u) {
-            throw new ExpressError(`User ${userId} not found`);
+            throw new ExpressError(`User ${userId} not found`, 404);
         }
         return new User(
             u.id,

@@ -68,7 +68,7 @@ describe("GET /api/users", () => {
 });
 
 describe("GET /api/users/:userId", () => {
-    test("get one user and 200 status code with valid token", async () => {
+    test("get one user and 200 status code with valid token and valid user id", async () => {
         console.log(testUserId);
         const res = await request(app)
             .get(`/api/users/${testUserId}`)
@@ -86,12 +86,45 @@ describe("GET /api/users/:userId", () => {
         });
     });
 
-    test("get error message and 401 status code with no token", async () => {
+    test("get error message and 401 status code with no token and valid user id", async () => {
         console.log(testUserId);
         const res = await request(app).get(`/api/users/${testUserId}`);
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
             error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 401 status code with bad token and valid user id", async () => {
+        console.log(testUserId);
+        const res = await request(app)
+            .get(`/api/users/${testUserId}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 404 status code with valid token and invalid user id", async () => {
+        console.log(testUserId);
+        const res = await request(app)
+            .get(`/api/users/1000`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(404);
+        expect(res.body).toEqual({
+            error: { message: "User 1000 not found", status: 404 },
+        });
+    });
+
+    test("get error message and 400 status code with valid token and invalid userId parameter type", async () => {
+        console.log(testUserId);
+        const res = await request(app)
+            .get(`/api/users/badType`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: { message: "Invalid user id data type", status: 400 },
         });
     });
 });
