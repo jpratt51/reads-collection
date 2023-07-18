@@ -12,6 +12,13 @@ router.get(
     async function getAllUserFollowers(req, res, next) {
         try {
             const { userId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other Users Followers",
+                    403
+                );
+                return next(invalidUser);
+            }
             let followers = await UserFollower.getAll(userId);
             return res.status(200).json(followers);
         } catch (error) {
@@ -26,6 +33,13 @@ router.get(
     async function getOneUserFollower(req, res, next) {
         try {
             const { userId, followerId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other Users Followers",
+                    403
+                );
+                return next(invalidUser);
+            }
             let follower = await UserFollower.getById(userId, followerId);
             return res.status(200).json(follower);
         } catch (error) {
