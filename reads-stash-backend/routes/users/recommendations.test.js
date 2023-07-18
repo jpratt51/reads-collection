@@ -11,9 +11,9 @@ const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
-let testUserId;
-let test2UserId;
-let test3UserId;
+
+let testUserId, test2UserId, test3UserId;
+let recId1, recId2, recId3;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
@@ -30,10 +30,14 @@ beforeAll(async () => {
     test2UserId = res.rows[1].id;
     test3UserId = res.rows[2].id;
 
-    await db.query(
-        `INSERT INTO recommendations (recommendation, receiver_id, sender_id) VALUES ('recommendation from test1 to test2', $1, $2), ('recommendation from test2 to test1', $2, $1), ('recommendation from test1 to test3', $3, $2)`,
+    const recIds = await db.query(
+        `INSERT INTO recommendations (recommendation, receiver_id, sender_id) VALUES ('recommendation from test1 to test2', $1, $2), ('recommendation from test2 to test1', $2, $1), ('recommendation from test2 to test3', $3, $1) RETURNING id`,
         [test2UserId, testUserId, test3UserId]
     );
+
+    recId1 = recIds.rows[0].id;
+    recId2 = recIds.rows[1].id;
+    recId3 = recIds.rows[2].id;
 
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
@@ -44,7 +48,7 @@ afterAll(async () => {
 });
 
 describe("GET /api/users/:userId/recommendations", () => {
-    test("get all user recommendations and 200 status code with valid token and current user id.", async () => {
+    test("get all user recommendations and 200 status code with valid token and current user id. Should not get recommendation where neither the sender or receiver id matches the current user's id.", async () => {
         const res = await request(app)
             .get(`/api/users/${testUserId}/recommendations`)
             .set({ _token: testUserToken });
@@ -52,21 +56,15 @@ describe("GET /api/users/:userId/recommendations", () => {
         expect(res.body).toEqual([
             {
                 id: expect.any(Number),
-                receiverId: expect.any(Number),
+                receiverId: test2UserId,
                 recommendation: "recommendation from test1 to test2",
-                senderId: expect.any(Number),
+                senderId: testUserId,
             },
             {
                 id: expect.any(Number),
-                receiverId: expect.any(Number),
+                receiverId: testUserId,
                 recommendation: "recommendation from test2 to test1",
-                senderId: expect.any(Number),
-            },
-            {
-                id: expect.any(Number),
-                receiverId: expect.any(Number),
-                recommendation: "recommendation from test1 to test3",
-                senderId: expect.any(Number),
+                senderId: test2UserId,
             },
         ]);
     });
@@ -105,62 +103,58 @@ describe("GET /api/users/:userId/recommendations", () => {
     });
 });
 
-// describe("GET /api/users/:userId", () => {
-//     test("get one user and 200 status code with valid token and valid user id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             email: "test@email.com",
-//             exp: null,
-//             fname: "tfn",
-//             id: expect.any(Number),
-//             lname: "tln",
-//             totalBooks: null,
-//             totalPages: null,
-//             username: "test1",
-//         });
-//     });
+describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
+    test("get one user recommendation and 200 status code with valid token, valid user id and valid user recommendation id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            id: expect.any(Number),
+            receiverId: test2UserId,
+            recommendation: "recommendation from test1 to test2",
+            senderId: testUserId,
+        });
+    });
 
-//     test("get error message and 401 status code with no token and valid user id", async () => {
-//         const res = await request(app).get(`/api/users/${testUserId}`);
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    // test("get error message and 401 status code with no token and valid user id", async () => {
+    //     const res = await request(app).get(`/api/users/${testUserId}`);
+    //     expect(res.statusCode).toBe(401);
+    //     expect(res.body).toEqual({
+    //         error: { message: "Unauthorized", status: 401 },
+    //     });
+    // });
 
-//     test("get error message and 401 status code with bad token and valid user id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    // test("get error message and 401 status code with bad token and valid user id", async () => {
+    //     const res = await request(app)
+    //         .get(`/api/users/${testUserId}`)
+    //         .set({ _token: "bad token" });
+    //     expect(res.statusCode).toBe(401);
+    //     expect(res.body).toEqual({
+    //         error: { message: "Unauthorized", status: 401 },
+    //     });
+    // });
 
-//     test("get error message and 404 status code with valid token and invalid user id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/1000`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(404);
-//         expect(res.body).toEqual({
-//             error: { message: "User 1000 not found", status: 404 },
-//         });
-//     });
+    // test("get error message and 404 status code with valid token and invalid user id", async () => {
+    //     const res = await request(app)
+    //         .get(`/api/users/1000`)
+    //         .set({ _token: testUserToken });
+    //     expect(res.statusCode).toBe(404);
+    //     expect(res.body).toEqual({
+    //         error: { message: "User 1000 not found", status: 404 },
+    //     });
+    // });
 
-//     test("get error message and 400 status code with valid token and invalid userId parameter type", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/badType`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: { message: "Invalid user id data type", status: 400 },
-//         });
-//     });
-// });
+    // test("get error message and 400 status code with valid token and invalid userId parameter type", async () => {
+    //     const res = await request(app)
+    //         .get(`/api/users/badType`)
+    //         .set({ _token: testUserToken });
+    //     expect(res.statusCode).toBe(400);
+    //     expect(res.body).toEqual({
+    //         error: { message: "Invalid user id data type", status: 400 },
+    //     });
+    // });
+});
 
 // describe("PATCH /api/users/:userId", () => {
 //     test("get updated user object and 200 status code when sending in valid token, valid userId and valid update user inputs", async () => {
