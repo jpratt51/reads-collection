@@ -71,23 +71,38 @@ describe("GET /api/users/:userId/recommendations", () => {
         ]);
     });
 
-    // test("get error message and 401 status code if no token sent", async () => {
-    //     const res = await request(app).get("/api/users");
-    //     expect(res.statusCode).toBe(401);
-    //     expect(res.body).toEqual({
-    //         error: { message: "Unauthorized", status: 401 },
-    //     });
-    // });
+    test("get error message and 401 status code if no token sent and current user id", async () => {
+        const res = await request(app).get(
+            `/api/users/${testUserId}/recommendations`
+        );
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-    // test("get error message and 401 status code if bad token sent", async () => {
-    //     const res = await request(app)
-    //         .get("/api/users")
-    //         .set({ _token: "bad token" });
-    //     expect(res.statusCode).toBe(401);
-    //     expect(res.body).toEqual({
-    //         error: { message: "Unauthorized", status: 401 },
-    //     });
-    // });
+    test("get error message and 401 status code if bad token sent and current user id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/recommendations`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 403 status code if valid token sent and other user's id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test2UserId}/recommendations`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Recommendations",
+                status: 403,
+            },
+        });
+    });
 });
 
 // describe("GET /api/users/:userId", () => {
