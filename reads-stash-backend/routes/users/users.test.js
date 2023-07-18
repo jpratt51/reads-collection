@@ -28,10 +28,39 @@ afterAll(async () => {
 });
 
 describe("GET /api/users", () => {
-    test("get all users", async () => {
+    test("get all users and 200 status code with valid token", async () => {
         const res = await request(app)
             .get("/api/users")
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual([
+            {
+                exp: null,
+                fname: "tfn",
+                id: expect.any(Number),
+                lname: "tln",
+                totalBooks: null,
+                totalPages: null,
+                username: "test1",
+            },
+        ]);
+    });
+
+    test("get error message and 401 status code if no token sent", async () => {
+        const res = await request(app).get("/api/users");
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 401 status code if bad token sent", async () => {
+        const res = await request(app)
+            .get("/api/users")
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
     });
 });
