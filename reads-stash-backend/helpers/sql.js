@@ -1,11 +1,4 @@
-// Take in data and transform it to sql for update query
-
-// Example:
-// input = {"username" : "bigDeal100", "fname" : "Big", "lname" : "Deal"}
-// output = {
-// columns: 'username = $1, fname = $2, lname = $3',
-// values: ["bigDeal100", "Big", "Deal"]
-// }
+"use strict";
 
 function dataToSql(data) {
     const keys = Object.keys(data);

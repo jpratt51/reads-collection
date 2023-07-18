@@ -1,3 +1,5 @@
+"use strict";
+
 const db = require("../db");
 
 async function checkForUser(userId) {
