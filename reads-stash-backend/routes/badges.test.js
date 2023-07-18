@@ -11,6 +11,7 @@ const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 
 let testUserToken;
+let testBadgeId;
 
 beforeAll(async () => {
     const hashedPassword = await bcrypt.hash("secret", 1);
@@ -21,9 +22,10 @@ beforeAll(async () => {
     const testUser = { username: res.username, id: res.id };
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 
-    await db.query(
-        `INSERT INTO badges (name, thumbnail) VALUES ('testBadge', 'testThumbnail'), ('testBadge2', 'testThumbnail2')`
+    const testBadges = await db.query(
+        `INSERT INTO badges (name, thumbnail) VALUES ('testBadge', 'testThumbnail'), ('testBadge2', 'testThumbnail2') RETURNING *`
     );
+    testBadgeId = await testBadges.rows[0].id;
 });
 
 afterAll(async () => {
@@ -33,7 +35,7 @@ afterAll(async () => {
 });
 
 describe("GET /api/badges", () => {
-    test("get all badges and 200 status code with correct authorization token", async () => {
+    test("get all badges and 200 status code with correct token", async () => {
         const res = await request(app)
             .get("/api/badges")
             .set({ _token: testUserToken });
@@ -67,6 +69,20 @@ describe("GET /api/badges", () => {
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
             error: { message: "Unauthorized", status: 401 },
+        });
+    });
+});
+
+describe("GET /api/badges/:badgeId", () => {
+    test("get badge object and 200 status code with correct authorization token", async () => {
+        const res = await request(app)
+            .get(`/api/badges/${testBadgeId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            id: expect.any(Number),
+            name: "testBadge",
+            thumbnail: "testThumbnail",
         });
     });
 });
