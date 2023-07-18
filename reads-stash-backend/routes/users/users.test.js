@@ -165,7 +165,7 @@ describe("PATCH /api/users/:userId", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in invalid user id, valid token and valid update user inputs", async () => {
+    test("get error message and 403 status code when sending in invalid user id data type, valid token and valid update user inputs", async () => {
         const res = await request(app)
             .patch(`/api/users/bad_type`)
             .set({ _token: testUserToken })
