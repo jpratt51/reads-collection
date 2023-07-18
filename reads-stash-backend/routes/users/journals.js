@@ -3,7 +3,6 @@
 const express = require("express");
 const router = new express.Router();
 const db = require("../../db");
-const { dataToSql } = require("../../helpers/sql.js");
 const UserJournal = require("../../models/users/journal");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const jsonschema = require("jsonschema");
@@ -17,6 +16,13 @@ router.get(
     async function getAllUserJournals(req, res, next) {
         try {
             const { userId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other Users Journals",
+                    403
+                );
+                return next(invalidUser);
+            }
             let journals = await UserJournal.getAll(userId);
             return res.status(200).json(journals);
         } catch (error) {
@@ -31,6 +37,13 @@ router.get(
     async function getOneUserJournal(req, res, next) {
         try {
             const { userId, journalId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot View Other User's Reads",
+                    403
+                );
+                return next(invalidUser);
+            }
             let journal = await UserJournal.getById(userId, journalId);
             return res.status(200).json(journal);
         } catch (error) {
@@ -44,6 +57,14 @@ router.post(
     ensureLoggedIn,
     async function createUserJournal(req, res, next) {
         try {
+            const { title, text, userId } = req.body;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Create Journals For Other Users",
+                    403
+                );
+                return next(invalidUser);
+            }
             const validator = jsonschema.validate(
                 req.body,
                 createUserJournalSchema
@@ -54,7 +75,6 @@ router.post(
                 return next(errors);
             }
             const date = new Date().toJSON().slice(0, 10);
-            const { title, text, userId } = req.body;
             const journal = await UserJournal.create(title, date, text, userId);
             return res.status(201).json(journal);
         } catch (error) {
@@ -68,6 +88,14 @@ router.patch(
     ensureLoggedIn,
     async function updateUserJournal(req, res, next) {
         try {
+            const { userId, journalId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Update Other User's Journals",
+                    403
+                );
+                return next(invalidUser);
+            }
             const validator = jsonschema.validate(
                 req.body,
                 updateUserJournalSchema
@@ -78,7 +106,6 @@ router.patch(
                 return next(errors);
             }
             let date = new Date().toJSON().slice(0, 10);
-            const { userId, journalId } = req.params;
             const inputs = req.body;
             const journal = await UserJournal.getById(userId, journalId);
             journal.date = date;
@@ -98,6 +125,13 @@ router.delete(
     async function deleteUserJournal(req, res, next) {
         try {
             const { userId, journalId } = req.params;
+            if (req.user.id != userId) {
+                const invalidUser = new ExpressError(
+                    "Cannot Delete Other User's Journals",
+                    403
+                );
+                return next(invalidUser);
+            }
             const journal = await UserJournal.getById(userId, journalId);
             await journal.delete(userId);
             return res
