@@ -20,9 +20,30 @@ beforeAll(async () => {
     );
     const testUser = { username: res.username, id: res.id };
     testUserToken = jwt.sign(testUser, SECRET_KEY);
+
+    await db.query(
+        `INSERT INTO badges (name, thumbnail) VALUES ('testBadge', 'testThumbnail')`
+    );
 });
 
 afterAll(async () => {
     await db.query("DELETE FROM users;");
+    await db.query("DELETE FROM badges;");
     await db.end();
+});
+
+describe("GET /api/badges", () => {
+    test("get all badges", async () => {
+        const res = await request(app)
+            .get("/api/badges")
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual([
+            {
+                id: expect.any(Number),
+                name: "testBadge",
+                thumbnail: "testThumbnail",
+            },
+        ]);
+    });
 });
