@@ -11,6 +11,8 @@ class UserCollection {
     }
 
     static async getAll(userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
             `SELECT * FROM collections WHERE user_id = $1;`,
             [userId]
@@ -22,6 +24,10 @@ class UserCollection {
     }
 
     static async getById(userId, collectionId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
+        if (/^\d+$/.test(collectionId) === false)
+            throw new ExpressError(`Invalid collection id data type`, 400);
         const results = await db.query(
             `SELECT * FROM collections WHERE id = $1 AND user_id = $2;`,
             [collectionId, userId]

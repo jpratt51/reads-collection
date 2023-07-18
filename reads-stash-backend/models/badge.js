@@ -19,6 +19,8 @@ class Badge {
     }
 
     static async getById(badgeId) {
+        if (/^\d+$/.test(badgeId) === false)
+            throw new ExpressError(`Invalid badge id data type`, 400);
         const results = await db.query(`SELECT * FROM badges WHERE id = $1;`, [
             badgeId,
         ]);

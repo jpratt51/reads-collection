@@ -11,6 +11,8 @@ class UserBadge {
     }
 
     static async getAll(userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
             `SELECT * FROM users_badges WHERE user_id = $1;`,
             [userId]
@@ -22,6 +24,10 @@ class UserBadge {
     }
 
     static async getById(userId, badgeId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
+        if (/^\d+$/.test(badgeId) === false)
+            throw new ExpressError(`Invalid badge id data type`, 400);
         const results = await db.query(
             "SELECT * FROM users_badges WHERE id = $1 AND user_id = $2;",
             [badgeId, userId]

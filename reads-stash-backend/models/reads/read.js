@@ -41,6 +41,8 @@ class Read {
     }
 
     static async getById(readId) {
+        if (/^\d+$/.test(readId) === false)
+            throw new ExpressError(`Invalid read id data type`, 400);
         const results = await db.query(`SELECT * FROM reads WHERE id = $1;`, [
             readId,
         ]);

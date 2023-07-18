@@ -12,6 +12,8 @@ class UserRecommendation {
     }
 
     static async getAll(userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
             `SELECT * FROM recommendations WHERE receiver_id = $1 OR sender_id = $1;`,
             [userId]
@@ -29,6 +31,10 @@ class UserRecommendation {
     }
 
     static async getById(recommendationId, userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
+        if (/^\d+$/.test(recommendationId) === false)
+            throw new ExpressError(`Invalid recommendation id data type`, 400);
         const results = await db.query(
             `SELECT * FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $1 AND receiver_id = $2;`,
             [recommendationId, userId]
@@ -73,6 +79,8 @@ class UserRecommendation {
     }
 
     async delete(userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
         await db.query(
             "DELETE FROM recommendations WHERE id = $1 AND sender_id = $2 OR id = $1 AND receiver_id = $2",
             [this.id, userId]

@@ -12,6 +12,8 @@ class UserFollowed {
     }
 
     static async getAll(userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
             `SELECT * FROM users_followed WHERE user_id = $1;`,
             [userId]
@@ -23,6 +25,10 @@ class UserFollowed {
     }
 
     static async getById(userId, followedId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
+        if (/^\d+$/.test(followedId) === false)
+            throw new ExpressError(`Invalid followed id data type`, 400);
         const results = await db.query(
             `SELECT * FROM users_followed WHERE id = $1 AND user_id = $2;`,
             [followedId, userId]

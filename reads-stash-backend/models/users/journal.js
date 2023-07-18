@@ -14,6 +14,8 @@ class UserJournal {
     }
 
     static async getAll(userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
             `SELECT * FROM journals WHERE user_id = $1;`,
             [userId]
@@ -25,6 +27,10 @@ class UserJournal {
     }
 
     static async getById(userId, journalId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
+        if (/^\d+$/.test(journalId) === false)
+            throw new ExpressError(`Invalid journal id data type`, 400);
         const results = await db.query(
             `SELECT * FROM journals WHERE id = $1 AND user_id = $2;`,
             [journalId, userId]

@@ -14,6 +14,8 @@ let testUserToken;
 let testBadgeId;
 
 beforeAll(async () => {
+    await db.query("DELETE FROM users;");
+    await db.query("DELETE FROM badges;");
     const hashedPassword = await bcrypt.hash("secret", 1);
     const res = await db.query(
         `INSERT INTO users (username, fname, lname, email, password) VALUES ('test1', 'tfn', 'tln', 'test@email.com', $1) RETURNING username, id`,
@@ -25,7 +27,7 @@ beforeAll(async () => {
     const testBadges = await db.query(
         `INSERT INTO badges (name, thumbnail) VALUES ('testBadge', 'testThumbnail'), ('testBadge2', 'testThumbnail2') RETURNING *`
     );
-    testBadgeId = await testBadges.rows[0].id;
+    testBadgeId = testBadges.rows[0].id;
 });
 
 afterAll(async () => {
@@ -74,7 +76,7 @@ describe("GET /api/badges", () => {
 });
 
 describe("GET /api/badges/:badgeId", () => {
-    test("get badge object and 200 status code with correct authorization token", async () => {
+    test("get badge object and 200 status code with correct token and valid badge id request parameter", async () => {
         const res = await request(app)
             .get(`/api/badges/${testBadgeId}`)
             .set({ _token: testUserToken });
@@ -83,6 +85,30 @@ describe("GET /api/badges/:badgeId", () => {
             id: expect.any(Number),
             name: "testBadge",
             thumbnail: "testThumbnail",
+        });
+    });
+
+    test("get error message and 401 status code with no token and valid badge id request parameter", async () => {
+        const res = await request(app).get(`/api/badges/${testBadgeId}`);
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: {
+                message: "Unauthorized",
+                status: 401,
+            },
+        });
+    });
+
+    test("get error message and 404 status code with correct token and incorrect data type for badge id request parameter", async () => {
+        const res = await request(app)
+            .get(`/api/badges/bad_type`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: "Invalid badge id data type",
+                status: 400,
+            },
         });
     });
 });

@@ -11,6 +11,10 @@ class ReadCollection {
     }
 
     static async getById(readId, collectionId) {
+        if (/^\d+$/.test(readId) === false)
+            throw new ExpressError(`Invalid read id data type`, 400);
+        if (/^\d+$/.test(collectionId) === false)
+            throw new ExpressError(`Invalid collection id data type`, 400);
         const results = await db.query(
             `SELECT * FROM reads_collections WHERE read_id = $1 AND collection_id = $2;`,
             [readId, collectionId]

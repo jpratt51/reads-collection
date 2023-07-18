@@ -45,6 +45,8 @@ class User {
     }
 
     static async getById(userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query("SELECT * FROM users WHERE id = $1", [
             userId,
         ]);
@@ -97,7 +99,6 @@ class User {
             [username, fname, lname, email, password]
         );
         const u = results.rows[0];
-        console.log(u);
         return new User(u.id, u.username, u.fname, u.lname, u.email);
     }
 

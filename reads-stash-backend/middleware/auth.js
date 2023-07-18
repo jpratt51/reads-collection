@@ -17,11 +17,10 @@ function authenticateJWT(req, res, next) {
 function ensureLoggedIn(req, res, next) {
     try {
         if (!req.user) {
-            const e = new ExpressError("Unauthorized", 401);
-            return next(e);
-        } else {
-            return next();
+            const error = new ExpressError("Unauthorized", 401);
+            return next(error);
         }
+        return next();
     } catch (error) {}
 }
 
