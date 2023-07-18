@@ -45,8 +45,9 @@ router.post("/login", async function loginUser(req, res, next) {
             throw new ExpressError("Username and password required", 400);
         }
         const user = await User.getByUsername(username);
+        const { id } = user;
         if (await bcrypt.compare(password, user.password)) {
-            const token = jwt.sign({ username }, SECRET_KEY);
+            const token = jwt.sign({ id, username }, SECRET_KEY);
             return res.json({
                 message: "Successfully logged in!",
                 token,
