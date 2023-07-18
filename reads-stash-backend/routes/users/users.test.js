@@ -11,6 +11,7 @@ const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
+let testUserId;
 
 beforeAll(async () => {
     const hashedPassword = await bcrypt.hash("secret", 1);
@@ -18,7 +19,8 @@ beforeAll(async () => {
         `INSERT INTO users (username, fname, lname, email, password) VALUES ('test1', 'tfn', 'tln', 'test@email.com', $1) RETURNING username, id`,
         [hashedPassword]
     );
-    const testUser = { username: res.username, id: res.id };
+    const testUser = { username: res.rows[0].username, id: res.rows[0].id };
+    testUserId = res.rows[0].id;
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
 
@@ -58,6 +60,35 @@ describe("GET /api/users", () => {
         const res = await request(app)
             .get("/api/users")
             .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+});
+
+describe("GET /api/users/:userId", () => {
+    test("get one user and 200 status code with valid token", async () => {
+        console.log(testUserId);
+        const res = await request(app)
+            .get(`/api/users/${testUserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            email: "test@email.com",
+            exp: null,
+            fname: "tfn",
+            id: expect.any(Number),
+            lname: "tln",
+            totalBooks: null,
+            totalPages: null,
+            username: "test1",
+        });
+    });
+
+    test("get error message and 401 status code with no token", async () => {
+        console.log(testUserId);
+        const res = await request(app).get(`/api/users/${testUserId}`);
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
             error: { message: "Unauthorized", status: 401 },
