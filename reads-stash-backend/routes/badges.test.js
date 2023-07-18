@@ -22,7 +22,7 @@ beforeAll(async () => {
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 
     await db.query(
-        `INSERT INTO badges (name, thumbnail) VALUES ('testBadge', 'testThumbnail')`
+        `INSERT INTO badges (name, thumbnail) VALUES ('testBadge', 'testThumbnail'), ('testBadge2', 'testThumbnail2')`
     );
 });
 
@@ -33,7 +33,7 @@ afterAll(async () => {
 });
 
 describe("GET /api/badges", () => {
-    test("get all badges", async () => {
+    test("get all badges and 200 status code with correct authorization token", async () => {
         const res = await request(app)
             .get("/api/badges")
             .set({ _token: testUserToken });
@@ -44,6 +44,19 @@ describe("GET /api/badges", () => {
                 name: "testBadge",
                 thumbnail: "testThumbnail",
             },
+            {
+                id: expect.any(Number),
+                name: "testBadge2",
+                thumbnail: "testThumbnail2",
+            },
         ]);
+    });
+
+    test("get error and 401 status code without authorization token", async () => {
+        const res = await request(app).get("/api/badges");
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
     });
 });
