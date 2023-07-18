@@ -26,3 +26,12 @@ afterAll(async () => {
     await db.query("DELETE FROM users;");
     await db.end();
 });
+
+describe("GET /api/users", () => {
+    test("get all users", async () => {
+        const res = await request(app)
+            .get("/api/users")
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+    });
+});
