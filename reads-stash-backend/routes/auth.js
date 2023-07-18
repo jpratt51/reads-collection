@@ -6,7 +6,7 @@ const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/users/user");
-const SECRET_KEY = require("../config");
+const { SECRET_KEY } = require("../config");
 const jsonschema = require("jsonschema");
 const registerSchema = require("../schemas/register.json");
 const ExpressError = require("../expressError");
@@ -26,7 +26,8 @@ router.post("/register", async function registerUser(req, res, next) {
         const hashedPw = await bcrypt.hash(password, 12);
         const user = await User.create(username, fname, lname, email, hashedPw);
         const { id } = user;
-        const token = jwt.sign({ id, username }, SECRET_KEY);
+        const payload = { username: username, id: id };
+        const token = jwt.sign(payload, SECRET_KEY);
         return res.status(201).json({ token });
     } catch (error) {
         if (error.code === "23505") {
@@ -46,8 +47,9 @@ router.post("/login", async function loginUser(req, res, next) {
         }
         const user = await User.getByUsername(username);
         const { id } = user;
+        const payload = { username: username, id: id };
         if (await bcrypt.compare(password, user.password)) {
-            const token = jwt.sign({ id, username }, SECRET_KEY);
+            const token = jwt.sign(payload, SECRET_KEY);
             return res.json({
                 message: "Successfully logged in!",
                 token,
