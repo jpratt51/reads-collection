@@ -134,10 +134,7 @@ router.delete(
         try {
             const { userId, recommendationId } = req.params;
             if (req.user.id != userId) {
-                const invalidUser = new ExpressError(
-                    "Cannot Delete Recommendations From Other Users",
-                    403
-                );
+                const invalidUser = new ExpressError("Invalid User ID", 403);
                 return next(invalidUser);
             }
             const recommendation = await UserRecommendation.getById(
