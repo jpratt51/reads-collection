@@ -61,6 +61,7 @@ router.post(
     async function createUserRecommendation(req, res, next) {
         try {
             const { recommendation, receiverId, senderId } = req.body;
+            const { userId } = req.params;
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot Create Recommendations From Other Users",
