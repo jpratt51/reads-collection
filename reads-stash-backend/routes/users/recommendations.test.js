@@ -179,54 +179,58 @@ describe("PATCH /api/users/:userId", () => {
         });
     });
 
-    // test("get error message and 401 status code when sending in valid user id, invalid token and valid update user inputs", async () => {
-    //     const res = await request(app)
-    //         .patch(`/api/users/${testUserId}`)
-    //         .set({ _token: "bad token" })
-    //         .send({ lname: "updatedLname" });
-    //     expect(res.statusCode).toBe(401);
-    //     expect(res.body).toEqual({
-    //         error: { message: "Unauthorized", status: 401 },
-    //     });
-    // });
+    test("get error message and 401 status code when sending in invalid token, valid user id, valid recommendation id and valid update recommendation input", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .set({ _token: "bad token" })
+            .send({ recommendation: "update recommendation?" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-    // test("get error message and 403 status code when sending in invalid user id, valid token and valid update user inputs", async () => {
-    //     const res = await request(app)
-    //         .patch(`/api/users/1000`)
-    //         .set({ _token: testUserToken })
-    //         .send({ lname: "updatedLname" });
-    //     expect(res.statusCode).toBe(403);
-    //     expect(res.body).toEqual({
-    //         error: { message: "Cannot Update Other Users", status: 403 },
-    //     });
-    // });
+    test("get error message and 403 status code when sending in valid token, invalid user id, valid recommendation id and valid update recommendation input", async () => {
+        const res = await request(app)
+            .patch(`/api/users/1000/recommendations/${recId1}`)
+            .set({ _token: testUserToken })
+            .send({ recommendation: "update recommendation?" });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Update Recommendations From Other Users",
+                status: 403,
+            },
+        });
+    });
 
-    // test("get error message and 403 status code when sending in invalid user id data type, valid token and valid update user inputs", async () => {
-    //     const res = await request(app)
-    //         .patch(`/api/users/bad_type`)
-    //         .set({ _token: testUserToken })
-    //         .send({ lname: "updatedLname" });
-    //     expect(res.statusCode).toBe(403);
-    //     expect(res.body).toEqual({
-    //         error: { message: "Cannot Update Other Users", status: 403 },
-    //     });
-    // });
+    test("get error message and 403 status code when sending in valid token, invalid user id data type, valid recommendation id and valid update recommendation input", async () => {
+        const res = await request(app)
+            .patch(`/api/users/bad_type/recommendations/${recId1}`)
+            .set({ _token: testUserToken })
+            .send({ recommendation: "update recommendation?" });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Update Recommendations From Other Users",
+                status: 403,
+            },
+        });
+    });
 
-    // test("get error message and 400 status code when sending in valid user id, valid token and invalid update user inputs", async () => {
-    //     const res = await request(app)
-    //         .patch(`/api/users/${testUserId}`)
-    //         .set({ _token: testUserToken })
-    //         .send({ username: "lol" });
-    //     expect(res.statusCode).toBe(400);
-    //     expect(res.body).toEqual({
-    //         error: {
-    //             message: [
-    //                 "instance.username does not meet minimum length of 5",
-    //             ],
-    //             status: 400,
-    //         },
-    //     });
-    // });
+    test("get error message and 400 status code when sending in valid token, valid user id, valid recommendation id and invalid update recommendation input", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .set({ _token: testUserToken })
+            .send({ recommendation: 12345 });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: ["instance.recommendation is not of a type(s) string"],
+                status: 400,
+            },
+        });
+    });
 });
 
 // describe("DELETE /api/users", () => {
