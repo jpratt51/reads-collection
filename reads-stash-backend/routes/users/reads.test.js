@@ -28,7 +28,6 @@ beforeAll(async () => {
     );
 
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
-    const test2User = { username: res.rows[1].username, id: res.rows[1].id };
 
     testUserId = res.rows[0].id;
     test2UserId = res.rows[1].id;
