@@ -117,113 +117,117 @@ describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    // test("get error message and 401 status code with no token and valid user id", async () => {
-    //     const res = await request(app).get(`/api/users/${testUserId}`);
+    test("get error message and 401 status code with no token, a valid user id and valid recommendation id", async () => {
+        const res = await request(app).get(
+            `/api/users/${testUserId}/recommendations/${recId1}`
+        );
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 401 status code with bad token, a valid user id and valid recommendation id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 403 status code with valid token, invalid user id and valid recommendation id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test2UserId}/recommendations/${recId3}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Recommendations",
+                status: 403,
+            },
+        });
+    });
+
+    test("get error message and 403 status code with valid token, invalid userId parameter type and valid recommendation id", async () => {
+        const res = await request(app)
+            .get(`/api/users/bad_type/recommendations/${recId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Recommendations",
+                status: 403,
+            },
+        });
+    });
+});
+
+describe("PATCH /api/users/:userId", () => {
+    test("get updated user recommendation object and 200 status code when sending in valid token, valid userId, valid recommendation id and valid user recommendation input", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .set({ _token: testUserToken })
+            .send({ recommendation: "updated recommendation" });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            id: expect.any(Number),
+            receiverId: test2UserId,
+            recommendation: "updated recommendation",
+            senderId: testUserId,
+        });
+    });
+
+    // test("get error message and 401 status code when sending in valid user id, invalid token and valid update user inputs", async () => {
+    //     const res = await request(app)
+    //         .patch(`/api/users/${testUserId}`)
+    //         .set({ _token: "bad token" })
+    //         .send({ lname: "updatedLname" });
     //     expect(res.statusCode).toBe(401);
     //     expect(res.body).toEqual({
     //         error: { message: "Unauthorized", status: 401 },
     //     });
     // });
 
-    // test("get error message and 401 status code with bad token and valid user id", async () => {
+    // test("get error message and 403 status code when sending in invalid user id, valid token and valid update user inputs", async () => {
     //     const res = await request(app)
-    //         .get(`/api/users/${testUserId}`)
-    //         .set({ _token: "bad token" });
-    //     expect(res.statusCode).toBe(401);
+    //         .patch(`/api/users/1000`)
+    //         .set({ _token: testUserToken })
+    //         .send({ lname: "updatedLname" });
+    //     expect(res.statusCode).toBe(403);
     //     expect(res.body).toEqual({
-    //         error: { message: "Unauthorized", status: 401 },
+    //         error: { message: "Cannot Update Other Users", status: 403 },
     //     });
     // });
 
-    // test("get error message and 404 status code with valid token and invalid user id", async () => {
+    // test("get error message and 403 status code when sending in invalid user id data type, valid token and valid update user inputs", async () => {
     //     const res = await request(app)
-    //         .get(`/api/users/1000`)
-    //         .set({ _token: testUserToken });
-    //     expect(res.statusCode).toBe(404);
+    //         .patch(`/api/users/bad_type`)
+    //         .set({ _token: testUserToken })
+    //         .send({ lname: "updatedLname" });
+    //     expect(res.statusCode).toBe(403);
     //     expect(res.body).toEqual({
-    //         error: { message: "User 1000 not found", status: 404 },
+    //         error: { message: "Cannot Update Other Users", status: 403 },
     //     });
     // });
 
-    // test("get error message and 400 status code with valid token and invalid userId parameter type", async () => {
+    // test("get error message and 400 status code when sending in valid user id, valid token and invalid update user inputs", async () => {
     //     const res = await request(app)
-    //         .get(`/api/users/badType`)
-    //         .set({ _token: testUserToken });
+    //         .patch(`/api/users/${testUserId}`)
+    //         .set({ _token: testUserToken })
+    //         .send({ username: "lol" });
     //     expect(res.statusCode).toBe(400);
     //     expect(res.body).toEqual({
-    //         error: { message: "Invalid user id data type", status: 400 },
+    //         error: {
+    //             message: [
+    //                 "instance.username does not meet minimum length of 5",
+    //             ],
+    //             status: 400,
+    //         },
     //     });
     // });
 });
-
-// describe("PATCH /api/users/:userId", () => {
-//     test("get updated user object and 200 status code when sending in valid token, valid userId and valid update user inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}`)
-//             .set({ _token: testUserToken })
-//             .send({ username: "updatedUsername", fname: "updatedFname" });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             email: "test@email.com",
-//             exp: null,
-//             fname: "updatedFname",
-//             id: expect.any(Number),
-//             lname: "tln",
-//             totalBooks: null,
-//             totalPages: null,
-//             username: "updatedUsername",
-//         });
-//     });
-
-//     test("get error message and 401 status code when sending in valid user id, invalid token and valid update user inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}`)
-//             .set({ _token: "bad token" })
-//             .send({ lname: "updatedLname" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
-
-//     test("get error message and 403 status code when sending in invalid user id, valid token and valid update user inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/1000`)
-//             .set({ _token: testUserToken })
-//             .send({ lname: "updatedLname" });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: { message: "Cannot Update Other Users", status: 403 },
-//         });
-//     });
-
-//     test("get error message and 403 status code when sending in invalid user id data type, valid token and valid update user inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/bad_type`)
-//             .set({ _token: testUserToken })
-//             .send({ lname: "updatedLname" });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: { message: "Cannot Update Other Users", status: 403 },
-//         });
-//     });
-
-//     test("get error message and 400 status code when sending in valid user id, valid token and invalid update user inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}`)
-//             .set({ _token: testUserToken })
-//             .send({ username: "lol" });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: [
-//                     "instance.username does not meet minimum length of 5",
-//                 ],
-//                 status: 400,
-//             },
-//         });
-//     });
-// });
 
 // describe("DELETE /api/users", () => {
 //     test("get error message and 403 status code if valid token and other user's id", async () => {
