@@ -140,7 +140,11 @@ describe("PATCH /api/users/:userId", () => {
         const res = await request(app)
             .patch(`/api/users/${testUserId}`)
             .set({ _token: testUserToken })
-            .send({ username: "updatedUsername", fname: "updatedFname" });
+            .send({
+                username: "updatedUsername",
+                fname: "updatedFname",
+                exp: 100,
+            });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             email: "test@email.com",
@@ -148,6 +152,7 @@ describe("PATCH /api/users/:userId", () => {
             fname: "updatedFname",
             id: expect.any(Number),
             lname: "tln",
+            exp: 100,
             totalBooks: null,
             totalPages: null,
             username: "updatedUsername",

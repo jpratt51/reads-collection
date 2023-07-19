@@ -67,6 +67,9 @@ router.patch(
             inputs.fname ? (user.fname = inputs.fname) : null;
             inputs.lname ? (user.lname = inputs.lname) : null;
             inputs.email ? (user.email = inputs.email) : null;
+            inputs.exp ? (user.exp = +inputs.exp) : null;
+            inputs.totalBooks ? (user.totalBooks = +inputs.totalBooks) : null;
+            inputs.totalPages ? (user.totalPages = +inputs.totalPages) : null;
             await user.update();
             return res.json(user);
         } catch (error) {

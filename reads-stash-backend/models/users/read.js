@@ -14,6 +14,8 @@ class UserRead {
     }
 
     static async getAll(userId) {
+        if (/^\d+$/.test(userId) === false)
+            throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
             `SELECT * FROM users_reads WHERE user_id = $1;`,
             [userId]

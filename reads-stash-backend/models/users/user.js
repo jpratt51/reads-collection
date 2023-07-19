@@ -10,9 +10,9 @@ class User {
         fname,
         lname,
         email,
-        exp,
-        total_books,
-        total_pages,
+        exp = 0,
+        total_books = 0,
+        total_pages = 0,
         password
     ) {
         this.id = id;
@@ -108,9 +108,21 @@ class User {
             SET username = $1,
             fname = $2,
             lname = $3,
-            email = $4
-            WHERE id = $5;`,
-            [this.username, this.fname, this.lname, this.email, this.id]
+            email = $4,
+            exp = $5,
+            total_books = $6,
+            total_pages = $7
+            WHERE id = $8;`,
+            [
+                this.username,
+                this.fname,
+                this.lname,
+                this.email,
+                this.exp,
+                this.totalBooks,
+                this.totalPages,
+                this.id,
+            ]
         );
     }
 
