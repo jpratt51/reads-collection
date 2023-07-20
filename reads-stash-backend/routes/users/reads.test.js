@@ -15,6 +15,7 @@ let testUserToken,
     test2UserId,
     readId1,
     readId2,
+    readId3,
     userReadId1,
     userReadId2;
 
@@ -33,11 +34,12 @@ beforeAll(async () => {
     test2UserId = res.rows[1].id;
 
     const readIds = await db.query(
-        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', 'test publisher'), ('test title 2', 'test description 2', '1243567119', 4, 'BOOK', 'test publisher 2') RETURNING id`
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', 'test publisher'), ('test title 2', 'test description 2', '1243567119', 4, 'BOOK', 'test publisher 2'), ('test title 2', 'test description 2', '1243567119', 4, 'BOOK', 'test publisher 2') RETURNING id`
     );
 
     readId1 = readIds.rows[0].id;
     readId2 = readIds.rows[1].id;
+    readId3 = readIds.rows[2].id;
 
     const userReadIds = await db.query(
         `INSERT INTO users_reads (rating, review_text, review_date, user_id, read_id) VALUES (4, 'test review', '2023-07-19', $1, $2), (3, 'test review 2', '2023-07-19', $1, $3) RETURNING id`,
@@ -187,94 +189,102 @@ describe("GET /api/users/:userId/reads/:readId", () => {
     });
 });
 
-// describe("POST /api/users/:userId/recommendations", () => {
-//     test("get created user recommendation object and 201 status code when sending in valid token, valid userId, valid receiverId and valid user recommendation", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/recommendations`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 recommendation: "test recommendation",
-//                 receiverId: test2UserId,
-//                 senderId: testUserId,
-//             });
-//         expect(res.statusCode).toBe(201);
-//         expect(res.body).toEqual({
-//             id: expect.any(Number),
-//             receiverId: test2UserId,
-//             recommendation: "test recommendation",
-//             senderId: testUserId,
-//         });
-//     });
+describe("POST /api/users/:userId/reads", () => {
+    test("get created user read object and 201 status code when sending in valid token, valid userId, valid readId and valid user read inputs", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/reads`)
+            .set({ _token: testUserToken })
+            .send({
+                readId: readId3,
+                rating: 4,
+                reviewText: "test",
+                reviewDate: "2023-07-19",
+            });
+        expect(res.statusCode).toBe(201);
+        expect(res.body).toEqual({
+            avgRating: 4,
+            description: "test description 2",
+            id: expect.any(Number),
+            isbn: "1243567119",
+            printType: "BOOK",
+            publisher: "test publisher 2",
+            rating: 4,
+            readId: readId3,
+            reviewDate: "2023-07-19T05:00:00.000Z",
+            reviewText: "test",
+            title: "test title 2",
+        });
+    });
 
-//     test("get error message and 401 status code when sending in invalid token, valid userId, valid receiverId and valid user recommendation", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/recommendations`)
-//             .set({ _token: "bad token" })
-//             .send({
-//                 recommendation: "test recommendation?",
-//                 receiverId: test2UserId,
-//                 senderId: testUserId,
-//             });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    //     test("get error message and 401 status code when sending in invalid token, valid userId, valid receiverId and valid user recommendation", async () => {
+    //         const res = await request(app)
+    //             .post(`/api/users/${testUserId}/recommendations`)
+    //             .set({ _token: "bad token" })
+    //             .send({
+    //                 recommendation: "test recommendation?",
+    //                 receiverId: test2UserId,
+    //                 senderId: testUserId,
+    //             });
+    //         expect(res.statusCode).toBe(401);
+    //         expect(res.body).toEqual({
+    //             error: { message: "Unauthorized", status: 401 },
+    //         });
+    //     });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId, valid receiverId and valid recommendation input", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/1000/recommendations`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 recommendation: "test recommendation?",
-//                 receiverId: test2UserId,
-//                 senderId: testUserId,
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Create Recommendations From Other Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    //     test("get error message and 403 status code when sending in valid token, invalid userId, valid receiverId and valid recommendation input", async () => {
+    //         const res = await request(app)
+    //             .post(`/api/users/1000/recommendations`)
+    //             .set({ _token: testUserToken })
+    //             .send({
+    //                 recommendation: "test recommendation?",
+    //                 receiverId: test2UserId,
+    //                 senderId: testUserId,
+    //             });
+    //         expect(res.statusCode).toBe(403);
+    //         expect(res.body).toEqual({
+    //             error: {
+    //                 message: "Cannot Create Recommendations From Other Users",
+    //                 status: 403,
+    //             },
+    //         });
+    //     });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId data type, valid receiverId and valid recommendation input", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/bad_type/recommendations`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 recommendation: "test recommendation?",
-//                 receiverId: test2UserId,
-//                 senderId: testUserId,
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Create Recommendations From Other Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    //     test("get error message and 403 status code when sending in valid token, invalid userId data type, valid receiverId and valid recommendation input", async () => {
+    //         const res = await request(app)
+    //             .post(`/api/users/bad_type/recommendations`)
+    //             .set({ _token: testUserToken })
+    //             .send({
+    //                 recommendation: "test recommendation?",
+    //                 receiverId: test2UserId,
+    //                 senderId: testUserId,
+    //             });
+    //         expect(res.statusCode).toBe(403);
+    //         expect(res.body).toEqual({
+    //             error: {
+    //                 message: "Cannot Create Recommendations From Other Users",
+    //                 status: 403,
+    //             },
+    //         });
+    //     });
 
-//     test("get error message and 400 status code when sending in valid token, valid userId and invalid recommendation input", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/recommendations`)
-//             .set({ _token: testUserToken })
-//             .send({ badInput: "nope" });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: [
-//                     'instance requires property "recommendation"',
-//                     'instance requires property "receiverId"',
-//                     'instance requires property "senderId"',
-//                 ],
-//                 status: 400,
-//             },
-//         });
-//     });
-// });
+    //     test("get error message and 400 status code when sending in valid token, valid userId and invalid recommendation input", async () => {
+    //         const res = await request(app)
+    //             .post(`/api/users/${testUserId}/recommendations`)
+    //             .set({ _token: testUserToken })
+    //             .send({ badInput: "nope" });
+    //         expect(res.statusCode).toBe(400);
+    //         expect(res.body).toEqual({
+    //             error: {
+    //                 message: [
+    //                     'instance requires property "recommendation"',
+    //                     'instance requires property "receiverId"',
+    //                     'instance requires property "senderId"',
+    //                 ],
+    //                 status: 400,
+    //             },
+    //         });
+    //     });
+});
 
 // describe("PATCH /api/users/:userId", () => {
 //     test("get updated user recommendation object and 200 status code when sending in valid token, valid userId, valid recommendation id and valid user recommendation input", async () => {

@@ -92,19 +92,23 @@ class UserRead {
     static async create(inputs) {
         const readCheck = await db.query(
             "SELECT * FROM users_reads WHERE user_id = $1 AND read_id = $2;",
-            [inputs.userId, inputs.readId]
+            [inputs.user_id, inputs.read_id]
         );
 
-        if (!readCheck.rows[0]) return { message: "Read not found" };
+        if (readCheck.rows[0])
+            return new ExpressError("User read already exists", 400);
 
         const { columns, values, keys } = dataToSqlForCreate(inputs);
 
         await db.query(
-            `INSERT INTO users_reads (${keys}) VALUES (${columns}) `,
+            `INSERT INTO users_reads (${keys}) VALUES (${columns}) RETURNING *`,
             values
         );
 
-        const results = getById(inputs.userId, inputs.readId);
+        const results = await db.query(
+            `SELECT users_reads.id AS id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
+            [inputs.user_id, inputs.read_id]
+        );
 
         const r = results.rows[0];
 

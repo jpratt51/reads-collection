@@ -58,6 +58,8 @@ router.post(
         try {
             const { userId } = req.params;
             const { readId } = req.body;
+            const inputs = req.body;
+            inputs["userId"] = +userId;
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot Create Reads For Other Users",
@@ -65,17 +67,21 @@ router.post(
                 );
                 return next(invalidUser);
             }
-            const validator = jsonschema.validate(
-                req.body,
-                createUserReadSchema
-            );
+            const validator = jsonschema.validate(inputs, createUserReadSchema);
             if (!validator.valid) {
                 const listOfErrors = validator.errors.map((e) => e.stack);
                 const errors = new ExpressError(listOfErrors, 400);
                 return next(errors);
             }
 
-            const userRead = await UserRead.create(userId, readId);
+            const { rating, reviewText, reviewDate } = req.body;
+            const validInputs = {};
+            validInputs["user_id"] = userId;
+            validInputs["read_id"] = readId;
+            rating ? (validInputs["rating"] = rating) : null;
+            reviewText ? (validInputs["review_text"] = reviewText) : null;
+            reviewDate ? (validInputs["review_date"] = reviewDate) : null;
+            const userRead = await UserRead.create(validInputs);
             return res.status(201).json(userRead);
         } catch (error) {
             return next(error);
