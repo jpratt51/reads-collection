@@ -2,10 +2,30 @@
 
 const db = require("../../db");
 const ExpressError = require("../../expressError");
+const { dataToSqlForCreate } = require("../../helpers/sql");
 
 class UserRead {
-    constructor(id, rating, review_text, review_date, user_id, read_id) {
+    constructor(
+        id,
+        title,
+        description,
+        isbn,
+        avg_rating,
+        print_type,
+        publisher,
+        rating,
+        review_text,
+        review_date,
+        user_id,
+        read_id
+    ) {
         this.id = id;
+        this.title = title;
+        this.description = description;
+        this.isbn = isbn;
+        this.avg_rating = avg_rating;
+        this.print_type = print_type;
+        this.publisher = publisher;
         this.rating = rating;
         this.reviewText = review_text;
         this.reviewDate = review_date;
@@ -17,13 +37,19 @@ class UserRead {
         if (/^\d+$/.test(userId) === false)
             throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
-            `SELECT * FROM users_reads WHERE user_id = $1;`,
+            `SELECT reads.id, title, description, isbn, avg_rating, print_type, publisher, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1;`,
             [userId]
         );
         const userReads = results.rows.map(
             (r) =>
                 new UserRead(
                     r.id,
+                    r.title,
+                    r.description,
+                    r.isbn,
+                    r.avg_rating,
+                    r.print_type,
+                    r.publisher,
                     r.rating,
                     r.review_text,
                     r.review_date,
@@ -34,21 +60,27 @@ class UserRead {
         return userReads;
     }
 
-    static async getById(userId, usersReadsId) {
+    static async getById(userId, readId) {
         if (/^\d+$/.test(userId) === false)
             throw new ExpressError(`Invalid user id data type`, 400);
-        if (/^\d+$/.test(usersReadsId) === false)
-            throw new ExpressError(`Invalid userReads id data type`, 400);
+        if (/^\d+$/.test(readId) === false)
+            throw new ExpressError(`Invalid read id data type`, 400);
         const results = await db.query(
-            `SELECT * FROM users_reads WHERE id = $1 AND user_id = $2;`,
-            [usersReadsId, userId]
+            `SELECT users_reads.id AS id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
+            [userId, readId]
         );
         const r = results.rows[0];
         if (!r) {
-            throw new ExpressError(`User's read ${usersReadsId} not found`);
+            throw new ExpressError(`User's read ${readId} not found`, 404);
         }
         return new UserRead(
             r.id,
+            r.title,
+            r.description,
+            r.isbn,
+            r.avg_rating,
+            r.print_type,
+            r.publisher,
             r.rating,
             r.review_text,
             r.review_date,
@@ -57,21 +89,33 @@ class UserRead {
         );
     }
 
-    static async create(userId, readId) {
-        const readCheck = await db.query("SELECT * FROM reads WHERE id = $1", [
-            readId,
-        ]);
+    static async create(inputs) {
+        const readCheck = await db.query(
+            "SELECT * FROM users_reads WHERE user_id = $1 AND read_id = $2;",
+            [inputs.userId, inputs.readId]
+        );
 
         if (!readCheck.rows[0]) return { message: "Read not found" };
 
-        const results = await db.query(
-            "INSERT INTO users_reads (user_id, read_id) VALUES ($1, $2) RETURNING id, user_id, read_id",
-            [userId, readId]
+        const { columns, values, keys } = dataToSqlForCreate(inputs);
+
+        await db.query(
+            `INSERT INTO users_reads (${keys}) VALUES (${columns}) `,
+            values
         );
+
+        const results = getById(inputs.userId, inputs.readId);
+
         const r = results.rows[0];
 
         return new UserRead(
             r.id,
+            r.title,
+            r.description,
+            r.isbn,
+            r.avg_rating,
+            r.print_type,
+            r.publisher,
             r.rating,
             r.review_text,
             r.review_date,
@@ -81,6 +125,7 @@ class UserRead {
     }
 
     async delete(userId) {
+        console.log("**********", this.id);
         await db.query(
             "DELETE FROM users_reads WHERE id = $1 AND user_id = $2;",
             [this.id, userId]

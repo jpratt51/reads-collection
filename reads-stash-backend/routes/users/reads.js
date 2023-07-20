@@ -31,11 +31,11 @@ router.get(
 );
 
 router.get(
-    "/:userId/reads/:usersReadsId",
+    "/:userId/reads/:readId",
     ensureLoggedIn,
     async function getOneUserRead(req, res, next) {
         try {
-            const { userId, usersReadsId } = req.params;
+            const { userId, readId } = req.params;
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Reads",
@@ -43,7 +43,7 @@ router.get(
                 );
                 return next(invalidUser);
             }
-            const userRead = await UserRead.getById(userId, usersReadsId);
+            const userRead = await UserRead.getById(userId, readId);
             return res.json(userRead);
         } catch (error) {
             return next(error);
@@ -84,11 +84,11 @@ router.post(
 );
 
 router.delete(
-    "/:userId/reads/:usersReadsId",
+    "/:userId/reads/:readId",
     ensureLoggedIn,
     async function deleteUserRead(req, res, next) {
         try {
-            const { userId, usersReadsId } = req.params;
+            const { userId, readId } = req.params;
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot Delete Other User's Reads",
@@ -96,9 +96,9 @@ router.delete(
                 );
                 return next(invalidUser);
             }
-            const read = await UserRead.getById(userId, usersReadsId);
+            const read = await UserRead.getById(userId, readId);
             await read.delete(userId);
-            return res.json({ msg: `Deleted user read ${usersReadsId}` });
+            return res.json({ msg: `Deleted user read ${readId}` });
         } catch (error) {
             return next(error);
         }

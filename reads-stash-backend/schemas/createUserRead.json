@@ -9,6 +9,30 @@
         "readId"
     ],
     "properties": {
+        "rating": {
+            "type": "number",
+            "default": 0.0,
+            "title": "The rating Schema",
+            "examples": [
+                4.5
+            ]
+        },
+        "review_text": {
+            "type": "string",
+            "default": "",
+            "title": "The review_text Schema",
+            "examples": [
+                "test review"
+            ]
+        },
+        "review_date": {
+            "type": "string",
+            "default": "",
+            "title": "The review_date Schema",
+            "examples": [
+                "2023-07-19"
+            ]
+        },
         "userId": {
             "type": "integer",
             "default": 0,
@@ -27,6 +51,9 @@
         }
     },
     "examples": [{
+        "rating": 4.5,
+        "review_text": "test review",
+        "review_date": "2023-07-19",
         "userId": 1,
         "readId": 2
     }]
