@@ -33,14 +33,14 @@ beforeAll(async () => {
     test2UserId = res.rows[1].id;
 
     const readIds = await db.query(
-        `INSERT INTO reads (title, isbn) VALUES ('test title', '1243567119'), ('test 2 title', '1243567819') RETURNING id`
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', 'test publisher'), ('test title 2', 'test description 2', '1243567119', 4, 'BOOK', 'test publisher 2') RETURNING id`
     );
 
     readId1 = readIds.rows[0].id;
     readId2 = readIds.rows[1].id;
 
     const userReadIds = await db.query(
-        `INSERT INTO users_reads (user_id, read_id) VALUES ($1, $2), ($1, $3) RETURNING id`,
+        `INSERT INTO users_reads (rating, review_text, review_date, user_id, read_id) VALUES (4, 'test review', '2023-07-19', $1, $2), (3, 'test review 2', '2023-07-19', $1, $3) RETURNING id`,
         [testUserId, readId1, readId2]
     );
 
@@ -63,20 +63,28 @@ describe("GET /api/users/:userId/reads", () => {
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual([
             {
-                id: expect.any(Number),
-                rating: null,
-                readId: readId1,
-                reviewDate: null,
-                reviewText: null,
-                userId: testUserId,
+                avgRating: 4,
+                description: "test description",
+                id: readId1,
+                isbn: "1243567119",
+                printType: "BOOK",
+                publisher: "test publisher",
+                rating: 4,
+                reviewDate: "2023-07-19T05:00:00.000Z",
+                reviewText: "test review",
+                title: "test title",
             },
             {
-                id: expect.any(Number),
-                rating: null,
-                readId: readId2,
-                reviewDate: null,
-                reviewText: null,
-                userId: testUserId,
+                avgRating: 4,
+                description: "test description 2",
+                id: readId2,
+                isbn: "1243567119",
+                printType: "BOOK",
+                publisher: "test publisher 2",
+                rating: 3,
+                reviewDate: "2023-07-19T05:00:00.000Z",
+                reviewText: "test review 2",
+                title: "test title 2",
             },
         ]);
     });
@@ -113,66 +121,71 @@ describe("GET /api/users/:userId/reads", () => {
     });
 });
 
-// describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
-//     test("get one user recommendation and 200 status code with valid token, valid user id and valid user recommendation id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             id: expect.any(Number),
-//             receiverId: test2UserId,
-//             recommendation: "recommendation from test1 to test2",
-//             senderId: testUserId,
-//         });
-//     });
+describe("GET /api/users/:userId/reads/:readId", () => {
+    test("get one user read and 200 status code with valid token, valid user id and valid read id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/reads/${readId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            avgRating: 4,
+            description: "test description",
+            id: expect.any(Number),
+            isbn: "1243567119",
+            printType: "BOOK",
+            publisher: "test publisher",
+            rating: 4,
+            readId: expect.any(Number),
+            reviewDate: "2023-07-19T05:00:00.000Z",
+            reviewText: "test review",
+            title: "test title",
+        });
+    });
 
-//     test("get error message and 401 status code with no token, a valid user id and valid recommendation id", async () => {
-//         const res = await request(app).get(
-//             `/api/users/${testUserId}/recommendations/${recId1}`
-//         );
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with no token, a valid user id and valid read id", async () => {
+        const res = await request(app).get(
+            `/api/users/${testUserId}/reads/${readId1}`
+        );
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 401 status code with bad token, a valid user id and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
-
-//     test("get error message and 403 status code with valid token, invalid user id and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${test2UserId}/recommendations/${recId3}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Recommendations",
-//                 status: 403,
-//             },
-//         });
-//     });
-
-//     test("get error message and 403 status code with valid token, invalid userId parameter type and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/bad_type/recommendations/${recId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Recommendations",
-//                 status: 403,
-//             },
-//         });
-//     });
-// });
+    test("get error message and 401 status code with bad token, a valid user id and valid read id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/reads/${readId1}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+    test("get error message and 403 status code with valid token, invalid user id and valid read id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test2UserId}/reads/${readId2}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Reads",
+                status: 403,
+            },
+        });
+    });
+    test("get error message and 403 status code with valid token, invalid userId parameter type and valid read id", async () => {
+        const res = await request(app)
+            .get(`/api/users/bad_type/reads/${readId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Reads",
+                status: 403,
+            },
+        });
+    });
+});
 
 // describe("POST /api/users/:userId/recommendations", () => {
 //     test("get created user recommendation object and 201 status code when sending in valid token, valid userId, valid receiverId and valid user recommendation", async () => {

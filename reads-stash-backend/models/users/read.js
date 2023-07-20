@@ -23,8 +23,8 @@ class UserRead {
         this.title = title;
         this.description = description;
         this.isbn = isbn;
-        this.avg_rating = avg_rating;
-        this.print_type = print_type;
+        this.avgRating = avg_rating;
+        this.printType = print_type;
         this.publisher = publisher;
         this.rating = rating;
         this.reviewText = review_text;
