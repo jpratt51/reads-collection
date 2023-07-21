@@ -39,7 +39,7 @@ router.get(
             const { userId, journalId } = req.params;
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
-                    "Cannot View Other User's Reads",
+                    "Cannot View Other User's Journals",
                     403
                 );
                 return next(invalidUser);

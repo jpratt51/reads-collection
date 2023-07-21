@@ -12,7 +12,7 @@ const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
 
-let testUserId, test2UserId, journalId1, journalId2;
+let testUserId, test2UserId, journalId1, journalId2, journalId3;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
@@ -29,12 +29,13 @@ beforeAll(async () => {
     test2UserId = res.rows[1].id;
 
     const journalIds = await db.query(
-        `INSERT INTO journals (title, date, text, user_id) VALUES ('test journal title', '2023-07-21', 'test journal text', $1), ('test journal title 2', '2023-07-21', 'test journal text', $2) RETURNING id`,
+        `INSERT INTO journals (title, date, text, user_id) VALUES ('test journal title', '2023-07-21', 'test journal text', $1), ('test2 journal title', '2023-07-21', 'test2 journal text', $1), ('test journal title 2', '2023-07-21', 'test journal text', $2) RETURNING id`,
         [testUserId, test2UserId]
     );
 
     journalId1 = journalIds.rows[0].id;
     journalId2 = journalIds.rows[1].id;
+    journalId3 = journalIds.rows[2].id;
 
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
@@ -56,6 +57,13 @@ describe("GET /api/users/:userId/journals", () => {
                 id: journalId1,
                 text: "test journal text",
                 title: "test journal title",
+                userId: testUserId,
+            },
+            {
+                date: "2023-07-21T05:00:00.000Z",
+                id: journalId2,
+                text: "test2 journal text",
+                title: "test2 journal title",
                 userId: testUserId,
             },
         ]);
@@ -93,66 +101,67 @@ describe("GET /api/users/:userId/journals", () => {
     });
 });
 
-// describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
-//     test("get one user recommendation and 200 status code with valid token, valid user id and valid user recommendation id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             id: expect.any(Number),
-//             receiverId: test2UserId,
-//             recommendation: "recommendation from test1 to test2",
-//             senderId: testUserId,
-//         });
-//     });
+describe("GET /api/users/:userId/journals/:journalId", () => {
+    test("get one user journal and 200 status code with valid token, valid user id and valid user journal id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/journals/${journalId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            date: "2023-07-21T05:00:00.000Z",
+            id: journalId1,
+            text: "test journal text",
+            title: "test journal title",
+            userId: testUserId,
+        });
+    });
 
-//     test("get error message and 401 status code with no token, a valid user id and valid recommendation id", async () => {
-//         const res = await request(app).get(
-//             `/api/users/${testUserId}/recommendations/${recId1}`
-//         );
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with no token, a valid user id and valid journal id", async () => {
+        const res = await request(app).get(
+            `/api/users/${testUserId}/journals/${journalId1}`
+        );
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 401 status code with bad token, a valid user id and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with bad token, a valid user id and valid journal id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/journals/${journalId1}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code with valid token, invalid user id and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${test2UserId}/recommendations/${recId3}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Recommendations",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code with valid token, invalid user id and valid journal id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test2UserId}/journals/${journalId3}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Journals",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code with valid token, invalid userId parameter type and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/bad_type/recommendations/${recId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Recommendations",
-//                 status: 403,
-//             },
-//         });
-//     });
-// });
+    test("get error message and 403 status code with valid token, invalid userId parameter type and valid journal id", async () => {
+        const res = await request(app)
+            .get(`/api/users/bad_type/journals/${journalId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Journals",
+                status: 403,
+            },
+        });
+    });
+});
 
 // describe("POST /api/users/:userId/recommendations", () => {
 //     test("get created user recommendation object and 201 status code when sending in valid token, valid userId, valid receiverId and valid user recommendation", async () => {
