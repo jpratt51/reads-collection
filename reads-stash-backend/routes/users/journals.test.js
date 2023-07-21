@@ -44,7 +44,7 @@ afterAll(async () => {
     await db.end();
 });
 
-describe("GET /api/users/:userId/recommendations", () => {
+describe("GET /api/users/:userId/journals", () => {
     test("get all user journals and 200 status code with valid token and current user id. Should not get other user's journals.", async () => {
         const res = await request(app)
             .get(`/api/users/${testUserId}/journals`)
@@ -61,38 +61,36 @@ describe("GET /api/users/:userId/recommendations", () => {
         ]);
     });
 
-    // test("get error message and 401 status code if no token sent and current user id", async () => {
-    //     const res = await request(app).get(
-    //         `/api/users/${testUserId}/recommendations`
-    //     );
-    //     expect(res.statusCode).toBe(401);
-    //     expect(res.body).toEqual({
-    //         error: { message: "Unauthorized", status: 401 },
-    //     });
-    // });
+    test("get error message and 401 status code if no token sent and current user id", async () => {
+        const res = await request(app).get(`/api/users/${testUserId}/journals`);
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-    // test("get error message and 401 status code if bad token sent and current user id", async () => {
-    //     const res = await request(app)
-    //         .get(`/api/users/${testUserId}/recommendations`)
-    //         .set({ _token: "bad token" });
-    //     expect(res.statusCode).toBe(401);
-    //     expect(res.body).toEqual({
-    //         error: { message: "Unauthorized", status: 401 },
-    //     });
-    // });
+    test("get error message and 401 status code if bad token sent and current user id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/journals`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-    // test("get error message and 403 status code if valid token sent and other user's id", async () => {
-    //     const res = await request(app)
-    //         .get(`/api/users/${test2UserId}/recommendations`)
-    //         .set({ _token: testUserToken });
-    //     expect(res.statusCode).toBe(403);
-    //     expect(res.body).toEqual({
-    //         error: {
-    //             message: "Cannot View Other User's Recommendations",
-    //             status: 403,
-    //         },
-    //     });
-    // });
+    test("get error message and 403 status code if valid token sent and other user's id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test2UserId}/journals`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other Users Journals",
+                status: 403,
+            },
+        });
+    });
 });
 
 // describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
