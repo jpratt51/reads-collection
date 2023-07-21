@@ -356,7 +356,7 @@ describe("DELETE /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    test("get deleted user message and 200 status code if valid token, valid user id and valid recommendation id", async () => {
+    test("get deleted user recommendation message and 200 status code if valid token, valid user id and valid recommendation id", async () => {
         const res = await request(app)
             .delete(`/api/users/${testUserId}/recommendations/${recId1}`)
             .set({ _token: testUserToken });

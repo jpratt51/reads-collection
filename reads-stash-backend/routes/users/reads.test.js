@@ -366,45 +366,45 @@ describe("PATCH /api/users/:userId/reads/:readId", () => {
     });
 });
 
-// describe("DELETE /api/users/:userId/recommendations/:recommendationId", () => {
-//     test("get error message and 403 status code if valid token, other user's id and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${test2UserId}/recommendations/${recId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Invalid User ID",
-//                 status: 403,
-//             },
-//         });
-//     });
+describe("DELETE /api/users/:userId/reads/:readId", () => {
+    test("get error message and 403 status code if valid token, other user's id and valid read id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${test2UserId}/recommendations/${readId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Invalid User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 401 status code if invalid token, valid user id and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code if invalid token, valid user id and valid recommendation id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}/reads/${readId1}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code if valid token, bad data type user id and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/bad_type/recommendations/${recId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: { message: "Invalid User ID", status: 403 },
-//         });
-//     });
+    test("get error message and 403 status code if valid token, bad data type user id and valid read id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/bad_type/reads/${readId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: { message: "Cannot Delete Other User's Reads", status: 403 },
+        });
+    });
 
-//     test("get deleted user message and 200 status code if valid token, valid user id and valid recommendation id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({ msg: expect.stringContaining("Deleted") });
-//     });
-// });
+    test("get deleted user read message and 200 status code if valid token, valid user id and valid read id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}/reads/${readId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({ msg: expect.stringContaining("Deleted") });
+    });
+});
