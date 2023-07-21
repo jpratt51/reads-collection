@@ -2,7 +2,7 @@
 
 const db = require("../../db");
 const ExpressError = require("../../expressError");
-const { dataToSqlForCreate } = require("../../helpers/sql");
+const { dataToSql, dataToSqlForCreate } = require("../../helpers/sql");
 
 class UserRead {
     constructor(
@@ -110,8 +110,6 @@ class UserRead {
             readId,
         ]);
 
-        console.log("readCheck", readCheck.rows[0] === undefined);
-
         if (readCheck.rows[0] === undefined) {
             throw new ExpressError("Read does not exist", 400);
         }
@@ -120,6 +118,60 @@ class UserRead {
 
         await db.query(
             `INSERT INTO users_reads (${keys}) VALUES (${columns}) RETURNING *`,
+            values
+        );
+
+        const results = await db.query(
+            `SELECT users_reads.id AS id, users.id AS user_id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
+            [userId, readId]
+        );
+
+        const r = results.rows[0];
+
+        return new UserRead(
+            r.id,
+            r.title,
+            r.description,
+            r.isbn,
+            r.avg_rating,
+            r.print_type,
+            r.publisher,
+            r.rating,
+            r.review_text,
+            r.review_date,
+            r.user_id,
+            r.read_id
+        );
+    }
+
+    static async update(userId, readId, inputs) {
+        const { rating, reviewText, reviewDate } = inputs;
+        const validInputs = {};
+        validInputs["user_id"] = +userId;
+        validInputs["read_id"] = +readId;
+        rating ? (validInputs["rating"] = rating) : null;
+        reviewText ? (validInputs["review_text"] = reviewText) : null;
+        reviewDate ? (validInputs["review_date"] = reviewDate) : null;
+
+        const userReadCheck = await db.query(
+            "SELECT * FROM users_reads WHERE user_id = $1 AND read_id = $2;",
+            [userId, readId]
+        );
+
+        if (!userReadCheck.rows[0])
+            return new ExpressError("User read does not exist", 400);
+
+        const { columns, values } = dataToSql(validInputs);
+
+        values.push(userId);
+        values.push(readId);
+
+        const userIdIdx = values.length - 1;
+
+        const updateSqlQuery = await db.query(
+            `UPDATE users_reads SET ${columns} WHERE user_id = $${userIdIdx} AND read_id = $${
+                userIdIdx + 1
+            } RETURNING *`,
             values
         );
 

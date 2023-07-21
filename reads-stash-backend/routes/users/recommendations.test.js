@@ -253,7 +253,7 @@ describe("POST /api/users/:userId/recommendations", () => {
     });
 });
 
-describe("PATCH /api/users/:userId", () => {
+describe("PATCH /api/users/:userId/recommendations/:recommendationId", () => {
     test("get updated user recommendation object and 200 status code when sending in valid token, valid userId, valid recommendation id and valid user recommendation input", async () => {
         const res = await request(app)
             .patch(`/api/users/${testUserId}/recommendations/${recId1}`)

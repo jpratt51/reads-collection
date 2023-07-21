@@ -283,74 +283,88 @@ describe("POST /api/users/:userId/reads", () => {
     });
 });
 
-// describe("PATCH /api/users/:userId", () => {
-//     test("get updated user recommendation object and 200 status code when sending in valid token, valid userId, valid recommendation id and valid user recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: testUserToken })
-//             .send({ recommendation: "updated recommendation" });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             id: expect.any(Number),
-//             receiverId: test2UserId,
-//             recommendation: "updated recommendation",
-//             senderId: testUserId,
-//         });
-//     });
+describe("PATCH /api/users/:userId/reads/:readId", () => {
+    test("get updated user read object and 200 status code when sending in valid token, valid userId, valid readId and valid user recommendation input", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/reads/${readId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                readId: readId3,
+                rating: 5,
+                reviewText: "test updated",
+                reviewDate: "2023-07-20",
+            });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            avgRating: 4,
+            description: "test description",
+            id: expect.any(Number),
+            isbn: "1243567119",
+            printType: "BOOK",
+            publisher: "test publisher",
+            rating: 5,
+            readId: readId1,
+            reviewDate: "2023-07-20T05:00:00.000Z",
+            reviewText: "test updated",
+            title: "test title",
+            userId: testUserId,
+        });
+    });
 
-//     test("get error message and 401 status code when sending in invalid token, valid user id, valid recommendation id and valid update recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: "bad token" })
-//             .send({ recommendation: "update recommendation?" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code when sending in invalid token, valid user id, valid read id and valid user read update inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/reads/${readId1}`)
+            .set({ _token: "bad token" })
+            .send({
+                readId: readId3,
+                rating: 3,
+                reviewText: "test updated again?",
+                reviewDate: "2023-07-18",
+            });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid user id, valid recommendation id and valid update recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/1000/recommendations/${recId1}`)
-//             .set({ _token: testUserToken })
-//             .send({ recommendation: "update recommendation?" });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Update Recommendations From Other Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid user id, valid read id and valid update user read inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/1000/reads/${readId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                readId: readId3,
+                rating: 3,
+                reviewText: "test updated again?",
+                reviewDate: "2023-07-18",
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Update Reads For Other Users",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid user id data type, valid recommendation id and valid update recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/bad_type/recommendations/${recId1}`)
-//             .set({ _token: testUserToken })
-//             .send({ recommendation: "update recommendation?" });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Update Recommendations From Other Users",
-//                 status: 403,
-//             },
-//         });
-//     });
-
-//     test("get error message and 400 status code when sending in valid token, valid user id, valid recommendation id and invalid update recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: testUserToken })
-//             .send({ recommendation: 12345 });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: ["instance.recommendation is not of a type(s) string"],
-//                 status: 400,
-//             },
-//         });
-//     });
-// });
+    test("get error message and 403 status code when sending in valid token, invalid user id data type, valid recommendation id and valid update recommendation input", async () => {
+        const res = await request(app)
+            .patch(`/api/users/bad_type/reads/${readId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                readId: readId3,
+                rating: 3,
+                reviewText: "test updated again?",
+                reviewDate: "2023-07-18",
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Update Reads For Other Users",
+                status: 403,
+            },
+        });
+    });
+});
 
 // describe("DELETE /api/users/:userId/recommendations/:recommendationId", () => {
 //     test("get error message and 403 status code if valid token, other user's id and valid recommendation id", async () => {

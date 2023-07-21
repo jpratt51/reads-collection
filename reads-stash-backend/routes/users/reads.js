@@ -7,6 +7,7 @@ const UserRead = require("../../models/users/read");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const jsonschema = require("jsonschema");
 const createUserReadSchema = require("../../schemas/createUserRead.json");
+const updateUserReadSchema = require("../../schemas/updateUserRead.json");
 const ExpressError = require("../../expressError");
 
 router.get(
@@ -74,9 +75,41 @@ router.post(
                 const errors = new ExpressError(listOfErrors, 400);
                 return next(errors);
             }
-            console.log("here it is", validator, readId);
             const userRead = await UserRead.create(userId, readId, inputs);
             return res.status(201).json(userRead);
+        } catch (error) {
+            return next(error);
+        }
+    }
+);
+
+router.patch(
+    "/:userId/reads/:readId",
+    ensureLoggedIn,
+    async function updateUserRead(req, res, next) {
+        try {
+            const { userId, readId } = req.params;
+            const inputs = req.body;
+            inputs["userId"] = +userId;
+            inputs["readId"] = +readId;
+            if (req.user.id != userId) {
+                const invalidUserIdError = new ExpressError(
+                    "Cannot Update Reads For Other Users",
+                    403
+                );
+                return next(invalidUserIdError);
+            }
+            const validator = jsonschema.validate(inputs, updateUserReadSchema);
+
+            if (!validator.valid) {
+                const listOfErrors = validator.errors.map((e) => e.stack);
+                const errors = new ExpressError(listOfErrors, 400);
+                return next(errors);
+            }
+
+            const userRead = await UserRead.update(userId, readId, inputs);
+            console.log("userRead", userRead);
+            return res.json(userRead);
         } catch (error) {
             return next(error);
         }
