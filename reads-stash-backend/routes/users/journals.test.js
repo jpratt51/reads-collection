@@ -252,74 +252,98 @@ describe("POST /api/users/:userId/journals", () => {
     });
 });
 
-// describe("PATCH /api/users/:userId/recommendations/:recommendationId", () => {
-//     test("get updated user recommendation object and 200 status code when sending in valid token, valid userId, valid recommendation id and valid user recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: testUserToken })
-//             .send({ recommendation: "updated recommendation" });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             id: expect.any(Number),
-//             receiverId: test2UserId,
-//             recommendation: "updated recommendation",
-//             senderId: testUserId,
-//         });
-//     });
+describe("PATCH /api/users/:userId/journals/:journalId", () => {
+    test("get updated user journal object and 200 status code when sending in valid token, valid userId and valid user journal inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/journals/${journalId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                title: "updated journal title",
+                date: "2023-07-18",
+                text: "updated journal text",
+            });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            date: "2023-07-22",
+            id: journalId1,
+            text: "updated journal text",
+            title: "updated journal title",
+            userId: testUserId,
+        });
+    });
 
-//     test("get error message and 401 status code when sending in invalid token, valid user id, valid recommendation id and valid update recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: "bad token" })
-//             .send({ recommendation: "update recommendation?" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code when sending in invalid token, valid user id and valid update journal inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/journals/${journalId1}`)
+            .set({ _token: "bad token" })
+            .send({
+                title: "updated journal title?",
+                date: "2023-07-18",
+                text: "updated journal text?",
+            });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid user id, valid recommendation id and valid update recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/1000/recommendations/${recId1}`)
-//             .set({ _token: testUserToken })
-//             .send({ recommendation: "update recommendation?" });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Update Recommendations From Other Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid user id and valid update journal inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/1000/journals/${journalId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                title: "updated journal title?",
+                date: "2023-07-18",
+                text: "updated journal text?",
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Update Other User's Journals",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid user id data type, valid recommendation id and valid update recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/bad_type/recommendations/${recId1}`)
-//             .set({ _token: testUserToken })
-//             .send({ recommendation: "update recommendation?" });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Update Recommendations From Other Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid user id data type and valid update journal inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/bad_type/journals/${journalId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                title: "updated journal title?",
+                date: "2023-07-18",
+                text: "updated journal text?",
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Update Other User's Journals",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 400 status code when sending in valid token, valid user id, valid recommendation id and invalid update recommendation input", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
-//             .set({ _token: testUserToken })
-//             .send({ recommendation: 12345 });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: ["instance.recommendation is not of a type(s) string"],
-//                 status: 400,
-//             },
-//         });
-//     });
-// });
+    test("get error message and 400 status code when sending in valid token, valid user id and invalid update journal inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/journals/${journalId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                title: 17,
+                date: null,
+                text: true,
+            });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: [
+                    "instance.title is not of a type(s) string",
+                    "instance.text is not of a type(s) string",
+                ],
+                status: 400,
+            },
+        });
+    });
+});
 
 // describe("DELETE /api/users/:userId/recommendations/:recommendationId", () => {
 //     test("get error message and 403 status code if valid token, other user's id and valid recommendation id", async () => {
