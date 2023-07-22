@@ -57,7 +57,13 @@ router.post(
     ensureLoggedIn,
     async function createUserJournal(req, res, next) {
         try {
-            const { title, text, userId } = req.body;
+            const { title, text } = req.body;
+            const { userId } = req.params;
+            const inputs = {};
+            inputs.title = title;
+            inputs.text = text;
+            inputs.userId = +userId;
+            console.log("look here", inputs);
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot Create Journals For Other Users",
@@ -66,7 +72,7 @@ router.post(
                 return next(invalidUser);
             }
             const validator = jsonschema.validate(
-                req.body,
+                inputs,
                 createUserJournalSchema
             );
             if (!validator.valid) {
