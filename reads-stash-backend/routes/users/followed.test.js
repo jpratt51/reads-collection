@@ -104,67 +104,67 @@ describe("GET /api/users/:userId/followers", () => {
     });
 });
 
-// describe("GET /api/users/:userId/followers/:followerId", () => {
-//     test("get one user follower and 200 status code with valid token, valid user id and valid user journal id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/followers/${test2UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             email: "test@email.com",
-//             exp: null,
-//             fname: "tfn",
-//             followerId: test2UserId,
-//             lname: "tln",
-//             totalBooks: null,
-//             totalPages: null,
-//             userId: testUserId,
-//         });
-//     });
+describe("GET /api/users/:userId/followers/:followedId", () => {
+    test("get one user followed and 200 status code with valid token, valid user id and valid user followed id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/followed/${test2UserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            email: "test@email.com",
+            exp: null,
+            fname: "tfn",
+            followedId: test2UserId,
+            lname: "tln",
+            totalBooks: null,
+            totalPages: null,
+            userId: testUserId,
+        });
+    });
 
-//     test("get error message and 401 status code with no token, a valid user id and valid follower id", async () => {
-//         const res = await request(app).get(
-//             `/api/users/${testUserId}/followers/${test2UserId}`
-//         );
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with no token, a valid user id and valid followed id", async () => {
+        const res = await request(app).get(
+            `/api/users/${testUserId}/followed/${test2UserId}`
+        );
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 401 status code with bad token, a valid user id and valid follower id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/journals/${test2UserId}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with bad token, a valid user id and valid followed id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/followed/${test2UserId}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code with valid token, invalid user id and valid journal id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${test2UserId}/followers/${test3UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other Users Followers",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code with valid token, invalid user id and valid followed id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test2UserId}/followed/${test3UserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Followed Users",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code with valid token, invalid userId parameter type and valid follower id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/bad_type/followers/${testUserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other Users Followers",
-//                 status: 403,
-//             },
-//         });
-//     });
-// });
+    test("get error message and 403 status code with valid token, invalid userId parameter type and valid followed id", async () => {
+        const res = await request(app)
+            .get(`/api/users/bad_type/followed/${testUserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Followed Users",
+                status: 403,
+            },
+        });
+    });
+});

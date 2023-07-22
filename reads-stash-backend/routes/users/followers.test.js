@@ -107,7 +107,7 @@ describe("GET /api/users/:userId/followers", () => {
 });
 
 describe("GET /api/users/:userId/followers/:followerId", () => {
-    test("get one user follower and 200 status code with valid token, valid user id and valid user journal id", async () => {
+    test("get one user follower and 200 status code with valid token, valid user id and valid user followed id", async () => {
         const res = await request(app)
             .get(`/api/users/${testUserId}/followers/${test2UserId}`)
             .set({ _token: testUserToken });
@@ -136,7 +136,7 @@ describe("GET /api/users/:userId/followers/:followerId", () => {
 
     test("get error message and 401 status code with bad token, a valid user id and valid follower id", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/journals/${test2UserId}`)
+            .get(`/api/users/${testUserId}/followers/${test2UserId}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -144,7 +144,7 @@ describe("GET /api/users/:userId/followers/:followerId", () => {
         });
     });
 
-    test("get error message and 403 status code with valid token, invalid user id and valid journal id", async () => {
+    test("get error message and 403 status code with valid token, invalid user id and valid follower id", async () => {
         const res = await request(app)
             .get(`/api/users/${test2UserId}/followers/${test3UserId}`)
             .set({ _token: testUserToken });
