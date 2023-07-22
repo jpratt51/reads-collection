@@ -249,3 +249,51 @@ describe("POST /api/users/:userId/followed", () => {
         });
     });
 });
+
+describe("DELETE /api/users/:userId/followed/:followedId", () => {
+    test("get error message and 403 status code if valid token, other user's id and valid followed id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${test2UserId}/followed/${test3UserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Followed Users",
+                status: 403,
+            },
+        });
+    });
+
+    test("get error message and 401 status code if invalid token, valid user id and valid followed id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}/followed/${test2UserId}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 403 status code if valid token, bad data type user id and valid followed id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/bad_type/followed/${test2UserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Followed Users",
+                status: 403,
+            },
+        });
+    });
+
+    test("get deleted user followed message and 200 status code if valid token, valid user id and valid followed id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}/followed/${test2UserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            msg: expect.stringContaining("stopped following"),
+        });
+    });
+});
