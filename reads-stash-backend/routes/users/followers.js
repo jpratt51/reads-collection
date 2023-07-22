@@ -13,7 +13,6 @@ router.get(
     async function getAllUserFollowers(req, res, next) {
         try {
             const { userId } = req.params;
-            console.log("testify", userId, req.user.id);
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Followers",

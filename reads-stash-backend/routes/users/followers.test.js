@@ -50,13 +50,23 @@ describe("GET /api/users/:userId/followers", () => {
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual([
             {
+                email: "test@email.com",
+                exp: null,
+                fname: "tfn",
                 followerId: test2UserId,
-                id: expect.any(Number),
+                lname: "tln",
+                totalBooks: null,
+                totalPages: null,
                 userId: testUserId,
             },
             {
+                email: "test@email.com",
+                exp: null,
+                fname: "tfn",
                 followerId: test3UserId,
-                id: expect.any(Number),
+                lname: "tln",
+                totalBooks: null,
+                totalPages: null,
                 userId: testUserId,
             },
         ]);
@@ -96,19 +106,13 @@ describe("GET /api/users/:userId/followers", () => {
     });
 });
 
-// describe("GET /api/users/:userId/journals/:journalId", () => {
-//     test("get one user journal and 200 status code with valid token, valid user id and valid user journal id", async () => {
+// describe("GET /api/users/:userId/followers/:followerId", () => {
+//     test("get one user follower and 200 status code with valid token, valid user id and valid user journal id", async () => {
 //         const res = await request(app)
-//             .get(`/api/users/${testUserId}/journals/${journalId1}`)
+//             .get(`/api/users/${testUserId}/followers/${test2UserId}`)
 //             .set({ _token: testUserToken });
 //         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             date: "2023-07-21T05:00:00.000Z",
-//             id: journalId1,
-//             text: "test journal text",
-//             title: "test journal title",
-//             userId: testUserId,
-//         });
+//         expect(res.body).toEqual({ fname: 44, id: 43, lname: 42 });
 //     });
 
 //     test("get error message and 401 status code with no token, a valid user id and valid journal id", async () => {
