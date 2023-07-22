@@ -168,7 +168,7 @@ class UserRead {
 
         const userIdIdx = values.length - 1;
 
-        const updateSqlQuery = await db.query(
+        await db.query(
             `UPDATE users_reads SET ${columns} WHERE user_id = $${userIdIdx} AND read_id = $${
                 userIdIdx + 1
             } RETURNING *`,

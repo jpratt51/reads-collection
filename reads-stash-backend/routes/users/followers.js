@@ -5,6 +5,7 @@ const router = new express.Router();
 const db = require("../../db");
 const UserFollower = require("../../models/users/follower");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const ExpressError = require("../../expressError");
 
 router.get(
     "/:userId/followers",
@@ -12,9 +13,10 @@ router.get(
     async function getAllUserFollowers(req, res, next) {
         try {
             const { userId } = req.params;
+            console.log("testify", userId, req.user.id);
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
-                    "Cannot View Other Users Followers",
+                    "Cannot View Other User's Followers",
                     403
                 );
                 return next(invalidUser);

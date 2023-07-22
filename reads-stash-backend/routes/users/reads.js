@@ -108,7 +108,7 @@ router.patch(
             }
 
             const userRead = await UserRead.update(userId, readId, inputs);
-            console.log("userRead", userRead);
+
             return res.json(userRead);
         } catch (error) {
             return next(error);
