@@ -56,7 +56,12 @@ router.post(
     ensureLoggedIn,
     async function createUserFollowed(req, res, next) {
         try {
-            const { followedId, userId } = req.body;
+            const { followedId } = req.body;
+            const { userId } = req.params;
+            let inputs = {};
+            inputs["followedId"] = +followedId;
+            inputs["userId"] = +userId;
+
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Followed Users",
@@ -65,9 +70,10 @@ router.post(
                 return next(invalidUser);
             }
             const validator = jsonschema.validate(
-                req.body,
+                inputs,
                 createUserFollowedSchema
             );
+
             if (!validator.valid) {
                 const listOfErrors = validator.errors.map((e) => e.stack);
                 const errors = new ExpressError(listOfErrors, 400);

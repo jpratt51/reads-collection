@@ -59,7 +59,7 @@ router.post(
         try {
             const { title, text } = req.body;
             const { userId } = req.params;
-            const inputs = {};
+            let inputs = {};
             inputs.title = title;
             inputs.text = text;
             inputs.userId = +userId;

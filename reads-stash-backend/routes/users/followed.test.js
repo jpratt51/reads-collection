@@ -168,3 +168,84 @@ describe("GET /api/users/:userId/followers/:followedId", () => {
         });
     });
 });
+
+describe("POST /api/users/:userId/followed", () => {
+    test("get error message and 401 status code when sending in invalid token, valid userId and valid followedId", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/followed`)
+            .set({ _token: "bad token" })
+            .send({
+                followedId: test2UserId,
+            });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
+
+    test("get error message and 403 status code when sending in valid token, invalid userId and valid followedId", async () => {
+        const res = await request(app)
+            .post(`/api/users/1000/followed`)
+            .set({ _token: testUserToken })
+            .send({
+                followedId: test2UserId,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Followed Users",
+                status: 403,
+            },
+        });
+    });
+
+    test("get error message and 403 status code when sending in valid token, invalid userId data type and valid followedId", async () => {
+        const res = await request(app)
+            .post(`/api/users/bad_type/followed`)
+            .set({ _token: testUserToken })
+            .send({
+                followedId: test2UserId,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot View Other User's Followed Users",
+                status: 403,
+            },
+        });
+    });
+
+    test("get error message and 400 status code when sending in valid token, valid userId and invalid followedId", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/followed`)
+            .set({ _token: testUserToken })
+            .send({ followedId: "nope" });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: ["instance.followedId is not of a type(s) integer"],
+                status: 400,
+            },
+        });
+    });
+
+    test("get created followed user and 201 status code when sending in valid token, valid userId and valid followedId", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/followed`)
+            .set({ _token: testUserToken })
+            .send({
+                followedId: test2UserId,
+            });
+        expect(res.statusCode).toBe(201);
+        expect(res.body).toEqual({
+            email: "test@email.com",
+            exp: null,
+            fname: "tfn",
+            followedId: test2UserId,
+            lname: "tln",
+            totalBooks: null,
+            totalPages: null,
+            userId: testUserId,
+        });
+    });
+});
