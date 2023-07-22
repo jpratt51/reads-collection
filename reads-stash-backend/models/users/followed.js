@@ -5,8 +5,22 @@ const ExpressError = require("../../expressError");
 const { checkForUser } = require("../../helpers/checkForUser");
 
 class UserFollowed {
-    constructor(id, followed_id, user_id) {
-        this.id = id;
+    constructor(
+        fname,
+        lname,
+        email,
+        exp,
+        total_books,
+        total_pages,
+        followed_id,
+        user_id
+    ) {
+        this.fname = fname;
+        this.lname = lname;
+        this.email = email;
+        this.exp = exp;
+        this.totalBooks = total_books;
+        this.totalPages = total_pages;
         this.followedId = followed_id;
         this.userId = user_id;
     }
@@ -15,11 +29,21 @@ class UserFollowed {
         if (/^\d+$/.test(userId) === false)
             throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
-            `SELECT * FROM users_followed WHERE user_id = $1;`,
+            `SELECT users.id AS followed_id, users.fname, users.lname, users.email, users.exp, users.total_books, users.total_pages, user_id FROM users_followed JOIN users ON followed_id = users.id WHERE user_id = $1;`,
             [userId]
         );
         const userFollowed = results.rows.map(
-            (f) => new UserFollowed(f.id, f.followed_id, f.user_id)
+            (f) =>
+                new UserFollowed(
+                    f.fname,
+                    f.lname,
+                    f.email,
+                    f.exp,
+                    f.total_books,
+                    f.total_pages,
+                    f.followed_id,
+                    f.user_id
+                )
         );
         return userFollowed;
     }
@@ -30,14 +54,23 @@ class UserFollowed {
         if (/^\d+$/.test(followedId) === false)
             throw new ExpressError(`Invalid followed id data type`, 400);
         const results = await db.query(
-            `SELECT * FROM users_followed WHERE id = $1 AND user_id = $2;`,
-            [followedId, userId]
+            `SELECT users.id AS followed_id, users.fname, users.lname, users.email, users.exp, users.total_books, users.total_pages, user_id FROM users_followed JOIN users ON followed_id = users.id WHERE user_id = $1 AND followed_id = $2;`,
+            [userId, followedId]
         );
         const f = results.rows[0];
         if (!f) {
             throw new ExpressError(`User followed ${followerId} not found`);
         }
-        return new UserFollowed(f.id, f.followed_id, f.user_id);
+        return new UserFollowed(
+            f.fname,
+            f.lname,
+            f.email,
+            f.exp,
+            f.total_books,
+            f.total_pages,
+            f.followed_id,
+            f.user_id
+        );
     }
 
     static async create(followedId, userId) {
@@ -45,13 +78,29 @@ class UserFollowed {
         const followedCheck = await checkForUser(followedId);
         if (userCheck) return userCheck;
         if (followedCheck) return followedCheck;
-        const results = await db.query(
-            "INSERT INTO users_followed (followed_id, user_id) VALUES ($1, $2) RETURNING * ;",
+
+        await db.query(
+            "INSERT INTO users_followed (followed_id, user_id) VALUES ($1, $2) RETURNING id ;",
             [followedId, userId]
         );
+
+        const results = await db.query(
+            "SELECT users.id AS followed_id, users.fname, users.lname, users.email, users.exp, users.total_books, users.total_pages, user_id FROM users_followed JOIN users ON followed_id = users.id WHERE user_id = $1 AND followed_id = $2;",
+            [userId, followedId]
+        );
+
         const f = results.rows[0];
 
-        return new UserFollowed(f.id, f.followed_id, f.user_id);
+        return new UserFollowed(
+            f.fname,
+            f.lname,
+            f.email,
+            f.exp,
+            f.total_books,
+            f.total_pages,
+            f.followed_id,
+            f.user_id
+        );
     }
 
     async delete() {
