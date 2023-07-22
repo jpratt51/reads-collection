@@ -53,14 +53,23 @@ class UserFollower {
         if (/^\d+$/.test(followerId) === false)
             throw new ExpressError(`Invalid follower id data type`, 400);
         const results = await db.query(
-            `SELECT * FROM users_followers WHERE id = $1 AND user_id = $2;`,
-            [followerId, userId]
+            `SELECT users.id AS follower_id, users.fname, users.lname, users.email, users.exp, users.total_books, users.total_pages, user_id FROM users_followers JOIN users ON follower_id = users.id WHERE user_id = $1 AND follower_id = $2;`,
+            [userId, followerId]
         );
         const f = results.rows[0];
         if (!f) {
             throw new ExpressError(`User follower ${followerId} not found`);
         }
-        return new UserFollower(f.id, f.follower_id, f.user_id);
+        return new UserFollower(
+            f.fname,
+            f.lname,
+            f.email,
+            f.exp,
+            f.total_books,
+            f.total_pages,
+            f.follower_id,
+            f.user_id
+        );
     }
 }
 
