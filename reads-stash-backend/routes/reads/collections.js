@@ -8,7 +8,7 @@ const { ensureLoggedIn } = require("../../middleware/auth");
 const { checkUserIdMatchesLoggedInUser } = require("../../helpers/checkUser");
 const checkForValidInputs = require("../../helpers/inputsValidation");
 const jsonschema = require("jsonschema");
-const createReadCollectionSchema = require("../../schemas/createUsersReadCollection.json");
+const createReadCollectionSchema = require("../../schemas/createReadCollection.json");
 const ExpressError = require("../../expressError");
 
 router.get(
@@ -63,7 +63,6 @@ router.post(
                 createReadCollectionSchema
             );
             checkForValidInputs(validator);
-            console.log("inputs", inputs);
             const collection = await ReadCollection.create(inputs);
             return res.status(201).json(collection);
         } catch (error) {
