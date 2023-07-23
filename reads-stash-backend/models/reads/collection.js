@@ -49,20 +49,12 @@ class ReadCollection {
         );
         const readCollections = results.rows.map(
             (rc) =>
-                new ReadCollection(
-                    rc.id,
-                    rc.collection_name,
-                    rc.collection_id,
-                    rc.title,
-                    rc.isbn,
-                    rc.read_id
-                )
+                new ReadCollection(rc.id, rc.collection_name, rc.collection_id)
         );
         return readCollections;
     }
 
     static async getById(userId, readId, collectionId) {
-        console.log(userId, readId, collectionId);
         if (/^\d+$/.test(userId) === false)
             throw new ExpressError(`Invalid user id data type`, 400);
         if (/^\d+$/.test(collectionId) === false)
@@ -94,7 +86,6 @@ class ReadCollection {
             [collectionId, userId, readId]
         );
         const rc = results.rows[0];
-        console.log(rc);
         if (!rc) {
             throw new ExpressError(`User's Read Collection Not Found`);
         }
@@ -144,7 +135,6 @@ class ReadCollection {
             [readId, collectionId]
         );
         const rc = results.rows[0];
-        console.log("rc", rc);
 
         return new ReadCollection(rc.id, rc.collection_id, rc.read_id);
     }
