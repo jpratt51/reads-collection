@@ -5,20 +5,41 @@ const router = new express.Router();
 const db = require("../../db");
 const ReadCollection = require("../../models/reads/collection");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const { checkUserIdMatchesLoggedInUser } = require("../../helpers/checkUser");
+const checkForValidInputs = require("../../helpers/inputsValidation");
 const jsonschema = require("jsonschema");
-const createReadCollectionSchema = require("../../schemas/createReadCollection.json");
+const createReadCollectionSchema = require("../../schemas/createUsersReadCollection.json");
 const ExpressError = require("../../expressError");
 
 router.get(
+    "/:readId/collections",
+    ensureLoggedIn,
+    async function getAllReadsCollections(req, res, next) {
+        try {
+            const { userId } = req.body;
+            const { readId } = req.params;
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
+            const readCollection = await ReadCollection.getAll(userId, readId);
+            return res.json(readCollection);
+        } catch (error) {
+            return next(error);
+        }
+    }
+);
+
+router.get(
     "/:readId/collections/:collectionId",
-    async function getOneReadCollection(req, res, next) {
+    ensureLoggedIn,
+    async function getOneReadsCollection(req, res, next) {
         try {
             const { readId, collectionId } = req.params;
+            const { userId } = req.body;
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const readCollection = await ReadCollection.getById(
+                userId,
                 readId,
                 collectionId
             );
-            console.log(readCollection);
             return res.json(readCollection);
         } catch (error) {
             return next(error);
@@ -29,23 +50,21 @@ router.get(
 router.post(
     "/:readId/collections",
     ensureLoggedIn,
-    async function createReadCollection(req, res, next) {
+    async function createReadsCollection(req, res, next) {
         try {
+            const { readId } = req.params;
+            const { userId } = req.body;
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
+            let inputs = {};
+            inputs["readId"] = +readId;
+            inputs["collectionId"] = req.body.collectionId;
             const validator = jsonschema.validate(
-                req.body,
+                inputs,
                 createReadCollectionSchema
             );
-            if (!validator.valid) {
-                const listOfErrors = validator.errors.map((e) => e.stack);
-                const errors = new ExpressError(listOfErrors, 400);
-                return next(errors);
-            }
-            const { readId } = req.params;
-            const { collectionId } = req.body;
-            const collection = await ReadCollection.create(
-                readId,
-                collectionId
-            );
+            checkForValidInputs(validator);
+            console.log("inputs", inputs);
+            const collection = await ReadCollection.create(inputs);
             return res.status(201).json(collection);
         } catch (error) {
             return next(error);
@@ -56,16 +75,19 @@ router.post(
 router.delete(
     "/:readId/collections/:collectionId",
     ensureLoggedIn,
-    async function deleteReadCollection(req, res, next) {
+    async function deleteReadsCollection(req, res, next) {
         try {
             const { readId, collectionId } = req.params;
+            const { userId } = req.body;
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const readCollection = await ReadCollection.getById(
+                userId,
                 readId,
                 collectionId
             );
             await readCollection.delete();
             return res.json({
-                msg: `Deleted read ${readId} from collection ${collectionId}`,
+                msg: `Deleted Read ${userId} Association With Collection ${collectionId}`,
             });
         } catch (error) {
             return next(error);

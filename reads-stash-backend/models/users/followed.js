@@ -2,7 +2,7 @@
 
 const db = require("../../db");
 const ExpressError = require("../../expressError");
-const { checkForUser } = require("../../helpers/checkForUser");
+const { checkForUser } = require("../../helpers/checkUser");
 
 class UserFollowed {
     constructor(

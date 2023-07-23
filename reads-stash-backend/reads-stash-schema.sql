@@ -113,12 +113,12 @@ INSERT INTO users (username, fname, lname, email, password) VALUES
 ('t4u', 't4fname', 't4lname', 't4email', 't4password'),
 ('t5u', 't5fname', 't5lname', 't5email', 't5password');
 
-INSERT INTO reads (title, isbn) VALUES 
-('t1read', 1234567891011),
-('t2read', 1234567891012),
-('t3read', 1234567891013),
-('t4read', 1234567891014),
-('t5read', 1234567891015);
+INSERT INTO reads (title, isbn, description, avg_rating, print_type, publisher) VALUES 
+('t1read', 1234567891011, 'test 1 book description', 3.5, 'BOOK', 'Penguin' ),
+('t2read', 1234567891012, 'test 2 book description', 4, 'BOOK', 'Penguin' ),
+('t3read', 1234567891013, 'test 3 book description', 4.5, 'BOOK', 'Penguin' ),
+('t4read', 1234567891014, 'test 4 book description', 5, 'BOOK', 'Penguin' ),
+('t5read', 1234567891015, 'test 5 book description', 2.5, 'BOOK', 'Penguin' );
 
 INSERT INTO collections (name, user_id) VALUES 
 ('t1ucollection', 1),
@@ -134,12 +134,12 @@ INSERT INTO badges (name, thumbnail) VALUES
 ('t4badge', 't4thumbnail'),
 ('t5badge', 't5thumbnail');
 
-INSERT INTO users_reads (user_id, read_id) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5);
+INSERT INTO users_reads (rating, review_text, review_date, user_id, read_id) VALUES
+(4, 'test 1 review text', '2023-07-22', 1, 1),
+(2, 'test 2 review text', '2023-07-22', 1, 2),
+(3, 'test 3 review text', '2023-07-22', 1, 3),
+(4, 'test 4 review text', '2023-07-22', 1, 4),
+(5, 'test 5 review text', '2023-07-22', 1, 5);
 
 INSERT INTO authors (name) VALUES 
 ('t1author'),
@@ -157,6 +157,8 @@ INSERT INTO users_badges (user_id, badge_id) VALUES
 
 INSERT INTO reads_collections (read_id, collection_id) VALUES
 (1,1),
+(1,2),
+(1,3),
 (2,2),
 (3,3),
 (4,4),

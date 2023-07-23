@@ -14,10 +14,10 @@ const userJournalsRoutes = require("./routes/users/journals");
 const userFollowersRoutes = require("./routes/users/followers");
 const userFollowedRoutes = require("./routes/users/followed");
 const userRecommendationsRoutes = require("./routes/users/recommendations");
+const readsCollectionsRoutes = require("./routes/reads/collections");
 
 // reads routers
 const readRoutes = require("./routes/reads/reads");
-const readCollectionsRoutes = require("./routes/reads/collections");
 
 // other routers
 const badgeRoutes = require("./routes/badges");
@@ -40,7 +40,7 @@ app.use("/api/users", userRecommendationsRoutes);
 
 // reads
 app.use("/api/reads", readRoutes);
-app.use("/api/reads", readCollectionsRoutes);
+app.use("/api/reads", readsCollectionsRoutes);
 
 // other
 app.use("/api/badges", badgeRoutes);
