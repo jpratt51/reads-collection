@@ -187,70 +187,79 @@ describe("GET /api/reads/:readId/collections", () => {
     });
 });
 
-// describe("GET /api/users/:userId/followers/:followedId", () => {
-//     test("get one user followed and 200 status code with valid token, valid user id and valid user followed id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/followed/${test2UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             email: "test@email.com",
-//             exp: null,
-//             fname: "tfn",
-//             followedId: test2UserId,
-//             lname: "tln",
-//             totalBooks: null,
-//             totalPages: null,
-//             userId: testUserId,
-//         });
-//     });
+describe("GET /api/reads/:readId/collections/:collectionId", () => {
+    test("get one user's read collection and 200 status code with valid token, valid user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .get(`/api/reads/${read1}/collections/${user1collection1}`)
+            .set({ _token: testUserToken })
+            .send({ userId: testUserId });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            avgRating: 4,
+            collectionId: user1collection1,
+            collectionName: "t1ucollection",
+            description: "test 1 book description",
+            id: expect.any(Number),
+            isbn: "1234567891011",
+            printType: "BOOK",
+            publisher: "Penguin",
+            rating: 4,
+            readId: read1,
+            reviewDate: "2023-07-22T05:00:00.000Z",
+            reviewText: "test 1 review text",
+            title: "t1read",
+        });
+    });
 
-//     test("get error message and 401 status code with no token, a valid user id and valid followed id", async () => {
-//         const res = await request(app).get(
-//             `/api/users/${testUserId}/followed/${test2UserId}`
-//         );
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with no token, valid user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .get(`/api/reads/${read1}/collections/${user1collection1}`)
+            .send({ userId: testUserId });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 401 status code with bad token, a valid user id and valid followed id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/followed/${test2UserId}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with bad token, valid user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .get(`/api/reads/${read1}/collections/${user1collection1}`)
+            .set({ _token: "bad token" })
+            .send({ userId: testUserId });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code with valid token, invalid user id and valid followed id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${test2UserId}/followed/${test3UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code with valid token, invalid user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .get(`/api/reads/${read1}/collections/${user1collection1}`)
+            .set({ _token: testUserToken })
+            .send({ userId: test2UserId });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code with valid token, invalid userId parameter type and valid followed id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/bad_type/followed/${testUserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
-// });
+    test("get error message and 401 status code with valid token, invalid userId parameter type, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .get(`/api/reads/${read1}/collections/${user1collection1}`)
+            .set({ _token: "bad type" })
+            .send({ userId: testUserId });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: {
+                message: "Unauthorized",
+                status: 401,
+            },
+        });
+    });
+});
 
 // describe("POST /api/users/:userId/followed", () => {
 //     test("get error message and 401 status code when sending in invalid token, valid userId and valid followedId", async () => {
