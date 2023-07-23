@@ -121,32 +121,14 @@ describe("GET /api/reads/:readId/collections", () => {
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual([
             {
-                avgRating: null,
                 collectionId: user1collection1,
                 collectionName: "t1ucollection",
-                description: null,
                 id: expect.any(Number),
-                isbn: null,
-                printType: null,
-                publisher: null,
-                rating: null,
-                reviewDate: null,
-                reviewText: null,
-                title: null,
             },
             {
-                avgRating: null,
                 collectionId: user1collection2,
                 collectionName: "t2ucollection",
-                description: null,
                 id: expect.any(Number),
-                isbn: null,
-                printType: null,
-                publisher: null,
-                rating: null,
-                reviewDate: null,
-                reviewText: null,
-                title: null,
             },
         ]);
     });
@@ -261,86 +243,86 @@ describe("GET /api/reads/:readId/collections/:collectionId", () => {
     });
 });
 
-// describe("POST /api/users/:userId/followed", () => {
-//     test("get error message and 401 status code when sending in invalid token, valid userId and valid followedId", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/followed`)
-//             .set({ _token: "bad token" })
-//             .send({
-//                 followedId: test2UserId,
-//             });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+describe("POST /api/reads/:readId/collections", () => {
+    test("get error message and 401 status code when sending in invalid token, valid user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .post(`/api/reads/${read1}/collections`)
+            .set({ _token: "bad token" })
+            .send({
+                userId: testUserId,
+                collectionId: user1collection3,
+            });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId and valid followedId", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/1000/followed`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 followedId: test2UserId,
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .post(`/api/reads/${read1}/collections`)
+            .set({ _token: testUserToken })
+            .send({
+                userId: test2UserId,
+                collectionId: user1collection3,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId data type and valid followedId", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/bad_type/followed`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 followedId: test2UserId,
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid userId data type, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .post(`/api/reads/${read1}/collections`)
+            .set({ _token: testUserToken })
+            .send({
+                userId: "bad type",
+                collectionId: user1collection3,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 400 status code when sending in valid token, valid userId and invalid followedId", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/followed`)
-//             .set({ _token: testUserToken })
-//             .send({ followedId: "nope" });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: ["instance.followedId is not of a type(s) integer"],
-//                 status: 400,
-//             },
-//         });
-//     });
+    test("get error message and 400 status code when sending in valid token, valid userId, and read id and collection id for an existing read collection", async () => {
+        const res = await request(app)
+            .post(`/api/reads/${read1}/collections`)
+            .set({ _token: testUserToken })
+            .send({ userId: testUserId, collectionId: user1collection1 });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: "Read Collection Association Already Exists.",
+                status: 400,
+            },
+        });
+    });
 
-//     test("get created followed user and 201 status code when sending in valid token, valid userId and valid followedId", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/followed`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 followedId: test2UserId,
-//             });
-//         expect(res.statusCode).toBe(201);
-//         expect(res.body).toEqual({
-//             email: "test@email.com",
-//             exp: null,
-//             fname: "tfn",
-//             followedId: test2UserId,
-//             lname: "tln",
-//             totalBooks: null,
-//             totalPages: null,
-//             userId: testUserId,
-//         });
-//     });
-// });
+    test("get created read collection object and 201 status code when sending in valid token, valid userId, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .post(`/api/reads/${read1}/collections`)
+            .set({ _token: testUserToken })
+            .send({
+                userId: testUserId,
+                collectionId: user1collection3,
+            });
+        expect(res.statusCode).toBe(201);
+        expect(res.body).toEqual({
+            id: expect.any(Number),
+            collectionId: user1collection3,
+            collectionName: "t3ucollection",
+            readId: read1,
+        });
+    });
+});
 
 // describe("DELETE /api/users/:userId/followed/:followedId", () => {
 //     test("get error message and 403 status code if valid token, other user's id and valid followed id", async () => {

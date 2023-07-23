@@ -6,22 +6,23 @@ const ExpressError = require("../../expressError");
 class ReadCollection {
     constructor(
         id,
-        collection_name = null,
+        collection_name,
         collection_id,
-        title = null,
-        description = null,
-        isbn = null,
-        avg_rating = null,
-        print_type = null,
-        publisher = null,
-        rating = null,
-        review_text = null,
-        review_date = null,
-        read_id
+        read_id,
+        title,
+        description,
+        isbn,
+        avg_rating,
+        print_type,
+        publisher,
+        rating,
+        review_text,
+        review_date
     ) {
         this.id = id;
         this.collectionName = collection_name;
         this.collectionId = collection_id;
+        this.readId = read_id;
         this.title = title;
         this.description = description;
         this.isbn = isbn;
@@ -31,7 +32,6 @@ class ReadCollection {
         this.rating = rating;
         this.reviewText = review_text;
         this.reviewDate = review_date;
-        this.readId = read_id;
     }
 
     static async getAll(userId, readId) {
@@ -63,17 +63,17 @@ class ReadCollection {
             `SELECT
             rc.id AS id,
             c.name AS collection_name,
+            c.id AS collection_id,
+            r.id AS read_id,
             r.title,
-            r.isbn,
             r.description,
+            r.isbn,
             r.avg_rating,
             r.print_type,
             r.publisher,
             ur.rating,
             ur.review_text,
-            ur.review_date,
-            c.id AS collection_id,
-            r.id AS read_id
+            ur.review_date
         FROM reads_collections rc
         JOIN reads r ON rc.read_id = r.id
         JOIN users_reads ur ON ur.read_id = r.id
@@ -93,6 +93,7 @@ class ReadCollection {
             rc.id,
             rc.collection_name,
             rc.collection_id,
+            rc.read_id,
             rc.title,
             rc.description,
             rc.isbn,
@@ -101,8 +102,7 @@ class ReadCollection {
             rc.publisher,
             rc.rating,
             rc.review_text,
-            rc.review_date,
-            rc.read_id
+            rc.review_date
         );
     }
 
@@ -124,19 +124,31 @@ class ReadCollection {
             "SELECT * FROM reads_collections WHERE read_id = $1 AND collection_id = $2",
             [readId, collectionId]
         );
-        if (duplicateReadCollectionCheck.rows.length > 0)
+        if (duplicateReadCollectionCheck.rows.length !== 0)
             throw new ExpressError(
                 "Read Collection Association Already Exists.",
                 400
             );
 
-        const results = await db.query(
-            "INSERT INTO reads_collections (read_id, collection_id) VALUES ($1, $2) RETURNING *;",
+        await db.query(
+            "INSERT INTO reads_collections (read_id, collection_id) VALUES ($1, $2)",
             [readId, collectionId]
         );
-        const rc = results.rows[0];
 
-        return new ReadCollection(rc.id, rc.collection_id, rc.read_id);
+        const results = await db.query(
+            `SELECT rc.id, c.name AS collection_name, c.id AS collection_id, rc.read_id FROM reads_collections rc JOIN collections c ON rc.collection_id = c.id JOIN reads r ON rc.read_id = r.id WHERE rc.read_id = $1 AND rc.collection_id = $2`,
+            [readId, collectionId]
+        );
+
+        const rc = results.rows[0];
+        console.log("rc", rc);
+
+        return new ReadCollection(
+            rc.id,
+            rc.collection_name,
+            rc.collection_id,
+            rc.read_id
+        );
     }
 
     async delete() {
