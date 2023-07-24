@@ -52,7 +52,6 @@ router.post(
         try {
             const { name } = req.body;
             const { userId } = req.params;
-            console.log("hello world", userId);
             checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const validator = jsonschema.validate(
                 req.body,
