@@ -29,10 +29,11 @@ class UserBadge {
         if (/^\d+$/.test(badgeId) === false)
             throw new ExpressError(`Invalid badge id data type`, 400);
         const results = await db.query(
-            "SELECT * FROM users_badges WHERE id = $1 AND user_id = $2;",
-            [badgeId, userId]
+            "SELECT * FROM users_badges WHERE user_id = $1 AND badge_id = $2;",
+            [userId, badgeId]
         );
         const b = results.rows[0];
+        console.log("user_badges search results", b);
         if (!b) {
             throw new ExpressError(`User's badge ${badgeId} not found`);
         }
