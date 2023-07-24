@@ -29,6 +29,7 @@ beforeAll(async () => {
     );
 
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
+    testUserToken = jwt.sign(testUser, SECRET_KEY);
 
     testUserId = res.rows[0].id;
     test2UserId = res.rows[1].id;
@@ -46,8 +47,6 @@ beforeAll(async () => {
         `INSERT INTO users_badges (user_id, badge_id) VALUES ($1, $3), ($1, $4), ($2, $5) RETURNING id`,
         [testUserId, test2UserId, testBadge1Id, testBadge2Id, testBadge3Id]
     );
-
-    testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
 
 afterAll(async () => {
@@ -158,86 +157,84 @@ describe("GET /api/users/:userId/badges/:badgeId", () => {
     });
 });
 
-// describe("POST /api/users/:userId/badges", () => {
-//     test("get error message and 401 status code when sending in invalid token, valid userId and valid badge id", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/badges`)
-//             .set({ _token: "bad token" })
-//             .send({
-//                 followedId: test2UserId,
-//             });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+describe("POST /api/users/:userId/badges", () => {
+    test("get error message and 401 status code when sending in invalid token, valid userId and valid badge id", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/badges`)
+            .set({ _token: "bad token" })
+            .send({
+                badgeId: testBadge3Id,
+            });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId and valid badge id", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/1000/badges`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 followedId: test2UserId,
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid userId and valid badge id", async () => {
+        const res = await request(app)
+            .post(`/api/users/1000/badges`)
+            .set({ _token: testUserToken })
+            .send({
+                badgeId: testBadge3Id,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Create Badges For Other Users",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId data type and valid badge id", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/bad_type/badges`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 followedId: test2UserId,
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid userId data type and valid badge id", async () => {
+        const res = await request(app)
+            .post(`/api/users/bad_type/badges`)
+            .set({ _token: testUserToken })
+            .send({
+                badgeId: testBadge3Id,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Create Badges For Other Users",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 400 status code when sending in valid token, valid userId and invalid badge id", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/badges`)
-//             .set({ _token: testUserToken })
-//             .send({ followedId: "nope" });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: ["instance.followedId is not of a type(s) integer"],
-//                 status: 400,
-//             },
-//         });
-//     });
+    test("get error message and 400 status code when sending in valid token, valid userId and invalid badge id", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/badges`)
+            .set({ _token: testUserToken })
+            .send({
+                badgeId: testBadge3Id,
+            });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: ["instance.userId is not of a type(s) integer"],
+                status: 400,
+            },
+        });
+    });
 
-//     test("get cbadge user and 201 status code when sending in valid token, valid userId and valid badge id", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/badges`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 followedId: test2UserId,
-//             });
-//         expect(res.statusCode).toBe(201);
-//         expect(res.body).toEqual({
-//             email: "test@email.com",
-//             exp: null,
-//             fname: "tfn",
-//             followedId: test2UserId,
-//             lname: "tln",
-//             totalBooks: null,
-//             totalPages: null,
-//             userId: testUserId,
-//         });
-//     });
-// });
+    test("get cbadge user and 201 status code when sending in valid token, valid userId and valid badge id", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/badges`)
+            .set({ _token: testUserToken })
+            .send({
+                badgeId: testBadge3Id,
+            });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: ["instance.userId is not of a type(s) integer"],
+                status: 400,
+            },
+        });
+    });
+});
 
 // describe("DELETE /api/users/:userId/badges/:badgeId", () => {
 //     test("get error message and 403 status code if valid token, other user's id and valid badge id", async () => {

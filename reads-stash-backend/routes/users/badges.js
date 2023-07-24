@@ -56,7 +56,11 @@ router.post(
     ensureLoggedIn,
     async function createUserBadge(req, res, next) {
         try {
-            const { userId, badgeId } = req.body;
+            const { badgeId } = req.body;
+            const { userId } = req.params;
+            let inputs = {};
+            inputs["badgeId"] = badgeId;
+            inputs["userId"] = userId;
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot Create Badges For Other Users",
@@ -65,7 +69,7 @@ router.post(
                 return next(invalidUser);
             }
             const validator = jsonschema.validate(
-                req.body,
+                inputs,
                 createUserBadgeSchema
             );
             if (!validator.valid) {
