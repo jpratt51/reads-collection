@@ -29,6 +29,7 @@
             "type": "string",
             "default": "",
             "title": "The isbn Schema",
+            "pattern" : "^[0-9]+$",
             "examples": [
                 "9780989671767"
             ]

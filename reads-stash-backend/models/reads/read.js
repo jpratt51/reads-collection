@@ -118,14 +118,9 @@ class Read {
                 readAuthValues
             );
 
-            const readResults = await db.query(
-                `SELECT * FROM reads WHERE id = $1`,
-                [newReadId]
-            );
-
             const authResults = await db.query(
                 `SELECT a.name FROM reads_authors ra JOIN authors a ON ra.author_id = a.id WHERE ra.read_id = $1`,
-                [readResults.rows[0].id]
+                [readRes.rows[0].id]
             );
 
             const readAuths = authResults.rows.map((a) => a.name);
@@ -138,6 +133,7 @@ class Read {
                 r.avg_rating,
                 r.print_type,
                 r.publisher,
+                r.thumbnail,
                 readAuths
             );
         }
@@ -150,7 +146,7 @@ class Read {
             r.avg_rating,
             r.print_type,
             r.publisher,
-            r.authors
+            r.thumbnail
         );
     }
 }
