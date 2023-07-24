@@ -98,72 +98,70 @@ describe("GET /api/users/:userId/collections", () => {
     });
 });
 
-// describe("GET /api/users/:userId/journals/:journalId", () => {
-//     test("get one user journal and 200 status code with valid token, valid user id and valid user journal id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/journals/${journalId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             date: "2023-07-21T05:00:00.000Z",
-//             id: journalId1,
-//             text: "test journal text",
-//             title: "test journal title",
-//             userId: testUserId,
-//         });
-//     });
+describe("GET /api/users/:userId/collections/:collectionId", () => {
+    test("get one user collection and 200 status code with valid token, valid user id and valid user collection id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            id: expect.any(Number),
+            name: "test collection name 1",
+            userId: testUserId,
+        });
+    });
 
-//     test("get error message and 401 status code with no token, a valid user id and valid journal id", async () => {
-//         const res = await request(app).get(
-//             `/api/users/${testUserId}/journals/${journalId1}`
-//         );
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with no token, a valid user id and valid collection id", async () => {
+        const res = await request(app).get(
+            `/api/users/${testUserId}/collections/${collectionId1}`
+        );
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 401 status code with bad token, a valid user id and valid journal id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${testUserId}/journals/${journalId1}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code with bad token, a valid user id and valid collection id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code with valid token, invalid user id and valid journal id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/${test2UserId}/journals/${journalId3}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Journals",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code with valid token, invalid user id and valid collection id", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test2UserId}/collections/${collectionId3}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code with valid token, invalid userId parameter type and valid journal id", async () => {
-//         const res = await request(app)
-//             .get(`/api/users/bad_type/journals/${journalId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Journals",
-//                 status: 403,
-//             },
-//         });
-//     });
-// });
+    test("get error message and 403 status code with valid token, invalid userId parameter type and valid collection id", async () => {
+        const res = await request(app)
+            .get(`/api/users/bad_type/collections/${collectionId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
+});
 
-// describe("POST /api/users/:userId/journals", () => {
-//     test("get created user journal object and 201 status code when sending in valid token, valid userId and valid user journal inputs", async () => {
+// describe("POST /api/users/:userId/collections", () => {
+//     test("get created user journal object and 201 status code when sending in valid token, valid userId and valid user collection inputs", async () => {
 //         const res = await request(app)
-//             .post(`/api/users/${testUserId}/journals`)
+//             .post(`/api/users/${testUserId}/collections`)
 //             .set({ _token: testUserToken })
 //             .send({
 //                 title: "new journal title",
@@ -182,7 +180,7 @@ describe("GET /api/users/:userId/collections", () => {
 
 //     test("get error message and 401 status code when sending in invalid token, valid userId and valid user recommendation", async () => {
 //         const res = await request(app)
-//             .post(`/api/users/${testUserId}/journals`)
+//             .post(`/api/users/${testUserId}/collections`)
 //             .set({ _token: "bad token" })
 //             .send({
 //                 title: "new journal title 2?",
@@ -195,9 +193,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId and valid journal inputs", async () => {
+//     test("get error message and 403 status code when sending in valid token, invalid userId and valid collection inputs", async () => {
 //         const res = await request(app)
-//             .post(`/api/users/1000/journals`)
+//             .post(`/api/users/1000/collections`)
 //             .set({ _token: testUserToken })
 //             .send({
 //                 title: "new journal title 2?",
@@ -213,9 +211,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId data type and valid journal inputs", async () => {
+//     test("get error message and 403 status code when sending in valid token, invalid userId data type and valid collection inputs", async () => {
 //         const res = await request(app)
-//             .post(`/api/users/bad_type/journals`)
+//             .post(`/api/users/bad_type/collections`)
 //             .set({ _token: testUserToken })
 //             .send({
 //                 title: "new journal title 2?",
@@ -231,9 +229,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 400 status code when sending in valid token, valid userId and invalid journal inputs", async () => {
+//     test("get error message and 400 status code when sending in valid token, valid userId and invalid collection inputs", async () => {
 //         const res = await request(app)
-//             .post(`/api/users/${testUserId}/journals`)
+//             .post(`/api/users/${testUserId}/collections`)
 //             .set({ _token: testUserToken })
 //             .send({ badInput: "nope" });
 //         expect(res.statusCode).toBe(400);
@@ -249,10 +247,10 @@ describe("GET /api/users/:userId/collections", () => {
 //     });
 // });
 
-// describe("PATCH /api/users/:userId/journals/:journalId", () => {
-//     test("get updated user journal object and 200 status code when sending in valid token, valid userId and valid user journal inputs", async () => {
+// describe("PATCH /api/users/:userId/collections/:collectionId", () => {
+//     test("get updated user journal object and 200 status code when sending in valid token, valid userId and valid user collection inputs", async () => {
 //         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/journals/${journalId1}`)
+//             .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
 //             .set({ _token: testUserToken })
 //             .send({
 //                 title: "updated journal title",
@@ -269,9 +267,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 401 status code when sending in invalid token, valid user id and valid update journal inputs", async () => {
+//     test("get error message and 401 status code when sending in invalid token, valid user id and valid update collection inputs", async () => {
 //         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/journals/${journalId1}`)
+//             .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
 //             .set({ _token: "bad token" })
 //             .send({
 //                 title: "updated journal title?",
@@ -284,9 +282,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 403 status code when sending in valid token, invalid user id and valid update journal inputs", async () => {
+//     test("get error message and 403 status code when sending in valid token, invalid user id and valid update collection inputs", async () => {
 //         const res = await request(app)
-//             .patch(`/api/users/1000/journals/${journalId1}`)
+//             .patch(`/api/users/1000/collections/${collectionId1}`)
 //             .set({ _token: testUserToken })
 //             .send({
 //                 title: "updated journal title?",
@@ -302,9 +300,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 403 status code when sending in valid token, invalid user id data type and valid update journal inputs", async () => {
+//     test("get error message and 403 status code when sending in valid token, invalid user id data type and valid update collection inputs", async () => {
 //         const res = await request(app)
-//             .patch(`/api/users/bad_type/journals/${journalId1}`)
+//             .patch(`/api/users/bad_type/collections/${collectionId1}`)
 //             .set({ _token: testUserToken })
 //             .send({
 //                 title: "updated journal title?",
@@ -320,9 +318,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 400 status code when sending in valid token, valid user id and invalid update journal inputs", async () => {
+//     test("get error message and 400 status code when sending in valid token, valid user id and invalid update collection inputs", async () => {
 //         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/journals/${journalId1}`)
+//             .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
 //             .set({ _token: testUserToken })
 //             .send({
 //                 title: 17,
@@ -342,10 +340,10 @@ describe("GET /api/users/:userId/collections", () => {
 //     });
 // });
 
-// describe("DELETE /api/users/:userId/journals/:journalId", () => {
-//     test("get error message and 403 status code if valid token, other user's id and valid journal id", async () => {
+// describe("DELETE /api/users/:userId/collections/:collectionId", () => {
+//     test("get error message and 403 status code if valid token, other user's id and valid collection id", async () => {
 //         const res = await request(app)
-//             .delete(`/api/users/${test2UserId}/journals/${journalId1}`)
+//             .delete(`/api/users/${test2UserId}/collections/${collectionId1}`)
 //             .set({ _token: testUserToken });
 //         expect(res.statusCode).toBe(403);
 //         expect(res.body).toEqual({
@@ -356,9 +354,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 401 status code if invalid token, valid user id and valid journal id", async () => {
+//     test("get error message and 401 status code if invalid token, valid user id and valid collection id", async () => {
 //         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/journals/${journalId1}`)
+//             .delete(`/api/users/${testUserId}/collections/${collectionId1}`)
 //             .set({ _token: "bad token" });
 //         expect(res.statusCode).toBe(401);
 //         expect(res.body).toEqual({
@@ -366,9 +364,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get error message and 403 status code if valid token, bad data type user id and valid journal id", async () => {
+//     test("get error message and 403 status code if valid token, bad data type user id and valid collection id", async () => {
 //         const res = await request(app)
-//             .delete(`/api/users/bad_type/journals/${journalId1}`)
+//             .delete(`/api/users/bad_type/collections/${collectionId1}`)
 //             .set({ _token: testUserToken });
 //         expect(res.statusCode).toBe(403);
 //         expect(res.body).toEqual({
@@ -379,9 +377,9 @@ describe("GET /api/users/:userId/collections", () => {
 //         });
 //     });
 
-//     test("get deleted user journal message and 200 status code if valid token, valid user id and valid journal id", async () => {
+//     test("get deleted user collection message and 200 status code if valid token, valid user id and valid collection id", async () => {
 //         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/journals/${journalId1}`)
+//             .delete(`/api/users/${testUserId}/collections/${collectionId1}`)
 //             .set({ _token: testUserToken });
 //         expect(res.statusCode).toBe(200);
 //         expect(res.body).toEqual({ msg: expect.stringContaining("Deleted") });
