@@ -84,9 +84,10 @@ router.delete(
                 readId,
                 collectionId
             );
+            console.log("readCollection", readCollection);
             await readCollection.delete();
             return res.json({
-                msg: `Deleted Read ${userId} Association With Collection ${collectionId}`,
+                msg: `Deleted Read ${readId} Association With Collection ${collectionId}`,
             });
         } catch (error) {
             return next(error);

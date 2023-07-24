@@ -324,50 +324,62 @@ describe("POST /api/reads/:readId/collections", () => {
     });
 });
 
-// describe("DELETE /api/users/:userId/followed/:followedId", () => {
-//     test("get error message and 403 status code if valid token, other user's id and valid followed id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${test2UserId}/followed/${test3UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+describe("DELETE /api/reads/:readId/collections/:collectionId", () => {
+    test("get error message and 403 status code if valid token, other user's id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .delete(`/api/reads/${read1}/collections/${user1collection1}`)
+            .set({ _token: testUserToken })
+            .send({
+                userId: test2UserId,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 401 status code if invalid token, valid user id and valid followed id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/followed/${test2UserId}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code if invalid token, valid user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .delete(`/api/reads/${read1}/collections/${user1collection1}`)
+            .set({ _token: "bad token" })
+            .send({
+                userId: testUserId,
+            });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code if valid token, bad data type user id and valid followed id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/bad_type/followed/${test2UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code if valid token, bad data type user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .delete(`/api/reads/${read1}/collections/${user1collection1}`)
+            .set({ _token: testUserToken })
+            .send({
+                userId: "bad type",
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get deleted user followed message and 200 status code if valid token, valid user id and valid followed id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/followed/${test2UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             msg: expect.stringContaining("stopped following"),
-//         });
-//     });
-// });
+    test("get deleted user's read collection message and 200 status code if valid token, valid user id, valid read id and valid collection id", async () => {
+        const res = await request(app)
+            .delete(`/api/reads/${read1}/collections/${user1collection1}`)
+            .set({ _token: testUserToken })
+            .send({
+                userId: testUserId,
+            });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            msg: `Deleted Read ${read1} Association With Collection ${user1collection1}`,
+        });
+    });
+});
