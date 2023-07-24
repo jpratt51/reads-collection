@@ -313,48 +313,44 @@ describe("PATCH /api/users/:userId/collections/:collectionId", () => {
     });
 });
 
-// describe("DELETE /api/users/:userId/collections/:collectionId", () => {
-//     test("get error message and 403 status code if valid token, other user's id and valid collection id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${test2UserId}/collections/${collectionId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Delete Other User's Journals",
-//                 status: 403,
-//             },
-//         });
-//     });
+describe("DELETE /api/users/:userId/collections/:collectionId", () => {
+    test("get error message and 403 status code if valid token, other user's id and valid collection id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${test2UserId}/collections/${collectionId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: { message: "Incorrect User ID", status: 403 },
+        });
+    });
 
-//     test("get error message and 401 status code if invalid token, valid user id and valid collection id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/collections/${collectionId1}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code if invalid token, valid user id and valid collection id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code if valid token, bad data type user id and valid collection id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/bad_type/collections/${collectionId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Delete Other User's Journals",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code if valid token, bad data type user id and valid collection id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/bad_type/collections/${collectionId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: { message: "Incorrect User ID", status: 403 },
+        });
+    });
 
-//     test("get deleted user collection message and 200 status code if valid token, valid user id and valid collection id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/collections/${collectionId1}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({ msg: expect.stringContaining("Deleted") });
-//     });
-// });
+    test("get deleted user collection message and 200 status code if valid token, valid user id and valid collection id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            msg: `Deleted User Collection ${collectionId1}`,
+        });
+    });
+});
