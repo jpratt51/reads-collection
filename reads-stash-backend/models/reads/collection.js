@@ -151,7 +151,6 @@ class ReadCollection {
     }
 
     async delete() {
-        console.log("hello", this.readId, this.collectionId);
         await db.query(
             "DELETE FROM reads_collections WHERE read_id = $1 AND collection_id = $2;",
             [this.readId, this.collectionId]

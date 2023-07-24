@@ -12,8 +12,7 @@ async function checkForUser(userId) {
 
 function checkUserIdMatchesLoggedInUser(userId, loggedInUserId) {
     if (loggedInUserId != userId) {
-        const invalidUser = new ExpressError("Incorrect User ID", 403);
-        throw invalidUser;
+        throw new ExpressError("Incorrect User ID", 403);
     }
 }
 

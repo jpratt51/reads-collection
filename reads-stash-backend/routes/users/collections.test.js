@@ -158,94 +158,88 @@ describe("GET /api/users/:userId/collections/:collectionId", () => {
     });
 });
 
-// describe("POST /api/users/:userId/collections", () => {
-//     test("get created user journal object and 201 status code when sending in valid token, valid userId and valid user collection inputs", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/collections`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 title: "new journal title",
-//                 date: "2023-07-17",
-//                 text: "new journal text",
-//             });
-//         expect(res.statusCode).toBe(201);
-//         expect(res.body).toEqual({
-//             date: "2023-07-22T05:00:00.000Z",
-//             id: expect.any(Number),
-//             text: "new journal text",
-//             title: "new journal title",
-//             userId: testUserId,
-//         });
-//     });
+describe("POST /api/users/:userId/collections", () => {
+    test("get error message and 401 status code when sending in invalid token, valid userId and valid user collection inputs", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/collections`)
+            .set({ _token: "bad token" })
+            .send({
+                name: "test collection insertion",
+                userId: testUserId,
+            });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 401 status code when sending in invalid token, valid userId and valid user recommendation", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/collections`)
-//             .set({ _token: "bad token" })
-//             .send({
-//                 title: "new journal title 2?",
-//                 date: "2023-07-18",
-//                 text: "new journal text 2?",
-//             });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid userId and valid collection inputs", async () => {
+        const res = await request(app)
+            .post(`/api/users/1000/collections`)
+            .set({ _token: testUserToken })
+            .send({
+                name: "test collection insertion",
+                userId: testUserId,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId and valid collection inputs", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/1000/collections`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 title: "new journal title 2?",
-//                 date: "2023-07-18",
-//                 text: "new journal text 2?",
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Create Journals For Other Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid user id data type and valid collection inputs", async () => {
+        const res = await request(app)
+            .post(`/api/users/bad_type/collections`)
+            .set({ _token: testUserToken })
+            .send({
+                name: "test collection insertion",
+                userId: testUserId,
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Incorrect User ID",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid userId data type and valid collection inputs", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/bad_type/collections`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 title: "new journal title 2?",
-//                 date: "2023-07-18",
-//                 text: "new journal text 2?",
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Create Journals For Other Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 400 status code when sending in valid token, valid userId and invalid collection inputs", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/collections`)
+            .set({ _token: testUserToken })
+            .send({
+                name: 12345,
+                userId: testUserId,
+            });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: ["instance.name is not of a type(s) string"],
+                status: 400,
+            },
+        });
+    });
 
-//     test("get error message and 400 status code when sending in valid token, valid userId and invalid collection inputs", async () => {
-//         const res = await request(app)
-//             .post(`/api/users/${testUserId}/collections`)
-//             .set({ _token: testUserToken })
-//             .send({ badInput: "nope" });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: [
-//                     'instance requires property "title"',
-//                     'instance requires property "text"',
-//                 ],
-//                 status: 400,
-//             },
-//         });
-//     });
-// });
+    test("get created user collection object and 201 status code when sending in valid token, valid userId and valid user collection inputs", async () => {
+        const res = await request(app)
+            .post(`/api/users/${testUserId}/collections`)
+            .set({ _token: testUserToken })
+            .send({
+                name: "test collection insertion",
+                userId: testUserId,
+            });
+        expect(res.statusCode).toBe(201);
+        expect(res.body).toEqual({
+            id: expect.any(Number),
+            name: "test collection insertion",
+            userId: testUserId,
+        });
+    });
+});
 
 // describe("PATCH /api/users/:userId/collections/:collectionId", () => {
 //     test("get updated user journal object and 200 status code when sending in valid token, valid userId and valid user collection inputs", async () => {

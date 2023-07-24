@@ -50,7 +50,9 @@ router.post(
     ensureLoggedIn,
     async function createUserCollection(req, res, next) {
         try {
-            const { name, userId } = req.body;
+            const { name } = req.body;
+            const { userId } = req.params;
+            console.log("hello world", userId);
             checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const validator = jsonschema.validate(
                 req.body,
