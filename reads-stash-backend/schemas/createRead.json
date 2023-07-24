@@ -12,56 +12,49 @@
         "title": {
             "type": "string",
             "default": "",
-            "maxLength" : 500,
             "title": "The title Schema",
             "examples": [
-                "Flowers for Algernon"
+                "Unsouled"
             ]
         },
         "description": {
             "type": "string",
             "default": "",
-            "maxLength" : 500,
             "title": "The description Schema",
             "examples": [
-                "Oscar-winning film Charly starring Cliff Robertson and Claire Bloom-a mentally challenged man receives an operation that turns him into a genius...and introduces him to heartache."
-            ]
-        },
-        "publisher": {
-            "type": "string",
-            "default": "",
-            "maxLength" : 50,
-            "title": "The publisher Schema",
-            "examples": [
-                "Houghton Mifflin Harcourt"
+                "Sacred artists follow a thousand Paths to power, using their souls to control the forces of the natural world. Lindon is Unsouled, forbidden to learn the sacred arts of his clan. When faced with a looming fate he cannot ignore, he must rise beyond anything he's ever known...and forge his own Path."
             ]
         },
         "isbn": {
             "type": "string",
             "default": "",
-            "minLength" : 10,
-            "maxLength" : 13,
             "title": "The isbn Schema",
-            "pattern" : "^[0-9]+$",
             "examples": [
-                "9780156030304"
+                "9780989671767"
             ]
         },
         "avgRating": {
-            "type": "integer",
-            "default": 0,
+            "type": "number",
+            "default": 0.0,
             "title": "The avgRating Schema",
             "examples": [
-                4
+                4.5
             ]
         },
         "printType": {
             "type": "string",
             "default": "",
-            "maxLength" : 20,
             "title": "The printType Schema",
             "examples": [
                 "BOOK"
+            ]
+        },
+        "publisher": {
+            "type": "string",
+            "default": "",
+            "title": "The publisher Schema",
+            "examples": [
+                "Hidden Gnome Publishing"
             ]
         },
         "thumbnail": {
@@ -69,17 +62,37 @@
             "default": "",
             "title": "The thumbnail Schema",
             "examples": [
-                "http://books.google.com/books/content?id=NRWlitmahXkC\u0026printsec=frontcover\u0026img=1\u0026zoom=5\u0026edge=curl\u0026source=gbs_api"
+                "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api"
+            ]
+        },
+        "authors": {
+            "type": "array",
+            "default": [],
+            "title": "The authors Schema",
+            "items": {
+                "type": "string",
+                "default": "",
+                "title": "A Schema",
+                "examples": [
+                    "Will Wight"
+                ]
+            },
+            "examples": [
+                [
+                    "Will Wight"]
             ]
         }
     },
     "examples": [{
-        "title": "Flowers for Algernon",
-        "description": "Oscar-winning film Charly starring Cliff Robertson and Claire Bloom-a mentally challenged man receives an operation that turns him into a genius...and introduces him to heartache.",
-        "publisher": "Houghton Mifflin Harcourt",
-        "isbn": "9780156030304",
-        "avgRating": 4,
+        "title": "Unsouled",
+        "description": "Sacred artists follow a thousand Paths to power, using their souls to control the forces of the natural world. Lindon is Unsouled, forbidden to learn the sacred arts of his clan. When faced with a looming fate he cannot ignore, he must rise beyond anything he's ever known...and forge his own Path.",
+        "isbn": "9780989671767",
+        "avgRating": 4.5,
         "printType": "BOOK",
-        "thumbnail": "http://books.google.com/books/content?id=NRWlitmahXkC\u0026printsec=frontcover\u0026img=1\u0026zoom=5\u0026edge=curl\u0026source=gbs_api"
+        "publisher": "Hidden Gnome Publishing",
+        "thumbnail": "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api",
+        "authors": [
+            "Will Wight"
+        ]
     }]
 }
