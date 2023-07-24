@@ -54,7 +54,6 @@ router.post(
         try {
             const { readId } = req.params;
             const { userId } = req.body;
-            console.log("hello world", userId);
             checkUserIdMatchesLoggedInUser(userId, req.user.id);
             let inputs = {};
             inputs["readId"] = +readId;
