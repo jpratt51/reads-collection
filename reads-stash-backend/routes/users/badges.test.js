@@ -236,50 +236,50 @@ describe("POST /api/users/:userId/badges", () => {
     });
 });
 
-// describe("DELETE /api/users/:userId/badges/:badgeId", () => {
-//     test("get error message and 403 status code if valid token, other user's id and valid badge id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${test2UserId}/badges/${test3UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+describe("DELETE /api/users/:userId/badges/:badgeId", () => {
+    test("get error message and 403 status code if valid token, other user's id and valid badge id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${test2UserId}/badges/${testBadge1Id}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Delete Other User's Badges",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get error message and 401 status code if invalid token, valid user id and valid badge id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/badges/${test2UserId}`)
-//             .set({ _token: "bad token" });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 401 status code if invalid token, valid user id and valid badge id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}/badges/${testBadge1Id}`)
+            .set({ _token: "bad token" });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 403 status code if valid token, bad data type user id and valid badge id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/bad_type/badges/${test2UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot View Other User's Followed Users",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code if valid token, bad data type user id and valid badge id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/bad_type/badges/${testBadge1Id}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: {
+                message: "Cannot Delete Other User's Badges",
+                status: 403,
+            },
+        });
+    });
 
-//     test("get deleted user badge message and 200 status code if valid token, valid user id and valid badge id", async () => {
-//         const res = await request(app)
-//             .delete(`/api/users/${testUserId}/badges/${test2UserId}`)
-//             .set({ _token: testUserToken });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             msg: expect.stringContaining("stopped following"),
-//         });
-//     });
-// });
+    test("get deleted user badge message and 200 status code if valid token, valid user id and valid badge id", async () => {
+        const res = await request(app)
+            .delete(`/api/users/${testUserId}/badges/${testBadge1Id}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            msg: `Deleted user's badge ${testBadge1Id}`,
+        });
+    });
+});
