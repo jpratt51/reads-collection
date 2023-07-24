@@ -241,98 +241,77 @@ describe("POST /api/users/:userId/collections", () => {
     });
 });
 
-// describe("PATCH /api/users/:userId/collections/:collectionId", () => {
-//     test("get updated user journal object and 200 status code when sending in valid token, valid userId and valid user collection inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 title: "updated journal title",
-//                 date: "2023-07-18",
-//                 text: "updated journal text",
-//             });
-//         expect(res.statusCode).toBe(200);
-//         expect(res.body).toEqual({
-//             date: "2023-07-22",
-//             id: journalId1,
-//             text: "updated journal text",
-//             title: "updated journal title",
-//             userId: testUserId,
-//         });
-//     });
+describe("PATCH /api/users/:userId/collections/:collectionId", () => {
+    test("get error message and 401 status code when sending in invalid token, valid user id and valid update collection inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .set({ _token: "bad token" })
+            .send({
+                name: "test collection insertion",
+            });
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toEqual({
+            error: { message: "Unauthorized", status: 401 },
+        });
+    });
 
-//     test("get error message and 401 status code when sending in invalid token, valid user id and valid update collection inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
-//             .set({ _token: "bad token" })
-//             .send({
-//                 title: "updated journal title?",
-//                 date: "2023-07-18",
-//                 text: "updated journal text?",
-//             });
-//         expect(res.statusCode).toBe(401);
-//         expect(res.body).toEqual({
-//             error: { message: "Unauthorized", status: 401 },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid user id and valid update collection inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/1000/collections/${collectionId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                name: "test collection insertion",
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: { message: "Incorrect User ID", status: 403 },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid user id and valid update collection inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/1000/collections/${collectionId1}`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 title: "updated journal title?",
-//                 date: "2023-07-18",
-//                 text: "updated journal text?",
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Update Other User's Journals",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 403 status code when sending in valid token, invalid user id data type and valid update collection inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/bad_type/collections/${collectionId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                name: "test collection insertion",
+            });
+        expect(res.statusCode).toBe(403);
+        expect(res.body).toEqual({
+            error: { message: "Incorrect User ID", status: 403 },
+        });
+    });
 
-//     test("get error message and 403 status code when sending in valid token, invalid user id data type and valid update collection inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/bad_type/collections/${collectionId1}`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 title: "updated journal title?",
-//                 date: "2023-07-18",
-//                 text: "updated journal text?",
-//             });
-//         expect(res.statusCode).toBe(403);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: "Cannot Update Other User's Journals",
-//                 status: 403,
-//             },
-//         });
-//     });
+    test("get error message and 400 status code when sending in valid token, valid user id and invalid update collection inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                name: true,
+            });
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            error: {
+                message: ["instance.name is not of a type(s) string"],
+                status: 400,
+            },
+        });
+    });
 
-//     test("get error message and 400 status code when sending in valid token, valid user id and invalid update collection inputs", async () => {
-//         const res = await request(app)
-//             .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
-//             .set({ _token: testUserToken })
-//             .send({
-//                 title: 17,
-//                 date: null,
-//                 text: true,
-//             });
-//         expect(res.statusCode).toBe(400);
-//         expect(res.body).toEqual({
-//             error: {
-//                 message: [
-//                     "instance.title is not of a type(s) string",
-//                     "instance.text is not of a type(s) string",
-//                 ],
-//                 status: 400,
-//             },
-//         });
-//     });
-// });
+    test("get updated user collection object and 200 status code when sending in valid token, valid user id and valid user collection inputs", async () => {
+        const res = await request(app)
+            .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .set({ _token: testUserToken })
+            .send({
+                name: "test collection insertion",
+            });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            id: expect.any(Number),
+            name: "test collection insertion",
+            userId: testUserId,
+        });
+    });
+});
 
 // describe("DELETE /api/users/:userId/collections/:collectionId", () => {
 //     test("get error message and 403 status code if valid token, other user's id and valid collection id", async () => {
