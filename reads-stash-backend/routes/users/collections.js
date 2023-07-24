@@ -5,6 +5,8 @@ const router = new express.Router();
 const db = require("../../db");
 const UserCollection = require("../../models/users/collection");
 const { ensureLoggedIn } = require("../../middleware/auth");
+const checkForValidInputs = require("../../helpers/inputsValidation");
+const { checkUserIdMatchesLoggedInUser } = require("../../helpers/checkUser");
 const jsonschema = require("jsonschema");
 const createUserCollectionSchema = require("../../schemas/createUserCollection.json");
 const updateUserCollectionSchema = require("../../schemas/updateUserCollection.json");
@@ -16,13 +18,7 @@ router.get(
     async function getAllUserCollections(req, res, next) {
         try {
             const { userId } = req.params;
-            if (req.user.id != userId) {
-                const invalidUser = new ExpressError(
-                    "Cannot View Other User's Collections",
-                    403
-                );
-                return next(invalidUser);
-            }
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const collections = await UserCollection.getAll(userId);
             return res.json(collections);
         } catch (error) {
@@ -37,13 +33,7 @@ router.get(
     async function getOneUserCollection(req, res, next) {
         try {
             const { userId, collectionId } = req.params;
-            if (req.user.id != userId) {
-                const invalidUser = new ExpressError(
-                    "Cannot View Other User's Collections",
-                    403
-                );
-                return next(invalidUser);
-            }
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const collection = await UserCollection.getById(
                 userId,
                 collectionId
@@ -61,22 +51,12 @@ router.post(
     async function createUserCollection(req, res, next) {
         try {
             const { name, userId } = req.body;
-            if (req.user.id != userId) {
-                const invalidUser = new ExpressError(
-                    "Cannot View Other User's Collections",
-                    403
-                );
-                return next(invalidUser);
-            }
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const validator = jsonschema.validate(
                 req.body,
                 createUserCollectionSchema
             );
-            if (!validator.valid) {
-                const listOfErrors = validator.errors.map((e) => e.stack);
-                const errors = new ExpressError(listOfErrors, 400);
-                return next(errors);
-            }
+            checkForValidInputs(validator);
             const collection = await UserCollection.create(name, userId);
             return res.status(201).json(collection);
         } catch (error) {
@@ -91,22 +71,12 @@ router.patch(
     async function updateUserCollection(req, res, next) {
         try {
             const { userId, collectionId } = req.params;
-            if (req.user.id != userId) {
-                const invalidUser = new ExpressError(
-                    "Cannot View Other User's Collections",
-                    403
-                );
-                return next(invalidUser);
-            }
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const validator = jsonschema.validate(
                 req.body,
                 updateUserCollectionSchema
             );
-            if (!validator.valid) {
-                const listOfErrors = validator.errors.map((e) => e.stack);
-                const errors = new ExpressError(listOfErrors, 400);
-                return next(errors);
-            }
+            checkForValidInputs(validator);
             const { name } = req.body;
             const collection = await UserCollection.getById(
                 userId,
@@ -127,19 +97,13 @@ router.delete(
     async function deleteUserCollection(req, res, next) {
         try {
             const { userId, collectionId } = req.params;
-            if (req.user.id != userId) {
-                const invalidUser = new ExpressError(
-                    "Cannot View Other User's Collections",
-                    403
-                );
-                return next(invalidUser);
-            }
+            checkUserIdMatchesLoggedInUser(userId, req.user.id);
             const userCollection = await UserCollection.getById(
                 userId,
                 collectionId
             );
             await userCollection.delete(userId);
-            return res.json({ msg: `Deleted user collection ${collectionId}` });
+            return res.json({ msg: `Deleted User Collection ${collectionId}` });
         } catch (error) {
             return next(error);
         }

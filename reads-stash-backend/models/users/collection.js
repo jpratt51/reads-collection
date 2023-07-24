@@ -12,7 +12,7 @@ class UserCollection {
 
     static async getAll(userId) {
         if (/^\d+$/.test(userId) === false)
-            throw new ExpressError(`Invalid user id data type`, 400);
+            throw new ExpressError(`Invalid User ID Data Type`, 400);
         const results = await db.query(
             `SELECT * FROM collections WHERE user_id = $1;`,
             [userId]
@@ -25,9 +25,9 @@ class UserCollection {
 
     static async getById(userId, collectionId) {
         if (/^\d+$/.test(userId) === false)
-            throw new ExpressError(`Invalid user id data type`, 400);
+            throw new ExpressError(`Invalid User ID Data Type`, 400);
         if (/^\d+$/.test(collectionId) === false)
-            throw new ExpressError(`Invalid collection id data type`, 400);
+            throw new ExpressError(`Invalid Collection ID Data Type`, 400);
         const results = await db.query(
             `SELECT * FROM collections WHERE id = $1 AND user_id = $2;`,
             [collectionId, userId]
@@ -35,13 +35,24 @@ class UserCollection {
         const c = results.rows[0];
         if (!c) {
             throw new ExpressError(
-                `User's collection ${collectionId} not found`
+                `User's Collection ${collectionId} Not Found`
             );
         }
         return new UserCollection(c.id, c.name, c.user_id);
     }
 
     static async create(name, userId) {
+        const duplicateCheck = await db.query(
+            `SELECT * FROM collections WHERE user_id = $1 AND name = $2`,
+            [userId, name]
+        );
+
+        if (duplicateCheck.rows.length !== 0)
+            throw new ExpressError(
+                `Collection With Name ${name} And User ID ${userId} Already Exists`,
+                400
+            );
+
         const results = await db.query(
             "INSERT INTO collections (name, user_id) VALUES ($1, $2) RETURNING * ;",
             [name, userId]
