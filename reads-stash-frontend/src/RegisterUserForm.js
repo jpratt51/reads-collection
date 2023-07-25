@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const RegisterUserForm = () => {
+const RegisterUserForm = ({ getUserFormData }) => {
     const INITIAL_STATE = {
         username: "",
         fname: "",
@@ -11,14 +11,14 @@ const RegisterUserForm = () => {
     const [formData, setFormData] = useState(INITIAL_STATE);
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((data) => ({
-            ...data,
+        setFormData((formData) => ({
+            ...formData,
             [name]: value,
         }));
     };
     const handleSubmit = (e) => {
         e.preventDefault();
-        // const { username, fname } = formData;
+        getUserFormData({ ...formData });
         setFormData(INITIAL_STATE);
     };
     return (

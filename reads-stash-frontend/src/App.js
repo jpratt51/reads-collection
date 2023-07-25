@@ -1,11 +1,11 @@
 import "./App.css";
-import RegisterUserForm from "./RegisterUserForm";
+import RegisterUser from "./RegisterUser";
 import User from "./User.js";
 
 function App() {
     return (
         <div>
-            <RegisterUserForm />
+            <RegisterUser />
             <User />
         </div>
     );
