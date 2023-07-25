@@ -35,7 +35,7 @@ beforeAll(async () => {
     test2UserId = res.rows[1].id;
 
     const readIds = await db.query(
-        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', 'test publisher'), ('test title 2', 'test description 2', '1243567129', 4, 'BOOK', 'test publisher 2'), ('test title 2', 'test description 2', '1243567139', 4, 'BOOK', 'test publisher 2') RETURNING id`
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher, pages) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', 'test publisher', 100), ('test title 2', 'test description 2', '1243567129', 4, 'BOOK', 'test publisher 2', 250), ('test title 2', 'test description 2', '1243567139', 4, 'BOOK', 'test publisher 2', 300) RETURNING id`
     );
 
     readId1 = readIds.rows[0].id;
@@ -72,6 +72,7 @@ describe("GET /api/users/:userId/reads", () => {
                 isbn: "1243567119",
                 printType: "BOOK",
                 publisher: "test publisher",
+                pages: 100,
                 rating: 4,
                 reviewDate: "2023-07-19T05:00:00.000Z",
                 reviewText: "test review",
@@ -84,6 +85,7 @@ describe("GET /api/users/:userId/reads", () => {
                 isbn: "1243567129",
                 printType: "BOOK",
                 publisher: "test publisher 2",
+                pages: 250,
                 rating: 3,
                 reviewDate: "2023-07-19T05:00:00.000Z",
                 reviewText: "test review 2",
@@ -137,6 +139,7 @@ describe("GET /api/users/:userId/reads/:readId", () => {
             isbn: "1243567119",
             printType: "BOOK",
             publisher: "test publisher",
+            pages: 100,
             rating: 4,
             readId: expect.any(Number),
             reviewDate: "2023-07-19T05:00:00.000Z",
@@ -274,6 +277,7 @@ describe("POST /api/users/:userId/reads", () => {
             isbn: "1243567139",
             printType: "BOOK",
             publisher: "test publisher 2",
+            pages: 300,
             rating: 4,
             readId: readId3,
             reviewDate: "2023-07-19T05:00:00.000Z",
@@ -303,6 +307,7 @@ describe("PATCH /api/users/:userId/reads/:readId", () => {
             isbn: "1243567119",
             printType: "BOOK",
             publisher: "test publisher",
+            pages: 100,
             rating: 5,
             readId: readId1,
             reviewDate: "2023-07-20T05:00:00.000Z",

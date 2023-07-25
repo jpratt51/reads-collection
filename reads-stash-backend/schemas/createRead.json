@@ -58,6 +58,14 @@
                 "Hidden Gnome Publishing"
             ]
         },
+        "pages": {
+            "type": "integer",
+            "default": 0,
+            "title": "The pages Schema",
+            "examples": [
+                100
+            ]
+        },
         "thumbnail": {
             "type": "string",
             "default": "",
@@ -91,6 +99,7 @@
         "avgRating": 4.5,
         "printType": "BOOK",
         "publisher": "Hidden Gnome Publishing",
+        "pages": 100,
         "thumbnail": "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api",
         "authors": [
             "Will Wight"

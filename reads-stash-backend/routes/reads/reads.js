@@ -42,6 +42,7 @@ router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
             avgRating,
             printType,
             publisher,
+            pages,
             thumbnail,
             authors,
         } = req.body;
@@ -53,6 +54,7 @@ router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
         printType ? (validInputs["print_type"] = printType) : null;
         publisher ? (validInputs["publisher"] = publisher) : null;
         thumbnail ? (validInputs["thumbnail"] = thumbnail) : null;
+        pages ? (validInputs["pages"] = pages) : null;
 
         const read = await Read.create(validInputs, authors);
         return res.status(201).json(read);

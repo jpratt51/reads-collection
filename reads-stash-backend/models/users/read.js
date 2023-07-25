@@ -13,6 +13,7 @@ class UserRead {
         avg_rating,
         print_type,
         publisher,
+        pages,
         rating,
         review_text,
         review_date,
@@ -26,6 +27,7 @@ class UserRead {
         this.avgRating = avg_rating;
         this.printType = print_type;
         this.publisher = publisher;
+        this.pages = pages;
         this.rating = rating;
         this.reviewText = review_text;
         this.reviewDate = review_date;
@@ -37,7 +39,7 @@ class UserRead {
         if (/^\d+$/.test(userId) === false)
             throw new ExpressError(`Invalid user id data type`, 400);
         const results = await db.query(
-            `SELECT reads.id, title, description, isbn, avg_rating, print_type, publisher, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1;`,
+            `SELECT reads.id, title, description, isbn, avg_rating, print_type, publisher, pages, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1;`,
             [userId]
         );
         const userReads = results.rows.map(
@@ -50,6 +52,7 @@ class UserRead {
                     r.avg_rating,
                     r.print_type,
                     r.publisher,
+                    r.pages,
                     r.rating,
                     r.review_text,
                     r.review_date,
@@ -66,7 +69,7 @@ class UserRead {
         if (/^\d+$/.test(readId) === false)
             throw new ExpressError(`Invalid read id data type`, 400);
         const results = await db.query(
-            `SELECT users_reads.id AS id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
+            `SELECT users_reads.id AS id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, pages, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
             [userId, readId]
         );
         const r = results.rows[0];
@@ -81,6 +84,7 @@ class UserRead {
             r.avg_rating,
             r.print_type,
             r.publisher,
+            r.pages,
             r.rating,
             r.review_text,
             r.review_date,
@@ -122,7 +126,7 @@ class UserRead {
         );
 
         const results = await db.query(
-            `SELECT users_reads.id AS id, users.id AS user_id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
+            `SELECT users_reads.id AS id, users.id AS user_id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, pages, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
             [userId, readId]
         );
 
@@ -136,6 +140,7 @@ class UserRead {
             r.avg_rating,
             r.print_type,
             r.publisher,
+            r.pages,
             r.rating,
             r.review_text,
             r.review_date,
@@ -176,7 +181,7 @@ class UserRead {
         );
 
         const results = await db.query(
-            `SELECT users_reads.id AS id, users.id AS user_id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
+            `SELECT users_reads.id AS id, users.id AS user_id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, pages, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
             [userId, readId]
         );
 
@@ -190,6 +195,7 @@ class UserRead {
             r.avg_rating,
             r.print_type,
             r.publisher,
+            r.pages,
             r.rating,
             r.review_text,
             r.review_date,

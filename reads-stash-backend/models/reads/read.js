@@ -18,6 +18,7 @@ class Read {
         avg_rating,
         print_type,
         publisher,
+        pages,
         thumbnail,
         authors
     ) {
@@ -28,6 +29,7 @@ class Read {
         this.avgRating = avg_rating;
         this.printType = print_type;
         this.publisher = publisher;
+        this.pages = pages;
         this.thumbnail = thumbnail;
         this.authors = authors;
     }
@@ -44,6 +46,7 @@ class Read {
                     r.avg_rating,
                     r.print_type,
                     r.publisher,
+                    r.pages,
                     r.thumbnail
                 )
         );
@@ -78,6 +81,7 @@ class Read {
             r.avg_rating,
             r.print_type,
             r.publisher,
+            r.pages,
             r.thumbnail,
             readAuths
         );
@@ -140,6 +144,7 @@ class Read {
                 r.avg_rating,
                 r.print_type,
                 r.publisher,
+                r.pages,
                 r.thumbnail,
                 readAuths
             );
@@ -153,6 +158,7 @@ class Read {
             r.avg_rating,
             r.print_type,
             r.publisher,
+            r.pages,
             r.thumbnail
         );
     }

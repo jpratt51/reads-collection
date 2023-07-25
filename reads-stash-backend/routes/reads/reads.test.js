@@ -21,6 +21,7 @@ let readId1,
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
+    await db.query("DELETE FROM reads;");
 
     const hashedPassword = await bcrypt.hash("secret", 1);
     const res = await db.query(
@@ -34,7 +35,7 @@ beforeAll(async () => {
     testUserId = res.rows[0].id;
 
     const reads = await db.query(
-        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher, thumbnail) VALUES ('t1title', 't1description', '0987654321', 3, 'BOOK', 'Hidden Gnome Publishing', 't1thumbnail'), ('t2title', 't2description', '9876543210', 3, 'BOOK', 'Hidden Gnome Publishing', 't2thumbnail') RETURNING id`
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher, pages, thumbnail) VALUES ('t1title', 't1description', '0987654321', 3, 'BOOK', 'Hidden Gnome Publishing', 250, 't1thumbnail'), ('t2title', 't2description', '9876543210', 3, 'BOOK', 'Hidden Gnome Publishing', 300, 't2thumbnail') RETURNING id`
     );
 
     const read3 = await db.query(
@@ -78,6 +79,7 @@ describe("GET /api/reads", () => {
                 isbn: "0987654321",
                 printType: "BOOK",
                 publisher: "Hidden Gnome Publishing",
+                pages: 250,
                 thumbnail: "t1thumbnail",
                 title: "t1title",
             },
@@ -88,6 +90,7 @@ describe("GET /api/reads", () => {
                 isbn: "9876543210",
                 printType: "BOOK",
                 publisher: "Hidden Gnome Publishing",
+                pages: 300,
                 thumbnail: "t2thumbnail",
                 title: "t2title",
             },
@@ -98,6 +101,7 @@ describe("GET /api/reads", () => {
                 isbn: "8765432109",
                 printType: null,
                 publisher: null,
+                pages: null,
                 thumbnail: null,
                 title: "t3title",
             },
@@ -125,6 +129,7 @@ describe("GET /api/reads/:readId", () => {
             isbn: "0987654321",
             printType: "BOOK",
             publisher: "Hidden Gnome Publishing",
+            pages: 250,
             thumbnail: "t1thumbnail",
             title: "t1title",
         });
@@ -141,6 +146,7 @@ describe("GET /api/reads/:readId", () => {
             isbn: "8765432109",
             printType: null,
             publisher: null,
+            pages: null,
             thumbnail: null,
             title: "t3title",
         });
@@ -176,6 +182,7 @@ describe("POST /api/reads", () => {
                 avgRating: 4.5,
                 printType: "BOOK",
                 publisher: "Hidden Gnome Publishing",
+                pages: 400,
                 thumbnail:
                     "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api",
                 authors: ["Will Wight"],
@@ -197,6 +204,7 @@ describe("POST /api/reads", () => {
                 avgRating: 4.5,
                 printType: "BOOK",
                 publisher: "Hidden Gnome Publishing",
+                pages: 400,
                 thumbnail:
                     "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api",
                 authors: ["Will Wight"],
@@ -218,6 +226,7 @@ describe("POST /api/reads", () => {
                 avgRating: "happy",
                 printType: [5, 6, 7],
                 publisher: { publisher: "Hidden Gnome Publishing" },
+                pages: 400,
                 thumbnail: false,
                 authors: { author: "Will Wight" },
             });
@@ -251,6 +260,7 @@ describe("POST /api/reads", () => {
                 avgRating: 4.5,
                 printType: "BOOK",
                 publisher: "Hidden Gnome Publishing",
+                pages: 400,
                 thumbnail:
                     "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api",
                 authors: ["Will Wight"],
@@ -265,6 +275,7 @@ describe("POST /api/reads", () => {
             isbn: "9780989671767",
             printType: "BOOK",
             publisher: "Hidden Gnome Publishing",
+            pages: 400,
             thumbnail:
                 "http://books.google.com/books/content?id=OjYJtAEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
             title: "Unsouled",

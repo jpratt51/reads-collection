@@ -20,6 +20,7 @@ CREATE TABLE reads
     avg_rating INTEGER,
     print_type VARCHAR(20),
     publisher VARCHAR(50),
+    pages INTEGER,
     thumbnail VARCHAR(1000)
 );
 
