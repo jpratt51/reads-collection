@@ -32,16 +32,6 @@ router.get(
     }
 );
 
-// router.post("/", async function createUser(req, res, next) {
-//     try {
-//         const { username, fname, lname, email, password } = req.body;
-//         const user = await User.create(username, fname, lname, email, password);
-//         return res.status(201).json(user);
-//     } catch (error) {
-//         return next(error);
-//     }
-// });
-
 router.patch(
     "/:userId",
     ensureLoggedIn,

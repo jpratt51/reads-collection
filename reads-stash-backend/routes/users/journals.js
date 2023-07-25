@@ -63,7 +63,6 @@ router.post(
             inputs.title = title;
             inputs.text = text;
             inputs.userId = +userId;
-            console.log("look here", inputs);
             if (req.user.id != userId) {
                 const invalidUser = new ExpressError(
                     "Cannot Create Journals For Other Users",

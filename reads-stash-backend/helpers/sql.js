@@ -17,14 +17,17 @@ function dataToSql(data) {
 
 function dataToSqlForCreate(data) {
     const keys = Object.keys(data);
+    const values = Object.values(data);
     if (keys.length === 0) return { error: "No data" };
 
     const columns = keys.map((name, idx) => `$${idx + 1}`);
-    const values = Object.values(data);
+    const inserts = values.map((value) =>
+        typeof value === "string" ? `'${value}'` : value
+    );
 
     return {
         columns: columns.join(", "),
-        values: values,
+        values: inserts,
         keys: keys.join(", "),
     };
 }
@@ -71,9 +74,20 @@ async function dataToSqlReadAuths(readId, authList) {
     };
 }
 
+function removeQuotes(inputs) {
+    for (let i in inputs) {
+        if (typeof inputs[i] === "string") {
+            let newVal = inputs[i].replaceAll(/['"']/g, "");
+            inputs[i] = newVal;
+        }
+    }
+    return inputs;
+}
+
 module.exports = {
     dataToSql,
     dataToSqlForCreate,
     dataToSqlAuths,
     dataToSqlReadAuths,
+    removeQuotes,
 };

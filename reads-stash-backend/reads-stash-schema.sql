@@ -15,11 +15,12 @@ CREATE TABLE reads
 (
     id SERIAL PRIMARY KEY,
     title VARCHAR(500) NOT NULL,
-    description VARCHAR(500),
-    isbn VARCHAR(20) NOT NULL,
+    description VARCHAR(2000),
+    isbn VARCHAR(20) UNIQUE NOT NULL,
     avg_rating INTEGER,
     print_type VARCHAR(20),
-    publisher VARCHAR(50)
+    publisher VARCHAR(50),
+    thumbnail VARCHAR(1000)
 );
 
 CREATE TABLE collections

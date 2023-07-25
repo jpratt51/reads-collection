@@ -33,7 +33,7 @@ class UserBadge {
             [userId, badgeId]
         );
         const b = results.rows[0];
-        console.log("user_badges search results", b);
+
         if (!b) {
             throw new ExpressError(`User's badge ${badgeId} not found`);
         }

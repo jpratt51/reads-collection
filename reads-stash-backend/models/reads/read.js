@@ -6,6 +6,7 @@ const {
     dataToSqlForCreate,
     dataToSqlAuths,
     dataToSqlReadAuths,
+    removeQuotes,
 } = require("../../helpers/sql");
 
 class Read {
@@ -55,6 +56,11 @@ class Read {
         const readRes = await db.query(`SELECT * FROM reads WHERE id = $1;`, [
             readId,
         ]);
+
+        if (readRes.rows.length === 0) {
+            throw new ExpressError(`Read ${readId} not found`, 404);
+        }
+
         const authRes = await db.query(
             `SELECT a.name FROM reads_authors ra JOIN authors a ON ra.author_id = a.id WHERE ra.read_id = $1`,
             [readId]
@@ -63,9 +69,7 @@ class Read {
         const readAuths = authRes.rows.map((a) => a.name);
 
         const r = readRes.rows[0];
-        if (!r) {
-            throw new ExpressError(`Read ${readId} not found`);
-        }
+
         return new Read(
             r.id,
             r.title,
@@ -80,6 +84,8 @@ class Read {
     }
 
     static async create(inputs, authors) {
+        removeQuotes(inputs);
+
         const duplicateReadCheck = await db.query(
             "SELECT * FROM reads WHERE isbn = $1",
             [inputs.isbn]
@@ -89,10 +95,11 @@ class Read {
             return { message: "Read already in database." };
 
         const { columns, values, keys } = dataToSqlForCreate(inputs);
-
+        console.log([values.join(", ")]);
         const readRes = await db.query(
-            `INSERT INTO reads (${keys}) VALUES (${columns}) RETURNING * `,
-            values
+            `INSERT INTO reads (${keys}) VALUES (${values.join(
+                ", "
+            )}) RETURNING *`
         );
 
         const newReadId = readRes.rows[0].id;

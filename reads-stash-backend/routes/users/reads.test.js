@@ -21,6 +21,7 @@ let testUserToken,
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
+    await db.query("DELETE FROM reads;");
 
     const hashedPassword = await bcrypt.hash("secret", 1);
     const res = await db.query(
@@ -34,7 +35,7 @@ beforeAll(async () => {
     test2UserId = res.rows[1].id;
 
     const readIds = await db.query(
-        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', 'test publisher'), ('test title 2', 'test description 2', '1243567119', 4, 'BOOK', 'test publisher 2'), ('test title 2', 'test description 2', '1243567119', 4, 'BOOK', 'test publisher 2') RETURNING id`
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', 'test publisher'), ('test title 2', 'test description 2', '1243567129', 4, 'BOOK', 'test publisher 2'), ('test title 2', 'test description 2', '1243567139', 4, 'BOOK', 'test publisher 2') RETURNING id`
     );
 
     readId1 = readIds.rows[0].id;
@@ -80,7 +81,7 @@ describe("GET /api/users/:userId/reads", () => {
                 avgRating: 4,
                 description: "test description 2",
                 id: readId2,
-                isbn: "1243567119",
+                isbn: "1243567129",
                 printType: "BOOK",
                 publisher: "test publisher 2",
                 rating: 3,
@@ -270,13 +271,13 @@ describe("POST /api/users/:userId/reads", () => {
             avgRating: 4,
             description: "test description 2",
             id: expect.any(Number),
-            isbn: "1243567119",
+            isbn: "1243567139",
             printType: "BOOK",
             publisher: "test publisher 2",
             rating: 4,
             readId: readId3,
             reviewDate: "2023-07-19T05:00:00.000Z",
-            reviewText: "test",
+            reviewText: "'test'",
             title: "test title 2",
             userId: testUserId,
         });

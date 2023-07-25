@@ -50,13 +50,12 @@ router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
         validInputs["title"] = title;
         validInputs["isbn"] = isbn;
         description ? (validInputs["description"] = description) : null;
-        avgRating ? (validInputs["avg_Rating"] = avgRating) : null;
+        avgRating ? (validInputs["avg_rating"] = avgRating) : null;
         printType ? (validInputs["print_type"] = printType) : null;
         publisher ? (validInputs["publisher"] = publisher) : null;
         thumbnail ? (validInputs["thumbnail"] = thumbnail) : null;
 
         const read = await Read.create(validInputs, authors);
-        console.log("read", read);
         return res.status(201).json(read);
     } catch (error) {
         return next(error);

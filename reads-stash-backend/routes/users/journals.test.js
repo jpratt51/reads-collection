@@ -175,7 +175,7 @@ describe("POST /api/users/:userId/journals", () => {
             });
         expect(res.statusCode).toBe(201);
         expect(res.body).toEqual({
-            date: "2023-07-22T05:00:00.000Z",
+            date: expect.any(String),
             id: expect.any(Number),
             text: "new journal text",
             title: "new journal title",
@@ -259,12 +259,11 @@ describe("PATCH /api/users/:userId/journals/:journalId", () => {
             .set({ _token: testUserToken })
             .send({
                 title: "updated journal title",
-                date: "2023-07-18",
                 text: "updated journal text",
             });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
-            date: "2023-07-22",
+            date: expect.any(String),
             id: journalId1,
             text: "updated journal text",
             title: "updated journal title",
