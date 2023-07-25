@@ -125,6 +125,26 @@ class UserRead {
             values
         );
 
+        if (readCheck.rows[0].pages) {
+            const count = +readCheck.rows[0].pages || 0;
+            const currUserStats = await db.query(
+                `SELECT exp, total_books, total_pages FROM users WHERE id = $1`,
+                [userId]
+            );
+
+            let exp = +currUserStats.rows[0].exp || 0;
+            let total_books = +currUserStats.rows[0].total_books || 0;
+            let total_pages = +currUserStats.rows[0].total_pages || 0;
+            exp += count;
+            total_books += 1;
+            total_pages += count;
+
+            const userUpdate = await db.query(
+                `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4 RETURNING exp, total_books, total_pages`,
+                [exp, total_books, total_pages, userId]
+            );
+        }
+
         const results = await db.query(
             `SELECT users_reads.id AS id, users.id AS user_id, reads.id AS read_id, title, description, isbn, avg_rating, print_type, publisher, pages, rating, review_text, review_date FROM users_reads JOIN users ON users_reads.user_id = users.id JOIN reads ON users_reads.read_id = reads.id WHERE users.id = $1 AND reads.id = $2;`,
             [userId, readId]
@@ -205,6 +225,30 @@ class UserRead {
     }
 
     async delete(userId) {
+        const bookBeingDeleted = await db.query(
+            `SELECT r.pages FROM users_reads ur JOIN reads r ON ur.read_id = r.id WHERE ur.id = $1 AND user_id = $2`,
+            [this.id, userId]
+        );
+
+        if (bookBeingDeleted.rows[0].pages) {
+            let count = +bookBeingDeleted.rows[0].pages;
+
+            const currUserStats = await db.query(
+                `SELECT exp, total_books, total_pages FROM users WHERE id = $1`,
+                [userId]
+            );
+            let currExp = +currUserStats.rows[0].exp;
+            let currTotalBooks = +currUserStats.rows[0].total_books;
+            let currTotalPages = +currUserStats.rows[0].total_pages;
+            currExp -= count;
+            currTotalBooks -= 1;
+            currTotalPages -= count;
+
+            await db.query(
+                `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4`,
+                [currExp, currTotalBooks, currTotalPages, userId]
+            );
+        }
         await db.query(
             "DELETE FROM users_reads WHERE id = $1 AND user_id = $2;",
             [this.id, userId]

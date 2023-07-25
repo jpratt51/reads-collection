@@ -47,6 +47,11 @@ beforeAll(async () => {
         [testUserId, readId1, readId2]
     );
 
+    await db.query(
+        `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4`,
+        [350, 2, 350, testUserId]
+    );
+
     userReadId1 = userReadIds.rows[0].id;
     userReadId2 = userReadIds.rows[1].id;
 
@@ -286,6 +291,23 @@ describe("POST /api/users/:userId/reads", () => {
             userId: testUserId,
         });
     });
+
+    test("expect user stats to have been update from successful user read creation", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            email: "test@email.com",
+            exp: 650,
+            fname: "tfn",
+            id: testUserId,
+            lname: "tln",
+            totalBooks: 3,
+            totalPages: 650,
+            username: "test1",
+        });
+    });
 });
 
 describe("PATCH /api/users/:userId/reads/:readId", () => {
@@ -412,5 +434,22 @@ describe("DELETE /api/users/:userId/reads/:readId", () => {
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({ msg: expect.stringContaining("Deleted") });
+    });
+
+    test("expect user stats to have been update from successful user read deletion", async () => {
+        const res = await request(app)
+            .get(`/api/users/${testUserId}`)
+            .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual({
+            email: "test@email.com",
+            exp: 550,
+            fname: "tfn",
+            id: testUserId,
+            lname: "tln",
+            totalBooks: 2,
+            totalPages: 550,
+            username: "test1",
+        });
     });
 });
