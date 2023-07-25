@@ -128,7 +128,7 @@ class UserRead {
             `INSERT INTO users_reads (${keys}) VALUES (${columns}) RETURNING *`,
             values
         );
-        // should remove adding exp, total_books and total_pages to a separate function since it is not directly related to creating a user read
+
         if (readCheck.rows[0].pages) {
             let pageCount = +readCheck.rows[0].pages;
             increaseUserStats(pageCount, userId);

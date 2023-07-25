@@ -95,7 +95,6 @@ class Read {
             return { message: "Read already in database." };
 
         const { values, keys } = dataToSqlForCreate(inputs);
-        console.log([values.join(", ")]);
         const readRes = await db.query(
             `INSERT INTO reads (${keys}) VALUES (${values.join(
                 ", "

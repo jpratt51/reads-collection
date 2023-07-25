@@ -1,1 +1,24 @@
 /reads-stash-backend/node_modules
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/reads-stash-frontend/node_modules
+/reads-stash-frontend/.pnp
+/reads-stash-frontend/.pnp.js
+
+# testing
+/reads-stash-frontend/coverage
+
+# production
+/reads-stash-frontend/build
+
+# misc
+/reads-stash-frontend/.DS_Store
+/reads-stash-frontend/.env.local
+/reads-stash-frontend/.env.development.local
+/reads-stash-frontend/.env.test.local
+/reads-stash-frontend/.env.production.local
+
+/reads-stash-frontend/npm-debug.log*
+/reads-stash-frontend/yarn-debug.log*
+/reads-stash-frontend/yarn-error.log*
