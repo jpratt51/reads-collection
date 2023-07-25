@@ -4,6 +4,9 @@ const RegisterUserForm = () => {
     const INITIAL_STATE = {
         username: "",
         fname: "",
+        lname: "",
+        email: "",
+        password: "",
     };
     const [formData, setFormData] = useState(INITIAL_STATE);
     const handleChange = (e) => {
@@ -44,7 +47,7 @@ const RegisterUserForm = () => {
                 type="text"
                 name="lname"
                 placeholder="last name"
-                value={formData.fname}
+                value={formData.lname}
                 onChange={handleChange}
             />
             <label htmlFor="email">Email</label>
@@ -53,7 +56,7 @@ const RegisterUserForm = () => {
                 type="text"
                 name="email"
                 placeholder="email"
-                value={formData.fname}
+                value={formData.email}
                 onChange={handleChange}
             />
             <label htmlFor="password">Password</label>
@@ -62,7 +65,7 @@ const RegisterUserForm = () => {
                 type="text"
                 name="password"
                 placeholder="password"
-                value={formData.fname}
+                value={formData.password}
                 onChange={handleChange}
             />
             <button onClick={handleSubmit}>Signup</button>
