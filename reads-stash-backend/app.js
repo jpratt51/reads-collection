@@ -4,6 +4,7 @@ const express = require("express");
 const ExpressError = require("./expressError");
 const { authenticateJWT } = require("./middleware/auth");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const userRoutes = require("./routes/users/users");
 const userCollectionsRoutes = require("./routes/users/collections");
@@ -22,6 +23,7 @@ const authRoutes = require("./routes/auth");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(authenticateJWT);
 app.use(morgan("dev"));
