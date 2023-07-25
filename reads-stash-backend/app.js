@@ -5,7 +5,6 @@ const ExpressError = require("./expressError");
 const { authenticateJWT } = require("./middleware/auth");
 const morgan = require("morgan");
 
-// user routers
 const userRoutes = require("./routes/users/users");
 const userCollectionsRoutes = require("./routes/users/collections");
 const userReadsRoutes = require("./routes/users/reads");
@@ -16,10 +15,8 @@ const userFollowedRoutes = require("./routes/users/followed");
 const userRecommendationsRoutes = require("./routes/users/recommendations");
 const readsCollectionsRoutes = require("./routes/reads/collections");
 
-// reads routers
 const readRoutes = require("./routes/reads/reads");
 
-// other routers
 const badgeRoutes = require("./routes/badges");
 const authRoutes = require("./routes/auth");
 
@@ -38,11 +35,9 @@ app.use("/api/users", userFollowersRoutes);
 app.use("/api/users", userFollowedRoutes);
 app.use("/api/users", userRecommendationsRoutes);
 
-// reads
 app.use("/api/reads", readRoutes);
 app.use("/api/reads", readsCollectionsRoutes);
 
-// other
 app.use("/api/badges", badgeRoutes);
 app.use("/api/auth", authRoutes);
 

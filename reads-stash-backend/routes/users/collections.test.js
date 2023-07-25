@@ -12,7 +12,7 @@ const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
 
-let testUserId, test2UserId, collectionId1, collectionId2, collectionId3;
+let testUserId, test2UserId, collectionId1, collectionId3;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
@@ -35,7 +35,6 @@ beforeAll(async () => {
     );
 
     collectionId1 = collectionIds.rows[0].id;
-    collectionId2 = collectionIds.rows[1].id;
     collectionId3 = collectionIds.rows[2].id;
 });
 

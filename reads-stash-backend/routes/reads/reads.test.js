@@ -10,16 +10,14 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../../config");
 
-let testUserToken;
-
-let testUserId,
-    test2UserId,
-    readId1,
+let readId1,
     readId2,
     readId3,
     authorId1,
     authorId2,
-    authorId3;
+    authorId3,
+    testUserId,
+    testUserToken;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");

@@ -9,7 +9,6 @@ const { checkUserIdMatchesLoggedInUser } = require("../../helpers/checkUser");
 const checkForValidInputs = require("../../helpers/inputsValidation");
 const jsonschema = require("jsonschema");
 const createReadCollectionSchema = require("../../schemas/createReadCollection.json");
-const ExpressError = require("../../expressError");
 
 router.get(
     "/:readId/collections",

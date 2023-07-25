@@ -2,7 +2,6 @@
 
 const express = require("express");
 const router = new express.Router();
-const db = require("../../db");
 const UserCollection = require("../../models/users/collection");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const checkForValidInputs = require("../../helpers/inputsValidation");
@@ -10,7 +9,6 @@ const { checkUserIdMatchesLoggedInUser } = require("../../helpers/checkUser");
 const jsonschema = require("jsonschema");
 const createUserCollectionSchema = require("../../schemas/createUserCollection.json");
 const updateUserCollectionSchema = require("../../schemas/updateUserCollection.json");
-const ExpressError = require("../../expressError");
 
 router.get(
     "/:userId/collections",

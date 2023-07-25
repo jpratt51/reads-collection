@@ -2,7 +2,6 @@
 
 const express = require("express");
 const router = new express.Router();
-const db = require("../../db");
 const UserJournal = require("../../models/users/journal");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const jsonschema = require("jsonschema");

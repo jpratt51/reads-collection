@@ -2,7 +2,6 @@
 
 const express = require("express");
 const router = new express.Router();
-const db = require("../db");
 const Badge = require("../models/badge");
 const { ensureLoggedIn } = require("../middleware/auth");
 
