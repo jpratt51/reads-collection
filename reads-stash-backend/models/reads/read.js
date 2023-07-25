@@ -2,12 +2,8 @@
 
 const db = require("../../db");
 const ExpressError = require("../../expressError");
-const {
-    dataToSqlForCreate,
-    dataToSqlAuths,
-    dataToSqlReadAuths,
-    removeQuotes,
-} = require("../../helpers/sql");
+const { dataToSqlForCreate, removeQuotes } = require("../../helpers/sql");
+const addAuthors = require("../../helpers/authors");
 
 class Read {
     constructor(
@@ -98,7 +94,7 @@ class Read {
         if (duplicateReadCheck.rows[0])
             return { message: "Read already in database." };
 
-        const { columns, values, keys } = dataToSqlForCreate(inputs);
+        const { values, keys } = dataToSqlForCreate(inputs);
         console.log([values.join(", ")]);
         const readRes = await db.query(
             `INSERT INTO reads (${keys}) VALUES (${values.join(
@@ -111,30 +107,8 @@ class Read {
         const r = readRes.rows[0];
 
         if (authors) {
-            const { placeholders, insertValues, authList } =
-                await dataToSqlAuths(authors);
-
-            if (insertValues.length) {
-                await db.query(
-                    `INSERT INTO authors (name) VALUES ${placeholders} RETURNING id`,
-                    insertValues
-                );
-            }
-
-            const { readAuthPlaceholders, readAuthValues } =
-                await dataToSqlReadAuths(newReadId, authList);
-
-            await db.query(
-                `INSERT INTO reads_authors (read_id, author_id) VALUES ${readAuthPlaceholders} RETURNING *`,
-                readAuthValues
-            );
-
-            const authResults = await db.query(
-                `SELECT a.name FROM reads_authors ra JOIN authors a ON ra.author_id = a.id WHERE ra.read_id = $1`,
-                [readRes.rows[0].id]
-            );
-
-            const readAuths = authResults.rows.map((a) => a.name);
+            // starting here should move all adding authors to another function
+            await addAuthors(newReadId, readRes);
 
             return new Read(
                 r.id,

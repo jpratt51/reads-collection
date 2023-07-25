@@ -3,6 +3,10 @@
 const db = require("../../db");
 const ExpressError = require("../../expressError");
 const { dataToSql, dataToSqlForCreate } = require("../../helpers/sql");
+const {
+    increaseUserStats,
+    decreaseUserStats,
+} = require("../../helpers/userStats");
 
 class UserRead {
     constructor(
@@ -124,25 +128,10 @@ class UserRead {
             `INSERT INTO users_reads (${keys}) VALUES (${columns}) RETURNING *`,
             values
         );
-
+        // should remove adding exp, total_books and total_pages to a separate function since it is not directly related to creating a user read
         if (readCheck.rows[0].pages) {
-            const count = +readCheck.rows[0].pages || 0;
-            const currUserStats = await db.query(
-                `SELECT exp, total_books, total_pages FROM users WHERE id = $1`,
-                [userId]
-            );
-
-            let exp = +currUserStats.rows[0].exp || 0;
-            let total_books = +currUserStats.rows[0].total_books || 0;
-            let total_pages = +currUserStats.rows[0].total_pages || 0;
-            exp += count;
-            total_books += 1;
-            total_pages += count;
-
-            const userUpdate = await db.query(
-                `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4 RETURNING exp, total_books, total_pages`,
-                [exp, total_books, total_pages, userId]
-            );
+            let pageCount = +readCheck.rows[0].pages;
+            increaseUserStats(pageCount, userId);
         }
 
         const results = await db.query(
@@ -232,22 +221,7 @@ class UserRead {
 
         if (bookBeingDeleted.rows[0].pages) {
             let count = +bookBeingDeleted.rows[0].pages;
-
-            const currUserStats = await db.query(
-                `SELECT exp, total_books, total_pages FROM users WHERE id = $1`,
-                [userId]
-            );
-            let currExp = +currUserStats.rows[0].exp;
-            let currTotalBooks = +currUserStats.rows[0].total_books;
-            let currTotalPages = +currUserStats.rows[0].total_pages;
-            currExp -= count;
-            currTotalBooks -= 1;
-            currTotalPages -= count;
-
-            await db.query(
-                `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4`,
-                [currExp, currTotalBooks, currTotalPages, userId]
-            );
+            decreaseUserStats(count, userId);
         }
         await db.query(
             "DELETE FROM users_reads WHERE id = $1 AND user_id = $2;",
