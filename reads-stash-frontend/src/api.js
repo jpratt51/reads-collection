@@ -7,8 +7,13 @@ class ReadsStashApi {
 
     static async request(endpoint, data = {}, method = "get") {
         console.debug("API Call:", endpoint, data, method);
-
-        let { token } = JSON.parse(localStorage.getItem("user")) || "";
+        console.log("API Call:", endpoint, data, method);
+        let token;
+        try {
+            token = JSON.parse(localStorage.getItem("token")) || "";
+        } catch {
+            token = "";
+        }
 
         const url = `${BASE_URL}/${endpoint}`;
         const headers = { _token: `${token}` };
@@ -24,14 +29,6 @@ class ReadsStashApi {
     }
 
     static async register(username, fname, lname, email, password) {
-        console.log(
-            "made it to register static async function",
-            username,
-            fname,
-            lname,
-            email,
-            password
-        );
         let res = await this.request(
             `api/auth/register`,
             {
