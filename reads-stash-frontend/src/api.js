@@ -10,7 +10,7 @@ class ReadsStashApi {
         console.log("API Call:", endpoint, data, method);
         let token;
         try {
-            token = JSON.parse(localStorage.getItem("token")) || "";
+            token = JSON.parse(localStorage.getItem("user")) || "";
         } catch {
             token = "";
         }
