@@ -43,6 +43,18 @@ class ReadsStashApi {
         return res.token;
     }
 
+    static async login(username, password) {
+        let res = await this.request(
+            `api/auth/login`,
+            {
+                username,
+                password,
+            },
+            "post"
+        );
+        return res.token;
+    }
+
     // static async getAllCompanies() {
     //     let res = await this.request(`companies`);
     //     return res.companies;
@@ -69,18 +81,6 @@ class ReadsStashApi {
     //         : (data = { title, minSalary, hasEquity });
     //     let res = await this.request("jobs", data);
     //     return res.jobs;
-    // }
-
-    // static async login(username, password) {
-    //     let res = await this.request(
-    //         `auth/token`,
-    //         {
-    //             username,
-    //             password,
-    //         },
-    //         "post"
-    //     );
-    //     return res.token;
     // }
 
     // static async updateUser(password, firstName, lastName, email) {

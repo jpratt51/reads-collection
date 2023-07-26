@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import RegisterUserForm from "./RegisterUserForm";
-import ReadsStashApi from "./api.js";
-import useLogin from "./hooks/useLogin";
+import RegisterUserForm from "../RegisterUserForm";
+import ReadsStashApi from "../api.js";
+import useLogin from "../hooks/useLogin";
 
 const RegisterUser = () => {
     const INITIAL_STATE = {
