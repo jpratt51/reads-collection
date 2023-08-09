@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import RegisterUserForm from "../RegisterUserForm";
 import ReadsStashApi from "../api.js";
 import useLogin from "../hooks/useLogin";
+import ErrorMessages from "../ErrorMessages";
 
 const RegisterUser = () => {
     const INITIAL_STATE = {
@@ -36,7 +37,7 @@ const RegisterUser = () => {
         <div>
             <h1>Signup</h1>
             <RegisterUserForm getUserFormData={getUserFormData} />
-            {errors.length ? <div>{errors}</div> : null}
+            {errors.length ? <ErrorMessages errors={errors} /> : null}
         </div>
     );
 };

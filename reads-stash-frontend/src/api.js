@@ -7,7 +7,6 @@ class ReadsStashApi {
 
     static async request(endpoint, data = {}, method = "get") {
         console.debug("API Call:", endpoint, data, method);
-        console.log("API Call:", endpoint, data, method);
         let token;
         try {
             token = JSON.parse(localStorage.getItem("user")) || "";
