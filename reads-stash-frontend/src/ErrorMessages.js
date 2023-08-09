@@ -5,6 +5,7 @@ function ErrorMessages({ errors = [] }) {
 
     return (
         <div>
+            <p>Inputs Error</p>
             {errors.map((error) => (
                 <p>{error}</p>
             ))}
