@@ -13,32 +13,30 @@ const RegisterUser = () => {
     };
     const [user, setUser] = useState(INITIAL_STATE);
     const [userToken, setUserToken] = useLogin("user", "");
+    const [errors, setErrors] = useState("");
+    console.debug(errors);
     const getUserFormData = async (newUser) => {
         setUser({ ...newUser });
-        await user;
+        let res;
         try {
-            const res = await new ReadsStashApi().constructor.register(
+            res = await new ReadsStashApi().constructor.register(
                 user.username,
                 user.fname,
                 user.lname,
                 user.email,
                 user.password
             );
-            await res;
-            if (res)
-                setUserToken(
-                    JSON.stringify({ username: user.username, token: res })
-                );
-        } catch (e) {
-            return {
-                Error: "Could not add user to database.",
-            };
+        } catch (errors) {
+            setErrors(errors);
         }
+        setUserToken(JSON.stringify({ username: user.username, token: res }));
     };
+
     return (
         <div>
             <h1>Signup</h1>
             <RegisterUserForm getUserFormData={getUserFormData} />
+            {errors.length ? <div>{errors}</div> : null}
         </div>
     );
 };
