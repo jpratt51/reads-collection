@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ReadsStashApi from "../api.js";
 import useLogin from "../hooks/useLogin";
 import ErrorMessages from "../ErrorMessages";
 
 const RegisterUser = () => {
+    const navigate = useNavigate();
     const INITIAL_STATE = {
         username: "",
         fname: "",
@@ -36,6 +38,7 @@ const RegisterUser = () => {
             setUserToken(
                 JSON.stringify({ username: formData.username, token: res })
             );
+            navigate("/");
         } catch (errors) {
             setErrors(errors);
             console.debug(errors);
