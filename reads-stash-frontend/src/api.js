@@ -27,18 +27,9 @@ class ReadsStashApi {
         }
     }
 
-    static async register(username, fname, lname, email, password) {
-        let res = await this.request(
-            `api/auth/register`,
-            {
-                username,
-                fname,
-                lname,
-                email,
-                password,
-            },
-            "post"
-        );
+    static async register(data) {
+        console.log("data:", data);
+        let res = await this.request(`api/auth/register`, data, "post");
         return res.token;
     }
 
