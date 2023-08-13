@@ -28,20 +28,12 @@ class ReadsStashApi {
     }
 
     static async register(data) {
-        console.log("data:", data);
         let res = await this.request(`api/auth/register`, data, "post");
         return res.token;
     }
 
-    static async login(username, password) {
-        let res = await this.request(
-            `api/auth/login`,
-            {
-                username,
-                password,
-            },
-            "post"
-        );
+    static async login(data) {
+        let res = await this.request(`api/auth/login`, data, "post");
         return res.token;
     }
 

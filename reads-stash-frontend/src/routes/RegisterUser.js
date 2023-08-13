@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ReadsStashApi from "../api.js";
-import ErrorMessages from "../ErrorMessages";
+import ReadsStashApi from "../api/api.js";
+import Messages from "../common/Messages";
 import UserContext from "../UserContext.js";
 
 const RegisterUser = () => {
@@ -16,7 +16,7 @@ const RegisterUser = () => {
     };
     const [formData, setFormData] = useState(INITIAL_STATE);
     const [userToken, setUserToken] = useLogin("user", "");
-    const [errors, setErrors] = useState("");
+    const [messages, setMessages] = useState("");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -39,9 +39,13 @@ const RegisterUser = () => {
             setUserToken(
                 JSON.stringify({ username: formData.username, token: res })
             );
-            navigate("/");
+            setMessages([`Successfully registered user ${formData.username}`]);
+            setTimeout(() => {
+                navigate("/");
+            }, 4000);
         } catch (errors) {
-            setErrors(errors);
+            errors.unshift("Inputs error");
+            setMessages(errors);
             console.debug(errors);
         }
         setFormData(INITIAL_STATE);
@@ -90,7 +94,7 @@ const RegisterUser = () => {
                 <label htmlFor="password">Password</label>
                 <input
                     id="password"
-                    type="text"
+                    type="password"
                     name="password"
                     placeholder="password"
                     value={formData.password}
@@ -98,7 +102,7 @@ const RegisterUser = () => {
                 />
                 <button onClick={handleSubmit}>Signup</button>
             </form>
-            {errors.length ? <ErrorMessages errors={errors} /> : null}
+            {messages.length ? <Messages messages={messages} /> : null}
         </div>
     );
 };

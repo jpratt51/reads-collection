@@ -1,6 +1,6 @@
 import { React, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import ReadsStashApi from "../api.js";
+import ReadsStashApi from "../api/api.js";
 import UserContext from "../UserContext.js";
 
 function LoginUser() {
@@ -24,10 +24,10 @@ function LoginUser() {
         e.preventDefault();
         const { username, password } = formData;
         async function loginUser() {
-            let res = await new ReadsStashApi().constructor.login(
-                username || "",
-                password || ""
-            );
+            let res = await new ReadsStashApi().constructor.login({
+                username: username || "",
+                password: password || "",
+            });
             await res;
             login(username, res);
             navigate("/");
