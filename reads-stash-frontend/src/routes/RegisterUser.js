@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReadsStashApi from "../api.js";
-import useLogin from "../hooks/useLogin";
 import ErrorMessages from "../ErrorMessages";
+import UserContext from "../UserContext.js";
 
 const RegisterUser = () => {
     const navigate = useNavigate();
+    const { useLogin } = useContext(UserContext);
     const INITIAL_STATE = {
         username: "",
         fname: "",
