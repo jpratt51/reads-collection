@@ -29,17 +29,11 @@ const RegisterUser = () => {
         e.preventDefault();
         let res;
         try {
-            res = await new ReadsStashApi().constructor.register({
-                username: formData.username,
-                fname: formData.fname,
-                lname: formData.lname,
-                email: formData.email,
-                password: formData.password,
-            });
+            res = await new ReadsStashApi().constructor.register(formData);
             setUserToken(
                 JSON.stringify({ username: formData.username, token: res })
             );
-            setMessages([`Successfully registered user ${formData.username}`]);
+            setMessages([`Successfully registered user ${formData.username}!`]);
             setTimeout(() => {
                 navigate("/");
             }, 4000);
