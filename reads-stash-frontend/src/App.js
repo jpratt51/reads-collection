@@ -23,7 +23,7 @@ function App() {
 
     const logout = () => {
         setUser("");
-        localStorage.clear();
+        localStorage.removeItem("user");
         toggleLoggedIn();
     };
 
