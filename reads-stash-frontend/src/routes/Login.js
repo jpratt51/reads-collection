@@ -6,7 +6,7 @@ import UserContext from "../UserContext.js";
 
 function LoginUser() {
     const navigate = useNavigate();
-    const { useLogin } = useContext(UserContext);
+    const { useLogin, toggleLoggedIn } = useContext(UserContext);
     const INITIAL_STATE = {
         username: "",
         password: "",
@@ -31,14 +31,16 @@ function LoginUser() {
                 JSON.stringify({ username: formData.username, token: res })
             );
             setMessages([`User ${formData.username} successfully logged in!`]);
+            toggleLoggedIn();
             setTimeout(() => {
-                navigate("/");
-            }, 4000);
-            setFormData(INITIAL_STATE);
+                // window.location.reload();
+                return navigate("/");
+            }, 2500);
         } catch (errors) {
             errors.unshift("Inputs error");
             setMessages(errors);
             console.debug(errors);
+            setFormData(INITIAL_STATE);
         }
     };
 

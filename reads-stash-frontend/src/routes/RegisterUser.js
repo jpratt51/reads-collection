@@ -6,7 +6,7 @@ import UserContext from "../UserContext.js";
 
 const RegisterUser = () => {
     const navigate = useNavigate();
-    const { useLogin } = useContext(UserContext);
+    const { useLogin, toggleLoggedIn } = useContext(UserContext);
     const INITIAL_STATE = {
         username: "",
         fname: "",
@@ -34,6 +34,7 @@ const RegisterUser = () => {
                 JSON.stringify({ username: formData.username, token: res })
             );
             setMessages([`Successfully registered user ${formData.username}!`]);
+            toggleLoggedIn();
             setTimeout(() => {
                 navigate("/");
             }, 4000);
