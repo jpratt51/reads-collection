@@ -13,6 +13,9 @@ function Navigation({ logout }) {
                         Logout {user.username}
                     </Link>
                 </li>
+                <li>
+                    <NavLink to="/user/profile">Profile</NavLink>
+                </li>
             </ul>
         );
     }
