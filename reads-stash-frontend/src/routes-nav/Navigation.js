@@ -16,6 +16,9 @@ function Navigation({ logout }) {
                 <li>
                     <NavLink to="/user/profile">Profile</NavLink>
                 </li>
+                <li>
+                    <NavLink to="/user/reads">Reads</NavLink>
+                </li>
             </ul>
         );
     }
