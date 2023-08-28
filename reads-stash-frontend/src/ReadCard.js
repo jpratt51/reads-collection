@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const ReadCard = (props) => {
     return (
@@ -9,8 +10,11 @@ const ReadCard = (props) => {
             <p>Description: {props.description}</p>
             <p>Page Count: {props.pageCount}</p>
             <p>Print Type: {props.printType}</p>
-            <p>Thumbnail URL: {props.thumbNail}</p>
+            <Link to={`/read/${props.isbn}`} state={{ props: props }}>
+                <img src={props.thumbnail} alt="book cover" />
+            </Link>
             <p>Info URL: {props.infoLink}</p>
+            <p>Authors: {props.authors}</p>
         </div>
     );
 };

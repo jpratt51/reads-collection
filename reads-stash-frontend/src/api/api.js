@@ -15,7 +15,7 @@ class ReadsStashApi {
         }
 
         const url = `${BASE_URL}/${endpoint}`;
-        const headers = { _token: `${token}` };
+        const headers = { _token: `${token.token}` };
         const params = method === "get" ? data : {};
 
         try {
@@ -35,6 +35,26 @@ class ReadsStashApi {
     static async login(data) {
         let res = await this.request(`api/auth/login`, data, "post");
         return res.token;
+    }
+
+    static async getRead(isbn) {
+        let res = await this.request(`api/reads/${isbn}`);
+        return res;
+    }
+
+    static async postRead(data) {
+        let res = await this.request(`api/reads`, data, "post");
+        return res;
+    }
+
+    static async postUserRead(data) {
+        console.log("postUserRead data:", data);
+        let res = await this.request(
+            `api/users/${data.username}/reads`,
+            data,
+            "post"
+        );
+        return res;
     }
 
     // static async getAllCompanies() {

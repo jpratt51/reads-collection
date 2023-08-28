@@ -4,7 +4,8 @@ import Login from "../routes/Login";
 import RegisterUser from "../routes/RegisterUser";
 import Profile from "../routes/Profile";
 import Reads from "../routes/Reads";
-import { Routes, Route } from "react-router-dom";
+import ReadDetails from "../routes/ReadDetails";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 function AppRoutes() {
     return (
@@ -13,7 +14,9 @@ function AppRoutes() {
             <Route path="/auth/register" element={<RegisterUser />} />
             <Route path="/auth/login" element={<Login />} />
             <Route path="/user/profile" element={<Profile />} />
-            <Route path="/user/reads" element={<Reads />} />
+            <Route path="/reads" element={<Reads />} />
+            <Route path="/read/:id" element={<ReadDetails />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );
 }

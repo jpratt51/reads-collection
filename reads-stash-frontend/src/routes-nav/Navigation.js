@@ -17,7 +17,7 @@ function Navigation({ logout }) {
                     <NavLink to="/user/profile">Profile</NavLink>
                 </li>
                 <li>
-                    <NavLink to="/user/reads">Reads</NavLink>
+                    <NavLink to="/reads">Reads</NavLink>
                 </li>
             </ul>
         );

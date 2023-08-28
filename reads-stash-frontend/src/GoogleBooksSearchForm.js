@@ -26,7 +26,6 @@ function GoogleBooksSearchForm() {
         if (formData.title) URL = URL + formData.title.trim();
         if (formData.author) URL = URL + "+inauthor:" + formData.author.trim();
         URL = URL + "&key=" + GOOGLE_BOOKS_API_KEY;
-        console.log("URL:", URL);
         try {
             axios.get(URL).then((res) => {
                 setData(res.data.items);
@@ -74,10 +73,9 @@ function GoogleBooksSearchForm() {
                           description={read.volumeInfo.description}
                           pageCount={read.volumeInfo.pageCount}
                           printType={read.volumeInfo.printType}
-                          thumbnail={
-                              read.volumeInfo.imageLinks?.thumbnail ?? null
-                          }
+                          thumbnail={read.volumeInfo.imageLinks.thumbnail}
                           infoLink={read.volumeInfo.infoLink}
+                          authors={read.volumeInfo.authors}
                       />
                   ))
                 : null}
