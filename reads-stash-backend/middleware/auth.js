@@ -6,8 +6,7 @@ const ExpressError = require("../expressError");
 
 function authenticateJWT(req, res, next) {
     try {
-        const payload = jwt.verify(req.headers._token, SECRET_KEY);
-        req.user = payload;
+        req.user = jwt.verify(req.headers._token, SECRET_KEY);
         return next();
     } catch (error) {
         next();

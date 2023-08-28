@@ -17,10 +17,10 @@ router.get("/", async function getAllReads(req, res, next) {
     }
 });
 
-router.get("/:readId", async function getOneRead(req, res, next) {
+router.get("/:isbn", async function getOneRead(req, res, next) {
     try {
-        const { readId } = req.params;
-        const read = await Read.getById(readId);
+        const { isbn } = req.params;
+        const read = await Read.getByIsbn(isbn);
         return res.json(read);
     } catch (error) {
         return next(error);

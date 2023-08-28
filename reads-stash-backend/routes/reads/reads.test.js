@@ -13,10 +13,11 @@ const { SECRET_KEY } = require("../../config");
 let readId1,
     readId2,
     readId3,
+    isbn1,
+    isbn3,
     authorId1,
     authorId2,
     authorId3,
-    testUserId,
     testUserToken;
 
 beforeAll(async () => {
@@ -32,19 +33,19 @@ beforeAll(async () => {
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 
-    testUserId = res.rows[0].id;
-
     const reads = await db.query(
-        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher, pages, thumbnail) VALUES ('t1title', 't1description', '0987654321', 3, 'BOOK', 'Hidden Gnome Publishing', 250, 't1thumbnail'), ('t2title', 't2description', '9876543210', 3, 'BOOK', 'Hidden Gnome Publishing', 300, 't2thumbnail') RETURNING id`
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher, pages, thumbnail) VALUES ('t1title', 't1description', '0987654321', 3, 'BOOK', 'Hidden Gnome Publishing', 250, 't1thumbnail'), ('t2title', 't2description', '9876543210', 3, 'BOOK', 'Hidden Gnome Publishing', 300, 't2thumbnail') RETURNING id, isbn`
     );
 
     const read3 = await db.query(
-        `INSERT INTO reads (title, isbn) VALUES ('t3title', '8765432109') RETURNING id`
+        `INSERT INTO reads (title, isbn) VALUES ('t3title', '8765432109') RETURNING id, isbn`
     );
 
     readId1 = reads.rows[0].id;
     readId2 = reads.rows[1].id;
     readId3 = read3.rows[0].id;
+    isbn1 = reads.rows[0].isbn;
+    isbn3 = read3.rows[0].isbn;
 
     const authors = await db.query(
         `INSERT INTO authors (name) VALUES ('t1author'), ('t2author'), ('t3author') RETURNING id`
@@ -117,9 +118,9 @@ describe("GET /api/reads", () => {
     });
 });
 
-describe("GET /api/reads/:readId", () => {
-    test("get one read and 200 status code with valid readId. No token necessary.", async () => {
-        const res = await request(app).get(`/api/reads/${readId1}`);
+describe("GET /api/reads/:isbn", () => {
+    test("get one read and 200 status code with valid isbn. No token necessary.", async () => {
+        const res = await request(app).get(`/api/reads/${isbn1}`);
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             authors: ["t1author", "t2author"],
@@ -136,7 +137,7 @@ describe("GET /api/reads/:readId", () => {
     });
 
     test("works for reads with missing values: empty values should be null and missing authors should be an empty array", async () => {
-        const res = await request(app).get(`/api/reads/${readId3}`);
+        const res = await request(app).get(`/api/reads/${isbn3}`);
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             authors: [],
@@ -164,7 +165,7 @@ describe("GET /api/reads/:readId", () => {
         const res = await request(app).get(`/api/reads/${true}`);
         expect(res.statusCode).toBe(400);
         expect(res.body).toEqual({
-            error: { message: "Invalid read id data type", status: 400 },
+            error: { message: "Invalid isbn data type", status: 400 },
         });
     });
 });

@@ -3,7 +3,7 @@
 const db = require("../db");
 const { dataToSqlAuths, dataToSqlReadAuths } = require("./sql");
 
-async function addAuthors(newReadId, readRes) {
+async function addAuthors(newReadId, readRes, authors) {
     const { placeholders, insertValues, authList } = await dataToSqlAuths(
         authors
     );

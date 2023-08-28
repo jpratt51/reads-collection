@@ -22,7 +22,7 @@ function dataToSqlForCreate(data) {
 
     const columns = keys.map((name, idx) => `$${idx + 1}`);
     const inserts = values.map((value) =>
-        typeof value === "string" ? `'${value}'` : value
+        typeof value === "string" ? `${value}` : value
     );
 
     return {

@@ -5,8 +5,8 @@
     "default": {},
     "title": "Root Schema",
     "required": [
-        "userId",
-        "readId"
+        "username",
+        "isbn"
     ],
     "properties": {
         "rating": {
@@ -33,20 +33,21 @@
                 "2023-07-19"
             ]
         },
-        "userId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The userId Schema",
+        "username": {
+            "type": "string",
+            "default": "",
+            "title": "The username Schema",
             "examples": [
-                1
+                "testUsername"
             ]
         },
-        "readId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The readId Schema",
+        "isbn": {
+            "type": "string",
+            "default": "",
+            "title": "The isbn Schema",
+            "pattern" : "^[0-9]+$",
             "examples": [
-                2
+                "9780989671767"
             ]
         }
     },
@@ -54,7 +55,7 @@
         "rating": 4.5,
         "review_text": "test review",
         "review_date": "2023-07-19",
-        "userId": 1,
-        "readId": 2
+        "username": "testUsername",
+        "isbn": "9780989671767"
     }]
 }

@@ -44,8 +44,8 @@ CREATE TABLE users_reads
     rating INTEGER,
     review_text VARCHAR(7500),
     review_date DATE,
-    user_id INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
-    read_id INTEGER NOT NULL REFERENCES reads ON DELETE CASCADE
+    username VARCHAR(30) NOT NULL REFERENCES users (username) ON DELETE CASCADE,
+    isbn VARCHAR(20) NOT NULL REFERENCES reads (isbn) ON DELETE CASCADE
 );
 
 CREATE TABLE authors
@@ -136,12 +136,12 @@ INSERT INTO badges (name, thumbnail) VALUES
 ('t4badge', 't4thumbnail'),
 ('t5badge', 't5thumbnail');
 
-INSERT INTO users_reads (rating, review_text, review_date, user_id, read_id) VALUES
-(4, 'test 1 review text', '2023-07-22', 1, 1),
-(2, 'test 2 review text', '2023-07-22', 1, 2),
-(3, 'test 3 review text', '2023-07-22', 1, 3),
-(4, 'test 4 review text', '2023-07-22', 1, 4),
-(5, 'test 5 review text', '2023-07-22', 1, 5);
+INSERT INTO users_reads (rating, review_text, review_date, username, isbn) VALUES
+(4, 'test 1 review text', '2023-07-22', 't1u', 1234567891011),
+(2, 'test 2 review text', '2023-07-22', 't1u', 1234567891012),
+(3, 'test 3 review text', '2023-07-22', 't1u', 1234567891013),
+(4, 'test 4 review text', '2023-07-22', 't1u', 1234567891014),
+(5, 'test 5 review text', '2023-07-22', 't1u', 1234567891015);
 
 INSERT INTO authors (name) VALUES 
 ('t1author'),

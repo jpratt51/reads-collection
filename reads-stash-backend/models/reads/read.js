@@ -49,20 +49,20 @@ class Read {
         return reads;
     }
 
-    static async getById(readId) {
-        if (/^\d+$/.test(readId) === false)
-            throw new ExpressError(`Invalid read id data type`, 400);
-        const readRes = await db.query(`SELECT * FROM reads WHERE id = $1;`, [
-            readId,
+    static async getByIsbn(isbn) {
+        if (/^[0-9]+$/.test(isbn) === false)
+            throw new ExpressError(`Invalid isbn data type`, 400);
+        const readRes = await db.query(`SELECT * FROM reads WHERE isbn = $1;`, [
+            isbn,
         ]);
 
         if (readRes.rows.length === 0) {
-            throw new ExpressError(`Read ${readId} not found`, 404);
+            throw new ExpressError(`Read ${isbn} not found`, 404);
         }
 
         const authRes = await db.query(
             `SELECT a.name FROM reads_authors ra JOIN authors a ON ra.author_id = a.id WHERE ra.read_id = $1`,
-            [readId]
+            [readRes.rows[0].id]
         );
 
         const readAuths = authRes.rows.map((a) => a.name);
@@ -104,10 +104,8 @@ class Read {
         const newReadId = readRes.rows[0].id;
 
         const r = readRes.rows[0];
-
         if (authors) {
-            // starting here should move all adding authors to another function
-            await addAuthors(newReadId, readRes);
+            let readAuths = await addAuthors(newReadId, readRes, authors);
 
             return new Read(
                 r.id,

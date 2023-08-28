@@ -12,12 +12,11 @@ const { SECRET_KEY } = require("../../config");
 
 let testUserToken,
     testUserId,
+    testUsername,
     test2UserId,
     readId1,
     readId2,
-    readId3,
-    userReadId1,
-    userReadId2;
+    readId3;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
@@ -32,6 +31,7 @@ beforeAll(async () => {
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
 
     testUserId = res.rows[0].id;
+    testUsername = res.rows[0].username;
     test2UserId = res.rows[1].id;
 
     const readIds = await db.query(
@@ -51,9 +51,6 @@ beforeAll(async () => {
         `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4`,
         [350, 2, 350, testUserId]
     );
-
-    userReadId1 = userReadIds.rows[0].id;
-    userReadId2 = userReadIds.rows[1].id;
 
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
@@ -294,7 +291,7 @@ describe("POST /api/users/:userId/reads", () => {
 
     test("expect user stats to have been update from successful user read creation", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}`)
+            .get(`/api/users/${testUsername}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
@@ -438,7 +435,7 @@ describe("DELETE /api/users/:userId/reads/:readId", () => {
 
     test("expect user stats to have been update from successful user read deletion", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}`)
+            .get(`/api/users/${testUsername}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({

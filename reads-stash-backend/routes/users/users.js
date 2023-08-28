@@ -18,12 +18,12 @@ router.get("/", ensureLoggedIn, async function getAllUsers(req, res, next) {
 });
 
 router.get(
-    "/:userId",
+    "/:username",
     ensureLoggedIn,
     async function getOneUser(req, res, next) {
         try {
-            const { userId } = req.params;
-            let user = await User.getById(userId);
+            const { username } = req.params;
+            let user = await User.getByUsername(username);
             return res.json(user);
         } catch (error) {
             return next(error);

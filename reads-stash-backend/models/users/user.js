@@ -73,12 +73,7 @@ class User {
         );
         const u = results.rows[0];
         if (!u) {
-            const notFoundError = new ExpressError(
-                `User ${username} not found`,
-                400
-            );
-            notFoundError.code = 400;
-            throw notFoundError;
+            throw new ExpressError(`User ${username} not found`, 404);
         }
         return new User(
             u.id,

@@ -12,6 +12,7 @@ const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
 let testUserId;
+let testUsername;
 let test2UserId;
 
 beforeAll(async () => {
@@ -23,6 +24,7 @@ beforeAll(async () => {
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
     test2UserId = res.rows[1].id;
     testUserId = res.rows[0].id;
+    testUsername = res.rows[0].username;
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
 
@@ -78,10 +80,10 @@ describe("GET /api/users", () => {
     });
 });
 
-describe("GET /api/users/:userId", () => {
-    test("get one user and 200 status code with valid token and valid user id", async () => {
+describe("GET /api/users/:username", () => {
+    test("get one user and 200 status code with valid token and valid username", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}`)
+            .get(`/api/users/${testUsername}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
@@ -96,7 +98,7 @@ describe("GET /api/users/:userId", () => {
         });
     });
 
-    test("get error message and 401 status code with no token and valid user id", async () => {
+    test("get error message and 401 status code with no token and valid username", async () => {
         const res = await request(app).get(`/api/users/${testUserId}`);
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -104,7 +106,7 @@ describe("GET /api/users/:userId", () => {
         });
     });
 
-    test("get error message and 401 status code with bad token and valid user id", async () => {
+    test("get error message and 401 status code with bad token and valid username", async () => {
         const res = await request(app)
             .get(`/api/users/${testUserId}`)
             .set({ _token: "bad token" });
@@ -114,23 +116,13 @@ describe("GET /api/users/:userId", () => {
         });
     });
 
-    test("get error message and 404 status code with valid token and invalid user id", async () => {
+    test("get error message and 404 status code with valid token and invalid username", async () => {
         const res = await request(app)
-            .get(`/api/users/1000`)
+            .get(`/api/users/barnie`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(404);
         expect(res.body).toEqual({
-            error: { message: "User 1000 not found", status: 404 },
-        });
-    });
-
-    test("get error message and 400 status code with valid token and invalid userId parameter type", async () => {
-        const res = await request(app)
-            .get(`/api/users/badType`)
-            .set({ _token: testUserToken });
-        expect(res.statusCode).toBe(400);
-        expect(res.body).toEqual({
-            error: { message: "Invalid user id data type", status: 400 },
+            error: { message: "User barnie not found", status: 404 },
         });
     });
 });

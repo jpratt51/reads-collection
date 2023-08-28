@@ -52,20 +52,20 @@ router.get(
 );
 
 router.post(
-    "/:userId/reads",
+    "/:username/reads",
     ensureLoggedIn,
     async function createUserRead(req, res, next) {
         try {
-            const { userId } = req.params;
-            const { readId } = req.body;
+            const { username } = req.params;
+            const { isbn } = req.body;
             const inputs = req.body;
-            inputs["userId"] = +userId;
-            if (req.user.id != userId) {
-                const invalidUserIdError = new ExpressError(
+            inputs["username"] = username;
+            if (req.user.username != username) {
+                const invalidUsernameError = new ExpressError(
                     "Cannot Create Reads For Other Users",
                     403
                 );
-                return next(invalidUserIdError);
+                return next(invalidUsernameError);
             }
             const validator = jsonschema.validate(inputs, createUserReadSchema);
 
@@ -74,7 +74,7 @@ router.post(
                 const errors = new ExpressError(listOfErrors, 400);
                 return next(errors);
             }
-            const userRead = await UserRead.create(userId, readId, inputs);
+            const userRead = await UserRead.create(username, isbn, inputs);
             return res.status(201).json(userRead);
         } catch (error) {
             return next(error);

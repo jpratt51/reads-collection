@@ -2,11 +2,11 @@
 
 const db = require("../db");
 
-async function increaseUserStats(pageCount, userId) {
+async function increaseUserStats(pageCount, username) {
     const count = pageCount || 0;
     const currUserStats = await db.query(
-        `SELECT exp, total_books, total_pages FROM users WHERE id = $1`,
-        [userId]
+        `SELECT exp, total_books, total_pages FROM users WHERE username = $1`,
+        [username]
     );
 
     let exp = +currUserStats.rows[0].exp || 0;
@@ -17,15 +17,15 @@ async function increaseUserStats(pageCount, userId) {
     total_pages += count;
 
     const userUpdate = await db.query(
-        `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4 RETURNING exp, total_books, total_pages`,
-        [exp, total_books, total_pages, userId]
+        `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE username = $4 RETURNING exp, total_books, total_pages`,
+        [exp, total_books, total_pages, username]
     );
 }
 
-async function decreaseUserStats(count, userId) {
+async function decreaseUserStats(count, username) {
     const currUserStats = await db.query(
-        `SELECT exp, total_books, total_pages FROM users WHERE id = $1`,
-        [userId]
+        `SELECT exp, total_books, total_pages FROM users WHERE username = $1`,
+        [username]
     );
     let currExp = +currUserStats.rows[0].exp;
     let currTotalBooks = +currUserStats.rows[0].total_books;
@@ -35,8 +35,8 @@ async function decreaseUserStats(count, userId) {
     currTotalPages -= count;
 
     await db.query(
-        `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4`,
-        [currExp, currTotalBooks, currTotalPages, userId]
+        `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE username = $4`,
+        [currExp, currTotalBooks, currTotalPages, username]
     );
 }
 

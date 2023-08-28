@@ -122,16 +122,16 @@ describe("POST /api/auth/login", () => {
         });
     });
 
-    test("returns error and 400 status when user does not exist", async () => {
+    test("returns error and 404 status when user does not exist", async () => {
         const res = await request(app).post("/api/auth/login").send({
             username: "userDoesNotExist",
             password: "password",
         });
-        expect(res.statusCode).toBe(400);
+        expect(res.statusCode).toBe(404);
         expect(res.body).toEqual({
             error: {
                 message: "User userDoesNotExist not found",
-                status: 400,
+                status: 404,
             },
         });
     });
