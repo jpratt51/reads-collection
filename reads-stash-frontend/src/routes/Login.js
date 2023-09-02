@@ -1,4 +1,4 @@
-import { React, useState, useContext } from "react";
+import { React, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import ReadsStashApi from "../api/api.js";
 import Messages from "../common/Messages";
@@ -6,7 +6,8 @@ import UserContext from "../UserContext.js";
 
 function LoginUser() {
     const navigate = useNavigate();
-    const { useLogin, toggleLoggedIn } = useContext(UserContext);
+    const { user, useLogin, toggleLoggedIn } = useContext(UserContext);
+
     const INITIAL_STATE = {
         username: "",
         password: "",
@@ -43,6 +44,12 @@ function LoginUser() {
             setFormData(INITIAL_STATE);
         }
     };
+
+    useEffect(() => {
+        if (user) {
+            return navigate("/");
+        }
+    }, [navigate, user]);
 
     return (
         <div>

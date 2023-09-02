@@ -48,7 +48,6 @@ class ReadsStashApi {
     }
 
     static async postUserRead(data) {
-        console.log("postUserRead data:", data);
         let res = await this.request(
             `api/users/${data.username}/reads`,
             data,

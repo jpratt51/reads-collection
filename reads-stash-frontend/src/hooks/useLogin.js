@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-
 const useLogin = (key) => {
     const [state, setState] = useState(() => {
         let token;
         try {
-            token = JSON.parse(window.localStorage.getItem(key)) || "";
+            token = window.localStorage.getItem(key) || "";
+            token = JSON.parse(token);
+            console.log(typeof token);
             return token;
         } catch {
             token = "";

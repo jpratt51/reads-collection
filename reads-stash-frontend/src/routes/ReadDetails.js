@@ -53,24 +53,28 @@ function ReadDetails() {
         }
     };
 
-    return (
-        <div>
-            <ReadCard
-                isbn={props.isbn}
-                title={props.title}
-                publishedDate={props.publishedDate}
-                description={props.description}
-                pageCount={props.pageCount}
-                printType={props.printType}
-                thumbnail={props.thumbnail}
-                infoLink={props.infoLink}
-            />
-            {user && !read ? (
-                <button onClick={addReadToDb}>Add to Stash</button>
-            ) : null}
-            {messages.length ? <Messages messages={messages} /> : null}
-        </div>
-    );
+    if (props) {
+        return (
+            <div>
+                <ReadCard
+                    isbn={props.isbn}
+                    title={props.title}
+                    publishedDate={props.publishedDate}
+                    description={props.description}
+                    pageCount={props.pageCount}
+                    printType={props.printType}
+                    thumbnail={props.thumbnail}
+                    infoLink={props.infoLink}
+                />
+                {user && !read ? (
+                    <button onClick={addReadToDb}>Add to Stash</button>
+                ) : null}
+                {messages.length ? <Messages messages={messages} /> : null}
+            </div>
+        );
+    } else {
+        return <p>Loading ...</p>;
+    }
 }
 
 export default ReadDetails;
