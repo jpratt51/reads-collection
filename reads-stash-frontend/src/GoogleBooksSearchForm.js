@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import ReadCard from "./ReadCard";
-import { GOOGLE_BOOKS_BASE_URL, GOOGLE_BOOKS_API_KEY } from "./Config.js";
+import { GOOGLE_BOOKS_BASE_URL, GOOGLE_BOOKS_API_KEY } from "./config";
 import UserContext from "./UserContext";
 
 function GoogleBooksSearchForm() {
