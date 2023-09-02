@@ -31,12 +31,8 @@ function LoginUser() {
             setUserToken(
                 JSON.stringify({ username: formData.username, token: res })
             );
-            setMessages([`User ${formData.username} successfully logged in!`]);
+            console.debug(userToken);
             toggleLoggedIn();
-            setTimeout(() => {
-                // window.location.reload();
-                return navigate("/");
-            }, 2500);
         } catch (errors) {
             errors.unshift("Inputs error");
             setMessages(errors);

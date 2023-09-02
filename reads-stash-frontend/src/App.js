@@ -8,6 +8,9 @@ import Navigation from "./routes-nav/Navigation";
 function App() {
     const [user, setUser] = useState("");
     const [loggedIn, setLoggedIn] = useState(false);
+    const errorLoadingMessage = (
+        <p>Oops... something went wrong! Please try again.</p>
+    );
 
     useEffect(() => {
         try {
@@ -29,7 +32,9 @@ function App() {
 
     return (
         <div>
-            <UserContext.Provider value={{ user, useLogin, toggleLoggedIn }}>
+            <UserContext.Provider
+                value={{ user, useLogin, toggleLoggedIn, errorLoadingMessage }}
+            >
                 <Navigation logout={logout} />
                 <AppRoutes />
             </UserContext.Provider>

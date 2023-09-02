@@ -1,16 +1,18 @@
-import { React, useState } from "react";
+import { React, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import ReadCard from "./ReadCard";
 import { GOOGLE_BOOKS_BASE_URL, GOOGLE_BOOKS_API_KEY } from "./Config.js";
+import UserContext from "./UserContext";
 
 function GoogleBooksSearchForm() {
     const [data, setData] = useState("");
+    const [readCards, setReadCards] = useState("");
+    const [disabledStatus, setDisabledStatus] = useState(false);
+    const { errorLoadingMessage } = useContext(UserContext);
+
     const INITIAL_STATE = {
-        username: "",
-        fname: "",
-        lname: "",
-        email: "",
-        password: "",
+        title: "",
+        author: "",
     };
     const [formData, setFormData] = useState(INITIAL_STATE);
     const handleChange = (e) => {
@@ -32,9 +34,40 @@ function GoogleBooksSearchForm() {
             });
         } catch (errors) {
             console.debug(errors);
+            setReadCards(errorLoadingMessage);
         }
+        setDisabledStatus(true);
         setFormData(INITIAL_STATE);
+        setTimeout(() => setDisabledStatus(false), 2000);
     };
+
+    useEffect(() => {
+        try {
+            setReadCards(
+                data.map((read) => (
+                    <ReadCard
+                        key={read.volumeInfo.industryIdentifiers[0].identifier}
+                        isbn={read.volumeInfo.industryIdentifiers[0].identifier}
+                        title={read.volumeInfo.title}
+                        publishedDate={read.volumeInfo.publishedDate}
+                        description={read.volumeInfo.description}
+                        pageCount={read.volumeInfo.pageCount}
+                        printType={read.volumeInfo.printType}
+                        thumbnail={
+                            typeof read.volumeInfo.imageLinks.thumbnail ===
+                            "undefined"
+                                ? null
+                                : read.volumeInfo.imageLinks.thumbnail
+                        }
+                        infoLink={read.volumeInfo.infoLink}
+                        authors={read.volumeInfo.authors}
+                    />
+                ))
+            );
+        } catch {
+            setReadCards(errorLoadingMessage);
+        }
+    }, [data, errorLoadingMessage]);
     return (
         <div>
             <h1>Read Search</h1>
@@ -47,6 +80,7 @@ function GoogleBooksSearchForm() {
                     placeholder="title"
                     value={formData.title}
                     onChange={handleChange}
+                    disabled={disabledStatus}
                 />
                 <label htmlFor="author">Author</label>
                 <input
@@ -56,29 +90,11 @@ function GoogleBooksSearchForm() {
                     placeholder="author"
                     value={formData.author}
                     onChange={handleChange}
+                    disabled={disabledStatus}
                 />
                 <button onClick={handleSubmit}>Search</button>
             </form>
-            {data
-                ? data.map((read) => (
-                      <ReadCard
-                          key={
-                              read.volumeInfo.industryIdentifiers[0].identifier
-                          }
-                          isbn={
-                              read.volumeInfo.industryIdentifiers[0].identifier
-                          }
-                          title={read.volumeInfo.title}
-                          publishedDate={read.volumeInfo.publishedDate}
-                          description={read.volumeInfo.description}
-                          pageCount={read.volumeInfo.pageCount}
-                          printType={read.volumeInfo.printType}
-                          thumbnail={read.volumeInfo.imageLinks.thumbnail}
-                          infoLink={read.volumeInfo.infoLink}
-                          authors={read.volumeInfo.authors}
-                      />
-                  ))
-                : null}
+            {readCards}
         </div>
     );
 }

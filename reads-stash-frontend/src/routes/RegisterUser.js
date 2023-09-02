@@ -33,6 +33,7 @@ const RegisterUser = () => {
             setUserToken(
                 JSON.stringify({ username: formData.username, token: res })
             );
+            console.debug(userToken);
             setMessages([`Successfully registered user ${formData.username}!`]);
             toggleLoggedIn();
             setTimeout(() => {

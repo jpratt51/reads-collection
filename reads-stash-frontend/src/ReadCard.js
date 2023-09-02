@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
+import UserContext from "./UserContext.js";
 
 const ReadCard = (props) => {
     const [readDescription, setReadDescription] = useState("");
+    const { errorLoadingMessage } = useContext(UserContext);
 
     function truncate(text, maxLength) {
         if (text.length > maxLength) {
@@ -12,14 +14,21 @@ const ReadCard = (props) => {
     }
 
     useEffect(() => {
-        if (props.description.length > 200) {
+        try {
+            if (props.description.length > 200) {
+                setReadDescription({
+                    descriptionText: truncate(props.description, 200),
+                    buttonText: "show more",
+                });
+            } else {
+                setReadDescription({
+                    descriptionText: truncate(props.description, 200),
+                    buttonText: "",
+                });
+            }
+        } catch {
             setReadDescription({
-                descriptionText: truncate(props.description, 200),
-                buttonText: "show more",
-            });
-        } else {
-            setReadDescription({
-                descriptionText: truncate(props.description, 200),
+                descriptionText: "",
                 buttonText: "",
             });
         }
@@ -39,30 +48,42 @@ const ReadCard = (props) => {
         }
     };
 
-    return (
-        <div>
-            <h1>{props.title}</h1>
-            <p>By {props.authors}</p>
-            <Link to={`/read/${props.isbn}`} state={{ props: props }}>
-                <img src={props.thumbnail} alt="book cover" />
-            </Link>
-            <p>
-                Description: {readDescription.descriptionText}
-                {props.description.length > 200 ? (
-                    <button onClick={toggleDescriptionLength}>
-                        {readDescription.buttonText}
-                    </button>
-                ) : null}
-            </p>
-            <p>Date Published: {props.publishedDate}</p>
-            <p>Page Count: {props.pageCount}</p>
-            <p>Print Type: {props.printType}</p>
-            <Link to={props.infoLink} target="_blank" rel="noopener noreferrer">
-                <p>Google Books link</p>
-            </Link>
-            <p>ISBN: {props.isbn}</p>
-        </div>
-    );
+    if (props) {
+        try {
+            return (
+                <div>
+                    <h1>{props.title}</h1>
+                    <p>By {props.authors}</p>
+                    <Link to={`/read/${props.isbn}`} state={{ props: props }}>
+                        <img src={props.thumbnail} alt="book cover" />
+                    </Link>
+                    <p>
+                        Description: {readDescription.descriptionText}
+                        {props.description.length > 200 ? (
+                            <button onClick={toggleDescriptionLength}>
+                                {readDescription.buttonText}
+                            </button>
+                        ) : null}
+                    </p>
+                    <p>Date Published: {props.publishedDate}</p>
+                    <p>Page Count: {props.pageCount}</p>
+                    <p>Print Type: {props.printType}</p>
+                    <Link
+                        to={props.infoLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <p>Google Books link</p>
+                    </Link>
+                    <p>ISBN: {props.isbn}</p>
+                </div>
+            );
+        } catch {
+            return errorLoadingMessage;
+        }
+    } else {
+        return errorLoadingMessage;
+    }
 };
 
 export default ReadCard;
