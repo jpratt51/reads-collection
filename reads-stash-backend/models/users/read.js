@@ -46,11 +46,9 @@ class UserRead {
     }
 
     static async getAll(username, title, author) {
-        console.log("*****1", username, title, author);
         let queryString = `SELECT ur.id, r.title, r.description, r.isbn, r.avg_rating, r.print_type, r.published_date, r.page_count, r.info_link, r.thumbnail, ur.user_username AS username, ra.author_name AS author FROM users_reads ur JOIN users u ON ur.user_username = u.username JOIN reads r ON ur.read_isbn = r.isbn LEFT JOIN reads_authors ra ON ra.read_isbn = r.isbn WHERE u.username = $1`;
         let values = [username];
         let results;
-        console.log("*****2", queryString, values);
         if (title || author) {
             if (title && author) {
                 queryString += " AND r.title = $2 AND ra.author_name = $3;";
@@ -63,13 +61,10 @@ class UserRead {
                 queryString += " AND ra.author_name = $2;";
                 values.push(author);
             }
-            console.log("*****3", queryString, values);
             results = await db.query(queryString, values);
         } else {
-            console.log("*****4", queryString, values);
             results = await db.query(queryString + ";", values);
         }
-        console.log("*****5", results.rows);
         const userReads = results.rows.map(
             (r) =>
                 new UserRead(
@@ -187,7 +182,6 @@ class UserRead {
         rating ? (validInputs["rating"] = rating) : null;
         reviewText ? (validInputs["review_text"] = reviewText) : null;
         reviewDate ? (validInputs["review_date"] = reviewDate) : null;
-        console.log("*****6", validInputs);
         const userReadCheck = await db.query(
             "SELECT * FROM users_reads WHERE user_username = $1 AND read_isbn = $2;",
             [username, isbn]

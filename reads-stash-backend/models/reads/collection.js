@@ -151,7 +151,6 @@ class ReadCollection {
             `SELECT rc.id, c.name AS collection_name, c.id AS collection_id, rc.read_isbn FROM reads_collections rc JOIN collections c ON rc.collection_id = c.id JOIN reads r ON rc.read_isbn = r.isbn WHERE rc.read_isbn = $1 AND rc.collection_id = $2`,
             [isbn, collectionId]
         );
-        console.log("happy result", results.rows[0]);
         const rc = results.rows[0];
 
         return new ReadCollection(
