@@ -109,12 +109,11 @@ describe("POST /api/auth/login", () => {
     test("returns error and 400 status with incorrect credentials", async () => {
         const res = await request(app).post("/api/auth/login").send({
             username: "test1",
-            password: "secret",
+            password: "password",
         });
-        expect(res.statusCode).toBe(200);
+        expect(res.statusCode).toBe(400);
         expect(res.body).toEqual({
-            message: "Successfully logged in!",
-            token: expect.any(String),
+            error: { message: "Invalid username/password", status: 400 },
         });
     });
 
