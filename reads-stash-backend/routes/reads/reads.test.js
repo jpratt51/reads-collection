@@ -10,15 +10,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../../config");
 
-let readId1,
-    readId2,
-    readId3,
-    isbn1,
-    isbn3,
-    authorId1,
-    authorId2,
-    authorId3,
-    testUserToken;
+let isbn1, isbn2, isbn3, authorName1, authorName2, authorName3, testUserToken;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
@@ -34,30 +26,28 @@ beforeAll(async () => {
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 
     const reads = await db.query(
-        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher, pages, thumbnail) VALUES ('t1title', 't1description', '0987654321', 3, 'BOOK', 'Hidden Gnome Publishing', 250, 't1thumbnail'), ('t2title', 't2description', '9876543210', 3, 'BOOK', 'Hidden Gnome Publishing', 300, 't2thumbnail') RETURNING id, isbn`
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, published_date, page_count, thumbnail) VALUES ('t1title', 't1description', '0987654321', 3, 'BOOK', '2023-01-01', 250, 't1thumbnail'), ('t2title', 't2description', '9876543210', 3, 'BOOK', '2023-01-01', 300, 't2thumbnail') RETURNING isbn`
     );
 
     const read3 = await db.query(
-        `INSERT INTO reads (title, isbn) VALUES ('t3title', '8765432109') RETURNING id, isbn`
+        `INSERT INTO reads (title, isbn) VALUES ('t3title', '8765432109') RETURNING isbn`
     );
 
-    readId1 = reads.rows[0].id;
-    readId2 = reads.rows[1].id;
-    readId3 = read3.rows[0].id;
     isbn1 = reads.rows[0].isbn;
+    isbn2 = reads.rows[1].isbn;
     isbn3 = read3.rows[0].isbn;
 
     const authors = await db.query(
-        `INSERT INTO authors (name) VALUES ('t1author'), ('t2author'), ('t3author') RETURNING id`
+        `INSERT INTO authors (name) VALUES ('t1author'), ('t2author'), ('t3author') RETURNING name`
     );
 
-    authorId1 = authors.rows[0].id;
-    authorId2 = authors.rows[1].id;
-    authorId3 = authors.rows[2].id;
+    authorName1 = authors.rows[0].name;
+    authorName2 = authors.rows[1].name;
+    authorName3 = authors.rows[2].name;
 
     await db.query(
-        `INSERT INTO reads_authors (read_id, author_id) VALUES ($1, $3), ($1, $4), ($2, $5)`,
-        [readId1, readId2, authorId1, authorId2, authorId3]
+        `INSERT INTO reads_authors (read_isbn, author_name) VALUES ($1, $3), ($1, $4), ($2, $5)`,
+        [isbn1, isbn2, authorName1, authorName2, authorName3]
     );
 });
 
@@ -76,33 +66,36 @@ describe("GET /api/reads", () => {
             {
                 avgRating: 3,
                 description: "t1description",
-                id: readId1,
-                isbn: "0987654321",
+                id: expect.any(Number),
+                isbn: isbn1,
                 printType: "BOOK",
-                publisher: "Hidden Gnome Publishing",
-                pages: 250,
+                publishedDate: "2023-01-01T06:00:00.000Z",
+                pageCount: 250,
+                infoLink: null,
                 thumbnail: "t1thumbnail",
                 title: "t1title",
             },
             {
                 avgRating: 3,
                 description: "t2description",
-                id: readId2,
-                isbn: "9876543210",
+                id: expect.any(Number),
+                isbn: isbn2,
                 printType: "BOOK",
-                publisher: "Hidden Gnome Publishing",
-                pages: 300,
+                infoLink: null,
+                publishedDate: "2023-01-01T06:00:00.000Z",
+                pageCount: 300,
                 thumbnail: "t2thumbnail",
                 title: "t2title",
             },
             {
                 avgRating: null,
                 description: null,
-                id: readId3,
-                isbn: "8765432109",
+                id: expect.any(Number),
+                isbn: isbn3,
                 printType: null,
-                publisher: null,
-                pages: null,
+                publishedDate: null,
+                pageCount: null,
+                infoLink: null,
                 thumbnail: null,
                 title: "t3title",
             },
@@ -126,11 +119,12 @@ describe("GET /api/reads/:isbn", () => {
             authors: ["t1author", "t2author"],
             avgRating: 3,
             description: "t1description",
-            id: readId1,
-            isbn: "0987654321",
+            id: expect.any(Number),
+            isbn: isbn1,
             printType: "BOOK",
-            publisher: "Hidden Gnome Publishing",
-            pages: 250,
+            infoLink: null,
+            publishedDate: "2023-01-01T06:00:00.000Z",
+            pageCount: 250,
             thumbnail: "t1thumbnail",
             title: "t1title",
         });
@@ -143,17 +137,18 @@ describe("GET /api/reads/:isbn", () => {
             authors: [],
             avgRating: null,
             description: null,
-            id: readId3,
-            isbn: "8765432109",
+            id: expect.any(Number),
+            infoLink: null,
+            isbn: isbn3,
             printType: null,
-            publisher: null,
-            pages: null,
+            publishedDate: null,
+            pageCount: null,
             thumbnail: null,
             title: "t3title",
         });
     });
 
-    test("get error message and 404 status with bad read id", async () => {
+    test("get error message and 404 status with incorrect isbn", async () => {
         const res = await request(app).get(`/api/reads/10000`);
         expect(res.statusCode).toBe(404);
         expect(res.body).toEqual({
@@ -161,7 +156,7 @@ describe("GET /api/reads/:isbn", () => {
         });
     });
 
-    test("get error message with bad read id data type", async () => {
+    test("get error message with bad isbn data type", async () => {
         const res = await request(app).get(`/api/reads/${true}`);
         expect(res.statusCode).toBe(400);
         expect(res.body).toEqual({
@@ -226,7 +221,7 @@ describe("POST /api/reads", () => {
                 isbn: 8.9,
                 avgRating: "happy",
                 printType: [5, 6, 7],
-                publisher: { publisher: "Hidden Gnome Publishing" },
+                publishedDate: { publisher: "Hidden Gnome Publishing" },
                 pages: 400,
                 thumbnail: false,
                 authors: { author: "Will Wight" },
@@ -240,7 +235,7 @@ describe("POST /api/reads", () => {
                     "instance.isbn is not of a type(s) string",
                     "instance.avgRating is not of a type(s) number",
                     "instance.printType is not of a type(s) string",
-                    "instance.publisher is not of a type(s) string",
+                    "instance.publishedDate is not of a type(s) string",
                     "instance.thumbnail is not of a type(s) string",
                     "instance.authors is not of a type(s) array",
                 ],
@@ -260,8 +255,8 @@ describe("POST /api/reads", () => {
                 isbn: "9780989671767",
                 avgRating: 4.5,
                 printType: "BOOK",
-                publisher: "Hidden Gnome Publishing",
-                pages: 400,
+                publishedDate: "2023-01-01",
+                pageCount: 400,
                 thumbnail:
                     "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api",
                 authors: ["Will Wight"],
@@ -273,10 +268,11 @@ describe("POST /api/reads", () => {
             description:
                 "Sacred artists follow a thousand Paths to power, using their souls to control the forces of the natural world. Lindon is Unsouled, forbidden to learn the sacred arts of his clan. When faced with a looming fate he cannot ignore, he must rise beyond anything hes ever known...and forge his own Path.",
             id: expect.any(Number),
+            infoLink: null,
             isbn: "9780989671767",
             printType: "BOOK",
-            publisher: "Hidden Gnome Publishing",
-            pages: 400,
+            publishedDate: "2023-01-01T06:00:00.000Z",
+            pageCount: 400,
             thumbnail:
                 "http://books.google.com/books/content?id=OjYJtAEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
             title: "Unsouled",

@@ -18,15 +18,13 @@ class Badge {
         return badges;
     }
 
-    static async getById(badgeId) {
-        if (/^\d+$/.test(badgeId) === false)
-            throw new ExpressError(`Invalid badge id data type`, 400);
-        const results = await db.query(`SELECT * FROM badges WHERE id = $1;`, [
-            badgeId,
+    static async getByName(name) {
+        const results = await db.query(`SELECT * FROM badges WHERE name = $1`, [
+            name,
         ]);
         const b = results.rows[0];
         if (!b) {
-            throw new ExpressError(`Badge ${badgeId} not found`);
+            throw new ExpressError(`Badge ${name} Not Found`, 404);
         }
         return new Badge(b.id, b.name, b.thumbnail);
     }

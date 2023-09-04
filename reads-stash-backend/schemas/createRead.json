@@ -50,20 +50,12 @@
                 "BOOK"
             ]
         },
-        "publisher": {
+        "publishedDate": {
             "type": "string",
             "default": "",
-            "title": "The publisher Schema",
+            "title": "The publishedDate Schema",
             "examples": [
-                "Hidden Gnome Publishing"
-            ]
-        },
-        "pages": {
-            "type": "integer",
-            "default": 0,
-            "title": "The pages Schema",
-            "examples": [
-                100
+                "2017-05-20"
             ]
         },
         "thumbnail": {
@@ -72,6 +64,22 @@
             "title": "The thumbnail Schema",
             "examples": [
                 "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api"
+            ]
+        },
+        "infoLink": {
+            "type": "string",
+            "default": "",
+            "title": "The infoLink Schema",
+            "examples": [
+                "http://books.google.com/books?id=g32LzwEACAAJ\u0026dq=unsouled+inauthor:wight\u0026hl=\u0026source=gbs_api"
+            ]
+        },
+        "pageCount": {
+            "type": "integer",
+            "default": 0,
+            "title": "The pageCount Schema",
+            "examples": [
+                384
             ]
         },
         "authors": {
@@ -98,9 +106,10 @@
         "isbn": "9780989671767",
         "avgRating": 4.5,
         "printType": "BOOK",
-        "publisher": "Hidden Gnome Publishing",
-        "pages": 100,
+        "publishedDate": "2017-05-20",
         "thumbnail": "http://books.google.com/books/content?id=OjYJtAEACAAJ\u0026printsec=frontcover\u0026img=1\u0026zoom=1\u0026source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=g32LzwEACAAJ\u0026dq=unsouled+inauthor:wight\u0026hl=\u0026source=gbs_api",
+        "pageCount": 384,
         "authors": [
             "Will Wight"
         ]

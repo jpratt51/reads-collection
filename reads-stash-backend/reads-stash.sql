@@ -17,4 +17,3 @@ CREATE DATABASE reads_stash_test;
 
 \c reads_stash_test
 \i reads-stash-schema.sql
-\i reads-stash-seed.sql

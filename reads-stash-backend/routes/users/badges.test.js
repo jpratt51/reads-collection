@@ -12,15 +12,15 @@ const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
 
-let testUserId,
-    test2UserId,
-    test3UserId,
-    testBadge1Id,
-    testBadge2Id,
-    testBadge3Id;
+let test1Username,
+    test2Username,
+    test1BadgeName,
+    test2BadgeName,
+    test3BadgeName;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
+    await db.query("DELETE FROM badges;");
 
     const hashedPassword = await bcrypt.hash("secret", 1);
     const res = await db.query(
@@ -28,54 +28,54 @@ beforeAll(async () => {
         [hashedPassword]
     );
 
+    test1Username = res.rows[0].username;
+    test2Username = res.rows[1].username;
+
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 
-    testUserId = res.rows[0].id;
-    test2UserId = res.rows[1].id;
-    test3UserId = res.rows[2].id;
-
     const badges = await db.query(
-        `INSERT INTO badges (name, thumbnail) VALUES ('bronze', 'bronze thumbnail stand in'), ('silver', 'silver thumbnail stand in'), ('gold', 'gold thumbnail stand in') RETURNING id;`
+        `INSERT INTO badges (name, thumbnail) VALUES ('bronze', 'bronze thumbnail stand in'), ('silver', 'silver thumbnail stand in'), ('golden', 'golden thumbnail stand in') RETURNING name;`
     );
 
-    testBadge1Id = badges.rows[0].id;
-    testBadge2Id = badges.rows[1].id;
-    testBadge3Id = badges.rows[2].id;
+    test1BadgeName = badges.rows[0].name;
+    test2BadgeName = badges.rows[1].name;
+    test3BadgeName = badges.rows[2].name;
 
     await db.query(
-        `INSERT INTO users_badges (user_id, badge_id) VALUES ($1, $3), ($1, $4), ($2, $5) RETURNING id`,
-        [testUserId, test2UserId, testBadge1Id, testBadge2Id, testBadge3Id]
+        `INSERT INTO users_badges (user_username, name) VALUES ($1, $3), ($1, $4), ($2, $5)`,
+        [
+            test1Username,
+            test2Username,
+            test1BadgeName,
+            test2BadgeName,
+            test3BadgeName,
+        ]
     );
 });
 
 afterAll(async () => {
     await db.query("DELETE FROM users;");
+    await db.query("DELETE FROM badges;");
     await db.end();
 });
 
-describe("GET /api/users/:userId/badges", () => {
-    test("get all user's badges and 200 status code with valid token and current user id. Should not get other user's badges.", async () => {
+describe("GET /api/users/:username/badges", () => {
+    test("get all user's badges and 200 status code with valid token and current user username. Should not get other user's badges.", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/badges`)
+            .get(`/api/users/${test1Username}/badges`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual([
-            {
-                badgeId: testBadge1Id,
-                id: expect.any(Number),
-                userId: testUserId,
-            },
-            {
-                badgeId: testBadge2Id,
-                id: expect.any(Number),
-                userId: testUserId,
-            },
+            { id: expect.any(Number), username: "test1", name: "bronze" },
+            { id: expect.any(Number), username: "test1", name: "silver" },
         ]);
     });
 
-    test("get error message and 401 status code if no token sent and current user id", async () => {
-        const res = await request(app).get(`/api/users/${testUserId}/badges`);
+    test("get error message and 401 status code if no token sent with current user username", async () => {
+        const res = await request(app).get(
+            `/api/users/${test1Username}/badges`
+        );
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
             error: { message: "Unauthorized", status: 401 },
@@ -84,7 +84,7 @@ describe("GET /api/users/:userId/badges", () => {
 
     test("get error message and 401 status code if bad token sent and current user id", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/badges`)
+            .get(`/api/users/${test1Username}/badges`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -92,9 +92,9 @@ describe("GET /api/users/:userId/badges", () => {
         });
     });
 
-    test("get error message and 403 status code if valid token sent and other user's id", async () => {
+    test("get error message and 403 status code if valid token sent and other user's username", async () => {
         const res = await request(app)
-            .get(`/api/users/${test2UserId}/badges`)
+            .get(`/api/users/${test2Username}/badges`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -103,22 +103,22 @@ describe("GET /api/users/:userId/badges", () => {
     });
 });
 
-describe("GET /api/users/:userId/badges/:badgeId", () => {
-    test("get one user badge and 200 status code with valid token, valid user id and valid user badge id", async () => {
+describe("GET /api/users/:username/badges/:name", () => {
+    test("get one user badge and 200 status code with valid token, valid user username and valid badge name", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/badges/${testBadge1Id}`)
+            .get(`/api/users/${test1Username}/badges/${test1BadgeName}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
-            badgeId: testBadge1Id,
+            name: test1BadgeName,
             id: expect.any(Number),
-            userId: testUserId,
+            username: test1Username,
         });
     });
 
-    test("get error message and 401 status code with no token, a valid user id and valid badges id", async () => {
+    test("get error message and 401 status code with no token, a valid user username and valid badge name", async () => {
         const res = await request(app).get(
-            `/api/users/${testUserId}/badges/${testBadge1Id}`
+            `/api/users/${test1Username}/badges/${test1BadgeName}`
         );
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -126,9 +126,9 @@ describe("GET /api/users/:userId/badges/:badgeId", () => {
         });
     });
 
-    test("get error message and 401 status code with bad token, a valid user id and valid badges id", async () => {
+    test("get error message and 401 status code with bad token, a valid user username and valid badge name", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/badges/${testBadge1Id}`)
+            .get(`/api/users/${test1Username}/badges/${test1BadgeName}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -136,9 +136,9 @@ describe("GET /api/users/:userId/badges/:badgeId", () => {
         });
     });
 
-    test("get error message and 403 status code with valid token, invalid user id and valid badge id", async () => {
+    test("get error message and 403 status code with valid token, invalid user username and valid badge name", async () => {
         const res = await request(app)
-            .get(`/api/users/${test2UserId}/badges/${testBadge1Id}`)
+            .get(`/api/users/${test2Username}/badges/${test1BadgeName}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -146,9 +146,9 @@ describe("GET /api/users/:userId/badges/:badgeId", () => {
         });
     });
 
-    test("get error message and 403 status code with valid token, invalid user id parameter type and valid badge id", async () => {
+    test("get error message and 403 status code with valid token, incorrect user username parameter type and valid badge name", async () => {
         const res = await request(app)
-            .get(`/api/users/bad_type/badges/${testBadge1Id}`)
+            .get(`/api/users/incorrect/badges/${test1BadgeName}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -157,13 +157,13 @@ describe("GET /api/users/:userId/badges/:badgeId", () => {
     });
 });
 
-describe("POST /api/users/:userId/badges", () => {
-    test("get error message and 401 status code when sending in invalid token, valid userId and valid badge id", async () => {
+describe("POST /api/users/:username/badges", () => {
+    test("get error message and 401 status code when sending in invalid token, valid username and valid badge name", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/badges`)
+            .post(`/api/users/${test1Username}/badges`)
             .set({ _token: "bad token" })
             .send({
-                badgeId: testBadge3Id,
+                name: test3BadgeName,
             });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -171,12 +171,12 @@ describe("POST /api/users/:userId/badges", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid userId and valid badge id", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username and valid badge name", async () => {
         const res = await request(app)
             .post(`/api/users/1000/badges`)
             .set({ _token: testUserToken })
             .send({
-                badgeId: testBadge3Id,
+                name: test3BadgeName,
             });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -187,59 +187,42 @@ describe("POST /api/users/:userId/badges", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid userId data type and valid badge id", async () => {
+    test("get error message and 400 status code when sending in valid token, valid username and invalid badge name data type", async () => {
         const res = await request(app)
-            .post(`/api/users/bad_type/badges`)
+            .post(`/api/users/${test1Username}/badges`)
             .set({ _token: testUserToken })
             .send({
-                badgeId: testBadge3Id,
-            });
-        expect(res.statusCode).toBe(403);
-        expect(res.body).toEqual({
-            error: {
-                message: "Cannot Create Badges For Other Users",
-                status: 403,
-            },
-        });
-    });
-
-    test("get error message and 400 status code when sending in valid token, valid userId and invalid badge id", async () => {
-        const res = await request(app)
-            .post(`/api/users/${testUserId}/badges`)
-            .set({ _token: testUserToken })
-            .send({
-                badgeId: testBadge3Id,
+                name: true,
             });
         expect(res.statusCode).toBe(400);
         expect(res.body).toEqual({
             error: {
-                message: ["instance.userId is not of a type(s) integer"],
+                message: ["instance.name is not of a type(s) string"],
                 status: 400,
             },
         });
     });
 
-    test("get cbadge user and 201 status code when sending in valid token, valid userId and valid badge id", async () => {
+    test("get user badge and 201 status code when sending in valid token, valid username and valid badge name", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/badges`)
+            .post(`/api/users/${test1Username}/badges`)
             .set({ _token: testUserToken })
             .send({
-                badgeId: testBadge3Id,
+                name: test3BadgeName,
             });
-        expect(res.statusCode).toBe(400);
+        expect(res.statusCode).toBe(201);
         expect(res.body).toEqual({
-            error: {
-                message: ["instance.userId is not of a type(s) integer"],
-                status: 400,
-            },
+            id: expect.any(Number),
+            name: "golden",
+            username: "test1",
         });
     });
 });
 
 describe("DELETE /api/users/:userId/badges/:badgeId", () => {
-    test("get error message and 403 status code if valid token, other user's id and valid badge id", async () => {
+    test("get error message and 403 status code if valid token, other user's username and valid badge name", async () => {
         const res = await request(app)
-            .delete(`/api/users/${test2UserId}/badges/${testBadge1Id}`)
+            .delete(`/api/users/${test2Username}/badges/${test1BadgeName}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -250,9 +233,9 @@ describe("DELETE /api/users/:userId/badges/:badgeId", () => {
         });
     });
 
-    test("get error message and 401 status code if invalid token, valid user id and valid badge id", async () => {
+    test("get error message and 401 status code if invalid token, valid user username and valid badge name", async () => {
         const res = await request(app)
-            .delete(`/api/users/${testUserId}/badges/${testBadge1Id}`)
+            .delete(`/api/users/${test1Username}/badges/${test1BadgeName}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -260,9 +243,9 @@ describe("DELETE /api/users/:userId/badges/:badgeId", () => {
         });
     });
 
-    test("get error message and 403 status code if valid token, bad data type user id and valid badge id", async () => {
+    test("get error message and 403 status code if valid token, incorrect user username and valid badge name", async () => {
         const res = await request(app)
-            .delete(`/api/users/bad_type/badges/${testBadge1Id}`)
+            .delete(`/api/users/incorrect/badges/${test1BadgeName}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -273,13 +256,13 @@ describe("DELETE /api/users/:userId/badges/:badgeId", () => {
         });
     });
 
-    test("get deleted user badge message and 200 status code if valid token, valid user id and valid badge id", async () => {
+    test("get deleted user badge message and 200 status code if valid token, valid user username and valid badge name", async () => {
         const res = await request(app)
-            .delete(`/api/users/${testUserId}/badges/${testBadge1Id}`)
+            .delete(`/api/users/${test1Username}/badges/${test1BadgeName}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
-            msg: `Deleted user's badge ${testBadge1Id}`,
+            msg: `Deleted User's Badge ${test1BadgeName}`,
         });
     });
 });

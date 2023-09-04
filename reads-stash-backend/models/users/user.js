@@ -27,7 +27,9 @@ class User {
     }
 
     static async getAll() {
-        const results = await db.query("SELECT * FROM users;");
+        const results = await db.query(
+            "SELECT id, username, fname, lname, email, exp, total_books, total_pages FROM users;"
+        );
         const users = results.rows.map(
             (u) =>
                 new User(
@@ -35,7 +37,7 @@ class User {
                     u.username,
                     u.fname,
                     u.lname,
-                    u.emai,
+                    u.email,
                     u.exp,
                     u.total_books,
                     u.total_pages
@@ -68,12 +70,33 @@ class User {
 
     static async getByUsername(username) {
         const results = await db.query(
-            "SELECT * FROM users WHERE username = $1",
+            "SELECT id, username, fname, lname, email, exp, total_books, total_pages FROM users WHERE username = $1",
             [username]
         );
         const u = results.rows[0];
         if (!u) {
-            throw new ExpressError(`User ${username} not found`, 404);
+            throw new ExpressError(`User ${username} Not Found`, 404);
+        }
+        return new User(
+            u.id,
+            u.username,
+            u.fname,
+            u.lname,
+            u.email,
+            u.exp,
+            u.total_books,
+            u.total_pages
+        );
+    }
+
+    static async getByUsernameForLogin(username) {
+        const results = await db.query(
+            "SELECT id, username, fname, lname, email, exp, total_books, total_pages, password FROM users WHERE username = $1",
+            [username]
+        );
+        const u = results.rows[0];
+        if (!u) {
+            throw new ExpressError(`User ${username} Not Found`, 404);
         }
         return new User(
             u.id,

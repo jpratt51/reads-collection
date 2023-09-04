@@ -13,9 +13,10 @@ class Read {
         isbn,
         avg_rating,
         print_type,
-        publisher,
-        pages,
+        published_date,
         thumbnail,
+        info_link,
+        page_count,
         authors
     ) {
         this.id = id;
@@ -24,9 +25,10 @@ class Read {
         this.isbn = isbn;
         this.avgRating = avg_rating;
         this.printType = print_type;
-        this.publisher = publisher;
-        this.pages = pages;
+        this.publishedDate = published_date;
         this.thumbnail = thumbnail;
+        this.infoLink = info_link;
+        this.pageCount = page_count;
         this.authors = authors;
     }
 
@@ -41,9 +43,10 @@ class Read {
                     r.isbn,
                     r.avg_rating,
                     r.print_type,
-                    r.publisher,
-                    r.pages,
-                    r.thumbnail
+                    r.published_date,
+                    r.thumbnail,
+                    r.info_link,
+                    r.page_count
                 )
         );
         return reads;
@@ -61,8 +64,8 @@ class Read {
         }
 
         const authRes = await db.query(
-            `SELECT a.name FROM reads_authors ra JOIN authors a ON ra.author_id = a.id WHERE ra.read_id = $1`,
-            [readRes.rows[0].id]
+            `SELECT a.name FROM reads_authors ra JOIN authors a ON ra.author_name = a.name WHERE ra.read_isbn = $1`,
+            [readRes.rows[0].isbn]
         );
 
         const readAuths = authRes.rows.map((a) => a.name);
@@ -76,9 +79,10 @@ class Read {
             r.isbn,
             r.avg_rating,
             r.print_type,
-            r.publisher,
-            r.pages,
+            r.published_date,
             r.thumbnail,
+            r.info_link,
+            r.page_count,
             readAuths
         );
     }
@@ -101,12 +105,11 @@ class Read {
             )}) RETURNING *`
         );
 
-        const newReadId = readRes.rows[0].id;
+        const newReadIsbn = readRes.rows[0].isbn;
 
         const r = readRes.rows[0];
         if (authors) {
-            let readAuths = await addAuthors(newReadId, readRes, authors);
-
+            let readAuths = await addAuthors(newReadIsbn, readRes, authors);
             return new Read(
                 r.id,
                 r.title,
@@ -114,9 +117,10 @@ class Read {
                 r.isbn,
                 r.avg_rating,
                 r.print_type,
-                r.publisher,
-                r.pages,
+                r.published_date,
                 r.thumbnail,
+                r.info_link,
+                r.page_count,
                 readAuths
             );
         }
@@ -128,9 +132,10 @@ class Read {
             r.isbn,
             r.avg_rating,
             r.print_type,
-            r.publisher,
-            r.pages,
-            r.thumbnail
+            r.published_date,
+            r.thumbnail,
+            r.info_link,
+            r.page_count
         );
     }
 }

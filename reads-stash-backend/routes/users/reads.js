@@ -10,19 +10,20 @@ const updateUserReadSchema = require("../../schemas/updateUserRead.json");
 const ExpressError = require("../../expressError");
 
 router.get(
-    "/:userId/reads",
+    "/:username/reads",
     ensureLoggedIn,
     async function getAllUserReads(req, res, next) {
         try {
-            const { userId } = req.params;
-            if (req.user.id != userId) {
+            const { username } = req.params;
+            const { title, author } = req.body;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Reads",
                     403
                 );
                 return next(invalidUser);
             }
-            let userReads = await UserRead.getAll(userId);
+            let userReads = await UserRead.getAll(username, title, author);
             return res.json(userReads);
         } catch (error) {
             return next(error);
@@ -31,19 +32,19 @@ router.get(
 );
 
 router.get(
-    "/:userId/reads/:readId",
+    "/:username/reads/:isbn",
     ensureLoggedIn,
     async function getOneUserRead(req, res, next) {
         try {
-            const { userId, readId } = req.params;
-            if (req.user.id != userId) {
+            const { username, isbn } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Reads",
                     403
                 );
                 return next(invalidUser);
             }
-            const userRead = await UserRead.getById(userId, readId);
+            const userRead = await UserRead.getByIsbn(username, isbn);
             return res.json(userRead);
         } catch (error) {
             return next(error);
@@ -83,20 +84,20 @@ router.post(
 );
 
 router.patch(
-    "/:userId/reads/:readId",
+    "/:username/reads/:isbn",
     ensureLoggedIn,
     async function updateUserRead(req, res, next) {
         try {
-            const { userId, readId } = req.params;
+            const { username, isbn } = req.params;
             const inputs = req.body;
-            inputs["userId"] = +userId;
-            inputs["readId"] = +readId;
-            if (req.user.id != userId) {
-                const invalidUserIdError = new ExpressError(
+            inputs["username"] = username;
+            inputs["isbn"] = isbn;
+            if (req.user.username != username) {
+                const invalidUsernameError = new ExpressError(
                     "Cannot Update Reads For Other Users",
                     403
                 );
-                return next(invalidUserIdError);
+                return next(invalidUsernameError);
             }
             const validator = jsonschema.validate(inputs, updateUserReadSchema);
 
@@ -105,9 +106,7 @@ router.patch(
                 const errors = new ExpressError(listOfErrors, 400);
                 return next(errors);
             }
-
-            const userRead = await UserRead.update(userId, readId, inputs);
-
+            const userRead = await UserRead.update(username, isbn, inputs);
             return res.json(userRead);
         } catch (error) {
             return next(error);
@@ -116,21 +115,21 @@ router.patch(
 );
 
 router.delete(
-    "/:userId/reads/:readId",
+    "/:username/reads/:isbn",
     ensureLoggedIn,
     async function deleteUserRead(req, res, next) {
         try {
-            const { userId, readId } = req.params;
-            if (req.user.id != userId) {
+            const { username, isbn } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot Delete Other User's Reads",
                     403
                 );
                 return next(invalidUser);
             }
-            const read = await UserRead.getById(userId, readId);
-            await read.delete(userId);
-            return res.json({ msg: `Deleted user read ${readId}` });
+            const read = await UserRead.getByIsbn(username, isbn);
+            await read.delete(username);
+            return res.json({ msg: `Deleted user read ${isbn}` });
         } catch (error) {
             return next(error);
         }

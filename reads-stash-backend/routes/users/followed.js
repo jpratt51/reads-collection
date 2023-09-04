@@ -9,19 +9,19 @@ const createUserFollowedSchema = require("../../schemas/createUserFollowed.json"
 const ExpressError = require("../../expressError");
 
 router.get(
-    "/:userId/followed",
+    "/:username/followed",
     ensureLoggedIn,
     async function getAllUserFollowed(req, res, next) {
         try {
-            const { userId } = req.params;
-            if (req.user.id != userId) {
+            const { username } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Followed Users",
                     403
                 );
                 return next(invalidUser);
             }
-            let followed = await UserFollowed.getAll(userId);
+            let followed = await UserFollowed.getAll(username);
             return res.json(followed);
         } catch (error) {
             return next(error);
@@ -30,19 +30,22 @@ router.get(
 );
 
 router.get(
-    "/:userId/followed/:followedId",
+    "/:username/followed/:followedUsername",
     ensureLoggedIn,
     async function getOneUserFollowed(req, res, next) {
         try {
-            const { userId, followedId } = req.params;
-            if (req.user.id != userId) {
+            const { username, followedUsername } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Followed Users",
                     403
                 );
                 return next(invalidUser);
             }
-            let followed = await UserFollowed.getById(userId, followedId);
+            let followed = await UserFollowed.getByUsername(
+                username,
+                followedUsername
+            );
             return res.json(followed);
         } catch (error) {
             return next(error);
@@ -51,17 +54,17 @@ router.get(
 );
 
 router.post(
-    "/:userId/followed",
+    "/:username/followed",
     ensureLoggedIn,
     async function createUserFollowed(req, res, next) {
         try {
-            const { followedId } = req.body;
-            const { userId } = req.params;
+            const { followedUsername } = req.body;
+            const { username } = req.params;
             let inputs = {};
-            inputs["followedId"] = +followedId;
-            inputs["userId"] = +userId;
+            inputs["followedUsername"] = followedUsername;
+            inputs["username"] = username;
 
-            if (req.user.id != userId) {
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Followed Users",
                     403
@@ -78,7 +81,11 @@ router.post(
                 const errors = new ExpressError(listOfErrors, 400);
                 return next(errors);
             }
-            const followed = await UserFollowed.create(followedId, userId);
+            const followed = await UserFollowed.create(
+                followedUsername,
+                username
+            );
+
             return res.status(201).json(followed);
         } catch (error) {
             return next(error);
@@ -87,22 +94,25 @@ router.post(
 );
 
 router.delete(
-    "/:userId/followed/:followedId",
+    "/:username/followed/:followedUsername",
     ensureLoggedIn,
     async function deleteUserFollowed(req, res, next) {
         try {
-            const { userId, followedId } = req.params;
-            if (req.user.id != userId) {
+            const { username, followedUsername } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Followed Users",
                     403
                 );
                 return next(invalidUser);
             }
-            const followed = await UserFollowed.getById(userId, followedId);
+            const followed = await UserFollowed.getByUsername(
+                username,
+                followedUsername
+            );
             await followed.delete();
             return res.json({
-                msg: `User ${userId} stopped following user ${followedId}`,
+                msg: `User ${username} Stopped Following User ${followedUsername}`,
             });
         } catch (error) {
             return next(error);

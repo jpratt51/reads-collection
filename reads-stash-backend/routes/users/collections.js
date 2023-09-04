@@ -5,19 +5,19 @@ const router = new express.Router();
 const UserCollection = require("../../models/users/collection");
 const { ensureLoggedIn } = require("../../middleware/auth");
 const checkForValidInputs = require("../../helpers/inputsValidation");
-const { checkUserIdMatchesLoggedInUser } = require("../../helpers/checkUser");
+const { checkUsernameMatchesLoggedInUser } = require("../../helpers/checkUser");
 const jsonschema = require("jsonschema");
 const createUserCollectionSchema = require("../../schemas/createUserCollection.json");
 const updateUserCollectionSchema = require("../../schemas/updateUserCollection.json");
 
 router.get(
-    "/:userId/collections",
+    "/:username/collections",
     ensureLoggedIn,
     async function getAllUserCollections(req, res, next) {
         try {
-            const { userId } = req.params;
-            checkUserIdMatchesLoggedInUser(userId, req.user.id);
-            const collections = await UserCollection.getAll(userId);
+            const { username } = req.params;
+            checkUsernameMatchesLoggedInUser(username, req.user.username);
+            const collections = await UserCollection.getAll(username);
             return res.json(collections);
         } catch (error) {
             return next(error);
@@ -26,14 +26,14 @@ router.get(
 );
 
 router.get(
-    "/:userId/collections/:collectionId",
+    "/:username/collections/:collectionId",
     ensureLoggedIn,
     async function getOneUserCollection(req, res, next) {
         try {
-            const { userId, collectionId } = req.params;
-            checkUserIdMatchesLoggedInUser(userId, req.user.id);
+            const { username, collectionId } = req.params;
+            checkUsernameMatchesLoggedInUser(username, req.user.username);
             const collection = await UserCollection.getById(
-                userId,
+                username,
                 collectionId
             );
             return res.json(collection);
@@ -44,19 +44,22 @@ router.get(
 );
 
 router.post(
-    "/:userId/collections",
+    "/:username/collections",
     ensureLoggedIn,
     async function createUserCollection(req, res, next) {
         try {
             const { name } = req.body;
-            const { userId } = req.params;
-            checkUserIdMatchesLoggedInUser(userId, req.user.id);
+            const { username } = req.params;
+            let inputs = {};
+            inputs["name"] = name;
+            inputs["user_username"] = username;
+            checkUsernameMatchesLoggedInUser(username, req.user.username);
             const validator = jsonschema.validate(
-                req.body,
+                inputs,
                 createUserCollectionSchema
             );
             checkForValidInputs(validator);
-            const collection = await UserCollection.create(name, userId);
+            const collection = await UserCollection.create(name, username);
             return res.status(201).json(collection);
         } catch (error) {
             return next(error);
@@ -65,12 +68,12 @@ router.post(
 );
 
 router.patch(
-    "/:userId/collections/:collectionId",
+    "/:username/collections/:collectionId",
     ensureLoggedIn,
     async function updateUserCollection(req, res, next) {
         try {
-            const { userId, collectionId } = req.params;
-            checkUserIdMatchesLoggedInUser(userId, req.user.id);
+            const { username, collectionId } = req.params;
+            checkUsernameMatchesLoggedInUser(username, req.user.username);
             const validator = jsonschema.validate(
                 req.body,
                 updateUserCollectionSchema
@@ -78,7 +81,7 @@ router.patch(
             checkForValidInputs(validator);
             const { name } = req.body;
             const collection = await UserCollection.getById(
-                userId,
+                username,
                 collectionId
             );
             name ? (collection.name = name) : null;
@@ -91,17 +94,17 @@ router.patch(
 );
 
 router.delete(
-    "/:userId/collections/:collectionId",
+    "/:username/collections/:collectionId",
     ensureLoggedIn,
     async function deleteUserCollection(req, res, next) {
         try {
-            const { userId, collectionId } = req.params;
-            checkUserIdMatchesLoggedInUser(userId, req.user.id);
+            const { username, collectionId } = req.params;
+            checkUsernameMatchesLoggedInUser(username, req.user.username);
             const userCollection = await UserCollection.getById(
-                userId,
+                username,
                 collectionId
             );
-            await userCollection.delete(userId);
+            await userCollection.delete(username);
             return res.json({ msg: `Deleted User Collection ${collectionId}` });
         } catch (error) {
             return next(error);

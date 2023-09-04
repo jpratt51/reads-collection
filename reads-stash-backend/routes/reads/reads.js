@@ -41,8 +41,9 @@ router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
             isbn,
             avgRating,
             printType,
-            publisher,
-            pages,
+            publishedDate,
+            pageCount,
+            infoLink,
             thumbnail,
             authors,
         } = req.body;
@@ -52,9 +53,10 @@ router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
         description ? (validInputs["description"] = description) : null;
         avgRating ? (validInputs["avg_rating"] = avgRating) : null;
         printType ? (validInputs["print_type"] = printType) : null;
-        publisher ? (validInputs["publisher"] = publisher) : null;
+        publishedDate ? (validInputs["published_date"] = publishedDate) : null;
+        infoLink ? (validInputs["info_link"] = infoLink) : null;
         thumbnail ? (validInputs["thumbnail"] = thumbnail) : null;
-        pages ? (validInputs["pages"] = pages) : null;
+        pageCount ? (validInputs["page_count"] = pageCount) : null;
 
         const read = await Read.create(validInputs, authors);
         return res.status(201).json(read);

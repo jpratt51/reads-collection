@@ -11,8 +11,8 @@ class UserFollower {
         exp,
         total_books,
         total_pages,
-        follower_id,
-        user_id
+        follower_username,
+        username
     ) {
         this.fname = fname;
         this.lname = lname;
@@ -20,16 +20,14 @@ class UserFollower {
         this.exp = exp;
         this.totalBooks = total_books;
         this.totalPages = total_pages;
-        this.followerId = follower_id;
-        this.userId = user_id;
+        this.followerUsername = follower_username;
+        this.username = username;
     }
 
-    static async getAll(userId) {
-        if (/^\d+$/.test(userId) === false)
-            throw new ExpressError(`Invalid user id data type`, 400);
+    static async getAll(username) {
         const results = await db.query(
-            `SELECT users.id AS follower_id, users.fname, users.lname, users.email, users.exp, users.total_books, users.total_pages, user_id FROM users_followers JOIN users ON follower_id = users.id WHERE user_id = $1;`,
-            [userId]
+            `SELECT u.fname, u.lname, u.email, u.exp, u.total_books, u.total_pages, u.username AS follower_username, uf.user_username AS username FROM users_followers uf JOIN users u ON uf.follower_username = u.username WHERE uf.user_username = $1;`,
+            [username]
         );
         const userFollowers = results.rows.map(
             (f) =>
@@ -40,25 +38,23 @@ class UserFollower {
                     f.exp,
                     f.total_books,
                     f.total_pages,
-                    f.follower_id,
-                    f.user_id
+                    f.follower_username,
+                    f.username
                 )
         );
         return userFollowers;
     }
 
-    static async getById(userId, followerId) {
-        if (/^\d+$/.test(userId) === false)
-            throw new ExpressError(`Invalid user id data type`, 400);
-        if (/^\d+$/.test(followerId) === false)
-            throw new ExpressError(`Invalid follower id data type`, 400);
+    static async getByUsername(username, followerUsername) {
         const results = await db.query(
-            `SELECT users.id AS follower_id, users.fname, users.lname, users.email, users.exp, users.total_books, users.total_pages, user_id FROM users_followers JOIN users ON follower_id = users.id WHERE user_id = $1 AND follower_id = $2;`,
-            [userId, followerId]
+            `SELECT u.fname, u.lname, u.email, u.exp, u.total_books, u.total_pages, u.username AS follower_username, uf.user_username AS username FROM users_followers uf JOIN users u ON follower_username = u.username WHERE uf.user_username = $1 AND uf.follower_username = $2;`,
+            [username, followerUsername]
         );
         const f = results.rows[0];
         if (!f) {
-            throw new ExpressError(`User follower ${followerId} not found`);
+            throw new ExpressError(
+                `User follower ${followerUsername} not found`
+            );
         }
         return new UserFollower(
             f.fname,
@@ -67,8 +63,8 @@ class UserFollower {
             f.exp,
             f.total_books,
             f.total_pages,
-            f.follower_id,
-            f.user_id
+            f.follower_username,
+            f.username
         );
     }
 }

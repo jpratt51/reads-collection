@@ -14,7 +14,7 @@ router.post("/register", async function registerUser(req, res, next) {
     try {
         const { username, fname, lname, email, password } = req.body;
         if (!username || !password) {
-            throw new ExpressError("Username and password required", 400);
+            throw new ExpressError("Username and Password Required", 400);
         }
         const validator = jsonschema.validate(req.body, registerSchema);
         if (!validator.valid) {
@@ -44,7 +44,7 @@ router.post("/login", async function loginUser(req, res, next) {
         if (!username || !password) {
             throw new ExpressError("Username and password required", 400);
         }
-        const user = await User.getByUsername(username);
+        const user = await User.getByUsernameForLogin(username);
         const { id } = user;
         const payload = { username: username, id: id };
         if (await bcrypt.compare(password, user.password)) {

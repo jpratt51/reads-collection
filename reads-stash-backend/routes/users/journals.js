@@ -10,19 +10,19 @@ const updateUserJournalSchema = require("../../schemas/updateUserJournal.json");
 const ExpressError = require("../../expressError");
 
 router.get(
-    "/:userId/journals",
+    "/:username/journals",
     ensureLoggedIn,
     async function getAllUserJournals(req, res, next) {
         try {
-            const { userId } = req.params;
-            if (req.user.id != userId) {
+            const { username } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other Users Journals",
                     403
                 );
                 return next(invalidUser);
             }
-            let journals = await UserJournal.getAll(userId);
+            let journals = await UserJournal.getAll(username);
             return res.json(journals);
         } catch (error) {
             return next(error);
@@ -31,19 +31,19 @@ router.get(
 );
 
 router.get(
-    "/:userId/journals/:journalId",
+    "/:username/journals/:journalId",
     ensureLoggedIn,
     async function getOneUserJournal(req, res, next) {
         try {
-            const { userId, journalId } = req.params;
-            if (req.user.id != userId) {
+            const { username, journalId } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Journals",
                     403
                 );
                 return next(invalidUser);
             }
-            let journal = await UserJournal.getById(userId, journalId);
+            let journal = await UserJournal.getById(username, journalId);
             return res.json(journal);
         } catch (error) {
             return next(error);
@@ -52,17 +52,17 @@ router.get(
 );
 
 router.post(
-    "/:userId/journals",
+    "/:username/journals",
     ensureLoggedIn,
     async function createUserJournal(req, res, next) {
         try {
             const { title, text } = req.body;
-            const { userId } = req.params;
+            const { username } = req.params;
             let inputs = {};
             inputs.title = title;
             inputs.text = text;
-            inputs.userId = +userId;
-            if (req.user.id != userId) {
+            inputs.username = username;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot Create Journals For Other Users",
                     403
@@ -79,7 +79,12 @@ router.post(
                 return next(errors);
             }
             const date = new Date().toJSON().slice(0, 10);
-            const journal = await UserJournal.create(title, date, text, userId);
+            const journal = await UserJournal.create(
+                title,
+                date,
+                text,
+                username
+            );
             return res.status(201).json(journal);
         } catch (error) {
             return next(error);
@@ -88,12 +93,12 @@ router.post(
 );
 
 router.patch(
-    "/:userId/journals/:journalId",
+    "/:username/journals/:journalId",
     ensureLoggedIn,
     async function updateUserJournal(req, res, next) {
         try {
-            const { userId, journalId } = req.params;
-            if (req.user.id != userId) {
+            const { username, journalId } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot Update Other User's Journals",
                     403
@@ -111,7 +116,7 @@ router.patch(
             }
             let date = new Date().toJSON().slice(0, 10);
             const inputs = req.body;
-            const journal = await UserJournal.getById(userId, journalId);
+            const journal = await UserJournal.getById(username, journalId);
             journal.date = date;
             inputs.title ? (journal.title = inputs.title) : null;
             inputs.text ? (journal.text = inputs.text) : null;
@@ -124,20 +129,20 @@ router.patch(
 );
 
 router.delete(
-    "/:userId/journals/:journalId",
+    "/:username/journals/:journalId",
     ensureLoggedIn,
     async function deleteUserJournal(req, res, next) {
         try {
-            const { userId, journalId } = req.params;
-            if (req.user.id != userId) {
+            const { username, journalId } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot Delete Other User's Journals",
                     403
                 );
                 return next(invalidUser);
             }
-            const journal = await UserJournal.getById(userId, journalId);
-            await journal.delete(userId);
+            const journal = await UserJournal.getById(username, journalId);
+            await journal.delete(username);
             return res.json({ msg: `Deleted journal ${journalId}` });
         } catch (error) {
             return next(error);

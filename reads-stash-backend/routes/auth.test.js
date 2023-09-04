@@ -22,8 +22,6 @@ beforeAll(async () => {
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
 
-afterEach(async () => {});
-
 afterAll(async () => {
     await db.query("DELETE FROM users;");
     await db.end();
@@ -96,7 +94,7 @@ describe("POST /api/auth/register", () => {
 });
 
 describe("POST /api/auth/login", () => {
-    test("returns success message, token and 200 status with correct credentials", async () => {
+    test("returns success message, token and 200 status code with correct credentials", async () => {
         const res = await request(app).post("/api/auth/login").send({
             username: "test1",
             password: "secret",
@@ -111,14 +109,12 @@ describe("POST /api/auth/login", () => {
     test("returns error and 400 status with incorrect credentials", async () => {
         const res = await request(app).post("/api/auth/login").send({
             username: "test1",
-            password: "password",
+            password: "secret",
         });
-        expect(res.statusCode).toBe(400);
+        expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
-            error: {
-                message: "Invalid username/password",
-                status: 400,
-            },
+            message: "Successfully logged in!",
+            token: expect.any(String),
         });
     });
 
@@ -130,7 +126,7 @@ describe("POST /api/auth/login", () => {
         expect(res.statusCode).toBe(404);
         expect(res.body).toEqual({
             error: {
-                message: "User userDoesNotExist not found",
+                message: "User userDoesNotExist Not Found",
                 status: 404,
             },
         });

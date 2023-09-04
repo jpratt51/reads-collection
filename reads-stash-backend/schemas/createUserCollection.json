@@ -6,7 +6,7 @@
     "title": "Root Schema",
     "required": [
         "name",
-        "userId"
+        "user_username"
     ],
     "properties": {
         "name": {
@@ -18,17 +18,19 @@
                 "userCollection"
             ]
         },
-        "userId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The userId Schema",
+        "user_username": {
+            "type": "string",
+            "maxLength" : 30,
+            "minLength" : 5,
+            "default": "",
+            "title": "The user_username Schema",
             "examples": [
-                1
+                "testUsername"
             ]
         }
     },
     "examples": [{
         "name": "userCollection",
-        "userId": 1
+        "user_username": "testUsername"
     }]
 }

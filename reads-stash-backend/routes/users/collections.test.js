@@ -12,7 +12,7 @@ const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
 
-let testUserId, test2UserId, collectionId1, collectionId3;
+let test1Username, test2Username, collectionId1, collectionId3;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
@@ -26,12 +26,12 @@ beforeAll(async () => {
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 
-    testUserId = res.rows[0].id;
-    test2UserId = res.rows[1].id;
+    test1Username = res.rows[0].username;
+    test2Username = res.rows[1].username;
 
     const collectionIds = await db.query(
-        `INSERT INTO collections (name, user_id) VALUES ('test collection name 1', $1), ('test collection name 2', $1), ('test collection name 3', $2) RETURNING id`,
-        [testUserId, test2UserId]
+        `INSERT INTO collections (name, user_username) VALUES ('test collection name 1', $1), ('test collection name 2', $1), ('test collection name 3', $2) RETURNING id`,
+        [test1Username, test2Username]
     );
 
     collectionId1 = collectionIds.rows[0].id;
@@ -43,29 +43,21 @@ afterAll(async () => {
     await db.end();
 });
 
-describe("GET /api/users/:userId/collections", () => {
-    test("get all user collections and 200 status code with valid token and current user id. Should not get other user's collections.", async () => {
+describe("GET /api/users/:username/collections", () => {
+    test("get all user collections and 200 status code with valid token and current user username. Should not get other user's collections.", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/collections`)
+            .get(`/api/users/${test1Username}/collections`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual([
-            {
-                id: expect.any(Number),
-                name: "test collection name 1",
-                userId: testUserId,
-            },
-            {
-                id: expect.any(Number),
-                name: "test collection name 2",
-                userId: testUserId,
-            },
+            { id: expect.any(Number), name: "test collection name 1" },
+            { id: expect.any(Number), name: "test collection name 2" },
         ]);
     });
 
-    test("get error message and 401 status code if no token sent and current user id", async () => {
+    test("get error message and 401 status code if no token sent with current user username", async () => {
         const res = await request(app).get(
-            `/api/users/${testUserId}/collections`
+            `/api/users/${test1Username}/collections`
         );
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -73,9 +65,9 @@ describe("GET /api/users/:userId/collections", () => {
         });
     });
 
-    test("get error message and 401 status code if bad token sent and current user id", async () => {
+    test("get error message and 401 status code if bad token sent with current user username", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/collections`)
+            .get(`/api/users/${test1Username}/collections`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -83,36 +75,35 @@ describe("GET /api/users/:userId/collections", () => {
         });
     });
 
-    test("get error message and 403 status code if valid token sent and other user's id", async () => {
+    test("get error message and 403 status code if valid token sent with other user's username", async () => {
         const res = await request(app)
-            .get(`/api/users/${test2UserId}/collections`)
+            .get(`/api/users/${test2Username}/collections`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
             error: {
-                message: "Incorrect User ID",
+                message: "Incorrect Username",
                 status: 403,
             },
         });
     });
 });
 
-describe("GET /api/users/:userId/collections/:collectionId", () => {
-    test("get one user collection and 200 status code with valid token, valid user id and valid user collection id", async () => {
+describe("GET /api/users/:username/collections/:collectionId", () => {
+    test("get one user collection and 200 status code with valid token, valid user username and valid user collection id", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .get(`/api/users/${test1Username}/collections/${collectionId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             id: expect.any(Number),
             name: "test collection name 1",
-            userId: testUserId,
         });
     });
 
-    test("get error message and 401 status code with no token, a valid user id and valid collection id", async () => {
+    test("get error message and 401 status code with no token, a valid user username and valid collection id", async () => {
         const res = await request(app).get(
-            `/api/users/${testUserId}/collections/${collectionId1}`
+            `/api/users/${test1Username}/collections/${collectionId1}`
         );
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -120,9 +111,9 @@ describe("GET /api/users/:userId/collections/:collectionId", () => {
         });
     });
 
-    test("get error message and 401 status code with bad token, a valid user id and valid collection id", async () => {
+    test("get error message and 401 status code with bad token, a valid user username and valid collection id", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .get(`/api/users/${test1Username}/collections/${collectionId1}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -130,41 +121,40 @@ describe("GET /api/users/:userId/collections/:collectionId", () => {
         });
     });
 
-    test("get error message and 403 status code with valid token, invalid user id and valid collection id", async () => {
+    test("get error message and 403 status code with valid token, invalid user username and valid collection id", async () => {
         const res = await request(app)
-            .get(`/api/users/${test2UserId}/collections/${collectionId3}`)
+            .get(`/api/users/${test2Username}/collections/${collectionId3}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
             error: {
-                message: "Incorrect User ID",
+                message: "Incorrect Username",
                 status: 403,
             },
         });
     });
 
-    test("get error message and 403 status code with valid token, invalid userId parameter type and valid collection id", async () => {
+    test("get error message and 403 status code with valid token, incorrect user username and valid collection id", async () => {
         const res = await request(app)
-            .get(`/api/users/bad_type/collections/${collectionId1}`)
+            .get(`/api/users/incorrect/collections/${collectionId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
             error: {
-                message: "Incorrect User ID",
+                message: "Incorrect Username",
                 status: 403,
             },
         });
     });
 });
 
-describe("POST /api/users/:userId/collections", () => {
-    test("get error message and 401 status code when sending in invalid token, valid userId and valid user collection inputs", async () => {
+describe("POST /api/users/:username/collections", () => {
+    test("get error message and 401 status code when sending in invalid token, valid user username and valid user collection inputs", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/collections`)
+            .post(`/api/users/${test1Username}/collections`)
             .set({ _token: "bad token" })
             .send({
                 name: "test collection insertion",
-                userId: testUserId,
             });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -172,47 +162,28 @@ describe("POST /api/users/:userId/collections", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid userId and valid collection inputs", async () => {
+    test("get error message and 403 status code when sending in valid token, incorrect user username and valid collection inputs", async () => {
         const res = await request(app)
-            .post(`/api/users/1000/collections`)
+            .post(`/api/users/incorrect/collections`)
             .set({ _token: testUserToken })
             .send({
                 name: "test collection insertion",
-                userId: testUserId,
             });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
             error: {
-                message: "Incorrect User ID",
+                message: "Incorrect Username",
                 status: 403,
             },
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid user id data type and valid collection inputs", async () => {
+    test("get error message and 400 status code when sending in valid token, valid user username and invalid collection inputs", async () => {
         const res = await request(app)
-            .post(`/api/users/bad_type/collections`)
-            .set({ _token: testUserToken })
-            .send({
-                name: "test collection insertion",
-                userId: testUserId,
-            });
-        expect(res.statusCode).toBe(403);
-        expect(res.body).toEqual({
-            error: {
-                message: "Incorrect User ID",
-                status: 403,
-            },
-        });
-    });
-
-    test("get error message and 400 status code when sending in valid token, valid userId and invalid collection inputs", async () => {
-        const res = await request(app)
-            .post(`/api/users/${testUserId}/collections`)
+            .post(`/api/users/${test1Username}/collections`)
             .set({ _token: testUserToken })
             .send({
                 name: 12345,
-                userId: testUserId,
             });
         expect(res.statusCode).toBe(400);
         expect(res.body).toEqual({
@@ -223,27 +194,25 @@ describe("POST /api/users/:userId/collections", () => {
         });
     });
 
-    test("get created user collection object and 201 status code when sending in valid token, valid userId and valid user collection inputs", async () => {
+    test("get created user collection object and 201 status code when sending in valid token, valid user username and valid user collection inputs", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/collections`)
+            .post(`/api/users/${test1Username}/collections`)
             .set({ _token: testUserToken })
             .send({
                 name: "test collection insertion",
-                userId: testUserId,
             });
         expect(res.statusCode).toBe(201);
         expect(res.body).toEqual({
             id: expect.any(Number),
             name: "test collection insertion",
-            userId: testUserId,
         });
     });
 });
 
-describe("PATCH /api/users/:userId/collections/:collectionId", () => {
-    test("get error message and 401 status code when sending in invalid token, valid user id and valid update collection inputs", async () => {
+describe("PATCH /api/users/:username/collections/:collectionId", () => {
+    test("get error message and 401 status code when sending in invalid token, valid user username and valid update collection inputs", async () => {
         const res = await request(app)
-            .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .patch(`/api/users/${test1Username}/collections/${collectionId1}`)
             .set({ _token: "bad token" })
             .send({
                 name: "test collection insertion",
@@ -254,7 +223,7 @@ describe("PATCH /api/users/:userId/collections/:collectionId", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid user id and valid update collection inputs", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid user username and valid update collection inputs", async () => {
         const res = await request(app)
             .patch(`/api/users/1000/collections/${collectionId1}`)
             .set({ _token: testUserToken })
@@ -263,26 +232,26 @@ describe("PATCH /api/users/:userId/collections/:collectionId", () => {
             });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
-            error: { message: "Incorrect User ID", status: 403 },
+            error: { message: "Incorrect Username", status: 403 },
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid user id data type and valid update collection inputs", async () => {
+    test("get error message and 403 status code when sending in valid token, incorrect user username and valid update collection inputs", async () => {
         const res = await request(app)
-            .patch(`/api/users/bad_type/collections/${collectionId1}`)
+            .patch(`/api/users/incorrect/collections/${collectionId1}`)
             .set({ _token: testUserToken })
             .send({
                 name: "test collection insertion",
             });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
-            error: { message: "Incorrect User ID", status: 403 },
+            error: { message: "Incorrect Username", status: 403 },
         });
     });
 
-    test("get error message and 400 status code when sending in valid token, valid user id and invalid update collection inputs", async () => {
+    test("get error message and 400 status code when sending in valid token, valid user username and invalid update collection inputs", async () => {
         const res = await request(app)
-            .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .patch(`/api/users/${test1Username}/collections/${collectionId1}`)
             .set({ _token: testUserToken })
             .send({
                 name: true,
@@ -296,9 +265,9 @@ describe("PATCH /api/users/:userId/collections/:collectionId", () => {
         });
     });
 
-    test("get updated user collection object and 200 status code when sending in valid token, valid user id and valid user collection inputs", async () => {
+    test("get updated user collection object and 200 status code when sending in valid token, valid user username and valid user collection inputs", async () => {
         const res = await request(app)
-            .patch(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .patch(`/api/users/${test1Username}/collections/${collectionId1}`)
             .set({ _token: testUserToken })
             .send({
                 name: "test collection insertion",
@@ -307,25 +276,24 @@ describe("PATCH /api/users/:userId/collections/:collectionId", () => {
         expect(res.body).toEqual({
             id: expect.any(Number),
             name: "test collection insertion",
-            userId: testUserId,
         });
     });
 });
 
-describe("DELETE /api/users/:userId/collections/:collectionId", () => {
-    test("get error message and 403 status code if valid token, other user's id and valid collection id", async () => {
+describe("DELETE /api/users/:username/collections/:collectionId", () => {
+    test("get error message and 403 status code if valid token, other user's username and valid collection id", async () => {
         const res = await request(app)
-            .delete(`/api/users/${test2UserId}/collections/${collectionId1}`)
+            .delete(`/api/users/${test2Username}/collections/${collectionId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
-            error: { message: "Incorrect User ID", status: 403 },
+            error: { message: "Incorrect Username", status: 403 },
         });
     });
 
-    test("get error message and 401 status code if invalid token, valid user id and valid collection id", async () => {
+    test("get error message and 401 status code if invalid token, valid user username and valid collection id", async () => {
         const res = await request(app)
-            .delete(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .delete(`/api/users/${test1Username}/collections/${collectionId1}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -333,19 +301,19 @@ describe("DELETE /api/users/:userId/collections/:collectionId", () => {
         });
     });
 
-    test("get error message and 403 status code if valid token, bad data type user id and valid collection id", async () => {
+    test("get error message and 403 status code if valid token, incorrect username and valid collection id", async () => {
         const res = await request(app)
-            .delete(`/api/users/bad_type/collections/${collectionId1}`)
+            .delete(`/api/users/incorrect/collections/${collectionId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
-            error: { message: "Incorrect User ID", status: 403 },
+            error: { message: "Incorrect Username", status: 403 },
         });
     });
 
-    test("get deleted user collection message and 200 status code if valid token, valid user id and valid collection id", async () => {
+    test("get deleted user collection message and 200 status code if valid token, valid user username and valid collection id", async () => {
         const res = await request(app)
-            .delete(`/api/users/${testUserId}/collections/${collectionId1}`)
+            .delete(`/api/users/${test1Username}/collections/${collectionId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({

@@ -10,13 +10,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../../config");
 
-let testUserToken,
-    testUserId,
-    testUsername,
-    test2UserId,
-    readId1,
-    readId2,
-    readId3;
+let testUserToken, test1Username, test2Username, isbn1, isbn2, isbn3;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
@@ -30,26 +24,25 @@ beforeAll(async () => {
 
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
 
-    testUserId = res.rows[0].id;
-    testUsername = res.rows[0].username;
-    test2UserId = res.rows[1].id;
+    test1Username = res.rows[0].username;
+    test2Username = res.rows[1].username;
 
-    const readIds = await db.query(
-        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, publisher, pages) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', 'test publisher', 100), ('test title 2', 'test description 2', '1243567129', 4, 'BOOK', 'test publisher 2', 250), ('test title 2', 'test description 2', '1243567139', 4, 'BOOK', 'test publisher 2', 300) RETURNING id`
+    const isbns = await db.query(
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, published_date, page_count) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', '2023-01-01', 100), ('test title 2', 'test description 2', '1243567129', 4, 'BOOK', '2023-01-01', 250), ('test title 2', 'test description 2', '1243567139', 4, 'BOOK', '2023-01-01', 300) RETURNING isbn`
     );
 
-    readId1 = readIds.rows[0].id;
-    readId2 = readIds.rows[1].id;
-    readId3 = readIds.rows[2].id;
+    isbn1 = isbns.rows[0].isbn;
+    isbn2 = isbns.rows[1].isbn;
+    isbn3 = isbns.rows[2].isbn;
 
-    const userReadIds = await db.query(
-        `INSERT INTO users_reads (rating, review_text, review_date, user_id, read_id) VALUES (4, 'test review', '2023-07-19', $1, $2), (3, 'test review 2', '2023-07-19', $1, $3) RETURNING id`,
-        [testUserId, readId1, readId2]
+    await db.query(
+        `INSERT INTO users_reads (rating, review_text, review_date, user_username, read_isbn) VALUES (4, 'test review', '2023-07-19', $1, $2), (3, 'test review 2', '2023-07-19', $1, $3) RETURNING id`,
+        [test1Username, isbn1, isbn2]
     );
 
     await db.query(
-        `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE id = $4`,
-        [350, 2, 350, testUserId]
+        `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE username = $4`,
+        [350, 2, 350, test1Username]
     );
 
     testUserToken = jwt.sign(testUser, SECRET_KEY);
@@ -60,53 +53,55 @@ afterAll(async () => {
     await db.end();
 });
 
-describe("GET /api/users/:userId/reads", () => {
-    test("get all user reads and 200 status code with valid token and valid user id.", async () => {
+describe("GET /api/users/:username/reads", () => {
+    test("get all user reads and 200 status code with valid token and valid username.", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/reads`)
+            .get(`/api/users/${test1Username}/reads`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual([
             {
-                avgRating: 4,
-                description: "test description",
-                id: readId1,
-                isbn: "1243567119",
-                printType: "BOOK",
-                publisher: "test publisher",
-                pages: 100,
-                rating: 4,
-                reviewDate: "2023-07-19T05:00:00.000Z",
-                reviewText: "test review",
-                title: "test title",
-            },
-            {
+                authors: null,
                 avgRating: 4,
                 description: "test description 2",
-                id: readId2,
+                id: expect.any(Number),
+                infoLink: null,
                 isbn: "1243567129",
+                pageCount: 250,
                 printType: "BOOK",
-                publisher: "test publisher 2",
-                pages: 250,
-                rating: 3,
-                reviewDate: "2023-07-19T05:00:00.000Z",
-                reviewText: "test review 2",
+                publishedDate: "2023-01-01T06:00:00.000Z",
+                thumbnail: null,
                 title: "test title 2",
+                username: "test1",
+            },
+            {
+                authors: null,
+                avgRating: 4,
+                description: "test description",
+                id: expect.any(Number),
+                infoLink: null,
+                isbn: "1243567119",
+                pageCount: 100,
+                printType: "BOOK",
+                publishedDate: "2023-01-01T06:00:00.000Z",
+                thumbnail: null,
+                title: "test title",
+                username: "test1",
             },
         ]);
     });
 
-    test("Get error message and 401 status code if valid user id is sent but no token.", async () => {
-        const res = await request(app).get(`/api/users/${testUserId}/reads`);
+    test("Get error message and 401 status code if valid username is sent but no token.", async () => {
+        const res = await request(app).get(`/api/users/${test1Username}/reads`);
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
             error: { message: "Unauthorized", status: 401 },
         });
     });
 
-    test("Get error message and 401 status code if bad token is sent along with valid user id.", async () => {
+    test("Get error message and 401 status code if bad token is sent along with valid username.", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/reads`)
+            .get(`/api/users/${test1Username}/reads`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -116,7 +111,7 @@ describe("GET /api/users/:userId/reads", () => {
 
     test("Get error message and 403 status code if valid token is sent along with another user's id.", async () => {
         const res = await request(app)
-            .get(`/api/users/${test2UserId}/reads`)
+            .get(`/api/users/${test2Username}/reads`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -128,31 +123,34 @@ describe("GET /api/users/:userId/reads", () => {
     });
 });
 
-describe("GET /api/users/:userId/reads/:readId", () => {
-    test("get one user read and 200 status code with valid token, valid user id and valid read id", async () => {
+describe("GET /api/users/:username/reads/:isbn", () => {
+    test("get one user read and 200 status code with valid token, valid username and valid isbn", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/reads/${readId1}`)
+            .get(`/api/users/${test1Username}/reads/${isbn1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
+            authors: null,
             avgRating: 4,
             description: "test description",
             id: expect.any(Number),
+            infoLink: null,
             isbn: "1243567119",
+            pageCount: 100,
             printType: "BOOK",
-            publisher: "test publisher",
-            pages: 100,
+            publishedDate: "2023-01-01T06:00:00.000Z",
             rating: 4,
-            readId: expect.any(Number),
             reviewDate: "2023-07-19T05:00:00.000Z",
             reviewText: "test review",
+            thumbnail: null,
             title: "test title",
+            username: "test1",
         });
     });
 
-    test("get error message and 401 status code with no token, a valid user id and valid read id", async () => {
+    test("get error message and 401 status code with no token, a valid username and valid isbn", async () => {
         const res = await request(app).get(
-            `/api/users/${testUserId}/reads/${readId1}`
+            `/api/users/${test1Username}/reads/${isbn1}`
         );
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -160,18 +158,18 @@ describe("GET /api/users/:userId/reads/:readId", () => {
         });
     });
 
-    test("get error message and 401 status code with bad token, a valid user id and valid read id", async () => {
+    test("get error message and 401 status code with bad token, a valid username and valid isbn", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/reads/${readId1}`)
+            .get(`/api/users/${test1Username}/reads/${isbn1}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
             error: { message: "Unauthorized", status: 401 },
         });
     });
-    test("get error message and 403 status code with valid token, invalid user id and valid read id", async () => {
+    test("get error message and 403 status code with valid token, invalid username and valid isbn", async () => {
         const res = await request(app)
-            .get(`/api/users/${test2UserId}/reads/${readId2}`)
+            .get(`/api/users/${test2Username}/reads/${isbn2}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -181,9 +179,9 @@ describe("GET /api/users/:userId/reads/:readId", () => {
             },
         });
     });
-    test("get error message and 403 status code with valid token, invalid userId parameter type and valid read id", async () => {
+    test("get error message and 403 status code with valid token, incorrect username and valid read isbn", async () => {
         const res = await request(app)
-            .get(`/api/users/bad_type/reads/${readId1}`)
+            .get(`/api/users/incorrect/reads/${isbn1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -195,13 +193,13 @@ describe("GET /api/users/:userId/reads/:readId", () => {
     });
 });
 
-describe("POST /api/users/:userId/reads", () => {
-    test("get error message and 401 status code when sending in invalid token, valid userId, valid readId and valid user reads inputs", async () => {
+describe("POST /api/users/:username/reads", () => {
+    test("get error message and 401 status code when sending in invalid token, valid username, valid isbn and valid user reads inputs", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/reads`)
+            .post(`/api/users/${test1Username}/reads`)
             .set({ _token: "bad token" })
             .send({
-                readId: readId3,
+                isbn: isbn3,
                 rating: 4,
                 reviewText: "test",
                 reviewDate: "2023-07-19",
@@ -212,12 +210,12 @@ describe("POST /api/users/:userId/reads", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid userId, valid readId and valid user reads inputs", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username, valid isbn and valid user reads inputs", async () => {
         const res = await request(app)
             .post(`/api/users/1000/reads`)
             .set({ _token: testUserToken })
             .send({
-                readId: readId3,
+                isbn: isbn3,
                 rating: 4,
                 reviewText: "test",
                 reviewDate: "2023-07-19",
@@ -231,12 +229,12 @@ describe("POST /api/users/:userId/reads", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid userId data type, valid readId and valid user reads inputs", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username data type, valid isbn and valid user reads inputs", async () => {
         const res = await request(app)
             .post(`/api/users/bad_type/reads`)
             .set({ _token: testUserToken })
             .send({
-                readId: readId3,
+                isbn: isbn3,
                 rating: 4,
                 reviewText: "test",
                 reviewDate: "2023-07-19",
@@ -250,98 +248,104 @@ describe("POST /api/users/:userId/reads", () => {
         });
     });
 
-    test("get error message and 400 status code when sending in valid token, valid userId, invalid readId and invalid user reads inputs", async () => {
+    test("get error message and 400 status code when sending in valid token, valid username, invalid isbn data type and invalid user reads inputs", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/reads`)
+            .post(`/api/users/${test1Username}/reads`)
             .set({ _token: testUserToken })
-            .send({ readId: 1000, badInput: "nope" });
+            .send({ isbn: 1000, badInput: "nope" });
         expect(res.statusCode).toBe(400);
         expect(res.body).toEqual({
-            error: { message: "Read does not exist", status: 400 },
+            error: {
+                message: ["instance.isbn is not of a type(s) string"],
+                status: 400,
+            },
         });
     });
 
-    test("get created user read object and 201 status code when sending in valid token, valid userId, valid readId and valid user read inputs", async () => {
+    test("get created user read object and 201 status code when sending in valid token, valid username, valid isbn and valid user read inputs", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/reads`)
+            .post(`/api/users/${test1Username}/reads`)
             .set({ _token: testUserToken })
             .send({
-                readId: readId3,
+                isbn: isbn3,
                 rating: 4,
                 reviewText: "test",
                 reviewDate: "2023-07-19",
             });
         expect(res.statusCode).toBe(201);
         expect(res.body).toEqual({
+            authors: null,
             avgRating: 4,
             description: "test description 2",
             id: expect.any(Number),
+            infoLink: null,
             isbn: "1243567139",
+            pageCount: 300,
             printType: "BOOK",
-            publisher: "test publisher 2",
-            pages: 300,
+            publishedDate: "2023-01-01T06:00:00.000Z",
             rating: 4,
-            readId: readId3,
             reviewDate: "2023-07-19T05:00:00.000Z",
-            reviewText: "'test'",
+            reviewText: "test",
+            thumbnail: null,
             title: "test title 2",
-            userId: testUserId,
+            username: "test1",
         });
     });
 
-    test("expect user stats to have been update from successful user read creation", async () => {
+    test("expect user stats to have been updated from successful user read creation", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUsername}`)
+            .get(`/api/users/${test1Username}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             email: "test@email.com",
             exp: 650,
             fname: "tfn",
-            id: testUserId,
+            id: expect.any(Number),
             lname: "tln",
             totalBooks: 3,
             totalPages: 650,
-            username: "test1",
+            username: test1Username,
         });
     });
 });
 
-describe("PATCH /api/users/:userId/reads/:readId", () => {
-    test("get updated user read object and 200 status code when sending in valid token, valid userId, valid readId and valid user recommendation input", async () => {
+describe("PATCH /api/users/:username/reads/:isbn", () => {
+    test("get updated user read object and 200 status code when sending in valid token, valid username, valid isbn and valid user recommendation input", async () => {
         const res = await request(app)
-            .patch(`/api/users/${testUserId}/reads/${readId1}`)
+            .patch(`/api/users/${test1Username}/reads/${isbn1}`)
             .set({ _token: testUserToken })
             .send({
-                readId: readId3,
                 rating: 5,
-                reviewText: "test updated",
+                reviewText: "text updated",
                 reviewDate: "2023-07-20",
             });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
+            authors: null,
             avgRating: 4,
             description: "test description",
             id: expect.any(Number),
+            infoLink: null,
             isbn: "1243567119",
+            pageCount: 100,
             printType: "BOOK",
-            publisher: "test publisher",
-            pages: 100,
+            publishedDate: "2023-01-01T06:00:00.000Z",
             rating: 5,
-            readId: readId1,
             reviewDate: "2023-07-20T05:00:00.000Z",
-            reviewText: "test updated",
+            reviewText: "text updated",
+            thumbnail: null,
             title: "test title",
-            userId: testUserId,
+            username: "test1",
         });
     });
 
-    test("get error message and 401 status code when sending in invalid token, valid user id, valid read id and valid user read update inputs", async () => {
+    test("get error message and 401 status code when sending in invalid token, valid username, valid isbn and valid user read update inputs", async () => {
         const res = await request(app)
-            .patch(`/api/users/${testUserId}/reads/${readId1}`)
+            .patch(`/api/users/${test1Username}/reads/${isbn1}`)
             .set({ _token: "bad token" })
             .send({
-                readId: readId3,
+                isbn: isbn3,
                 rating: 3,
                 reviewText: "test updated again?",
                 reviewDate: "2023-07-18",
@@ -352,12 +356,12 @@ describe("PATCH /api/users/:userId/reads/:readId", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid user id, valid read id and valid update user read inputs", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username, valid isbn and valid update user read inputs", async () => {
         const res = await request(app)
-            .patch(`/api/users/1000/reads/${readId1}`)
+            .patch(`/api/users/1000/reads/${isbn1}`)
             .set({ _token: testUserToken })
             .send({
-                readId: readId3,
+                isbn: isbn3,
                 rating: 3,
                 reviewText: "test updated again?",
                 reviewDate: "2023-07-18",
@@ -371,12 +375,12 @@ describe("PATCH /api/users/:userId/reads/:readId", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid user id data type, valid recommendation id and valid update recommendation input", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username data type, valid recommendation id and valid update recommendation input", async () => {
         const res = await request(app)
-            .patch(`/api/users/bad_type/reads/${readId1}`)
+            .patch(`/api/users/bad_type/reads/${isbn1}`)
             .set({ _token: testUserToken })
             .send({
-                readId: readId3,
+                isbn: isbn3,
                 rating: 3,
                 reviewText: "test updated again?",
                 reviewDate: "2023-07-18",
@@ -391,23 +395,23 @@ describe("PATCH /api/users/:userId/reads/:readId", () => {
     });
 });
 
-describe("DELETE /api/users/:userId/reads/:readId", () => {
-    test("get error message and 403 status code if valid token, other user's id and valid read id", async () => {
+describe("DELETE /api/users/:username/reads/:isbn", () => {
+    test("get error message and 403 status code if valid token, other user's id and valid isbn", async () => {
         const res = await request(app)
-            .delete(`/api/users/${test2UserId}/recommendations/${readId1}`)
+            .delete(`/api/users/${test2Username}/recommendations/${isbn1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
             error: {
-                message: "Invalid User ID",
+                message: "Invalid Username",
                 status: 403,
             },
         });
     });
 
-    test("get error message and 401 status code if invalid token, valid user id and valid recommendation id", async () => {
+    test("get error message and 401 status code if invalid token, valid username and valid recommendation id", async () => {
         const res = await request(app)
-            .delete(`/api/users/${testUserId}/reads/${readId1}`)
+            .delete(`/api/users/${test1Username}/reads/${isbn1}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -415,9 +419,9 @@ describe("DELETE /api/users/:userId/reads/:readId", () => {
         });
     });
 
-    test("get error message and 403 status code if valid token, bad data type user id and valid read id", async () => {
+    test("get error message and 403 status code if valid token, bad data type username and valid isbn", async () => {
         const res = await request(app)
-            .delete(`/api/users/bad_type/reads/${readId1}`)
+            .delete(`/api/users/bad_type/reads/${isbn1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -425,9 +429,9 @@ describe("DELETE /api/users/:userId/reads/:readId", () => {
         });
     });
 
-    test("get deleted user read message and 200 status code if valid token, valid user id and valid read id", async () => {
+    test("get deleted user read message and 200 status code if valid token, valid username and valid isbn", async () => {
         const res = await request(app)
-            .delete(`/api/users/${testUserId}/reads/${readId1}`)
+            .delete(`/api/users/${test1Username}/reads/${isbn1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({ msg: expect.stringContaining("Deleted") });
@@ -435,18 +439,18 @@ describe("DELETE /api/users/:userId/reads/:readId", () => {
 
     test("expect user stats to have been update from successful user read deletion", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUsername}`)
+            .get(`/api/users/${test1Username}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             email: "test@email.com",
             exp: 550,
             fname: "tfn",
-            id: testUserId,
+            id: expect.any(Number),
             lname: "tln",
             totalBooks: 2,
             totalPages: 550,
-            username: "test1",
+            username: test1Username,
         });
     });
 });

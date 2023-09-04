@@ -5,16 +5,17 @@
     "default": {},
     "title": "Root Schema",
     "required": [
-        "readId",
+        "isbn",
         "collectionId"
     ],
     "properties": {
-        "readId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The readId Schema",
+        "isbn": {
+            "type": "string",
+            "default": "",
+            "title": "The isbn Schema",
+            "pattern" : "^[0-9]+$",
             "examples": [
-                1
+                "9780989671767"
             ]
         },
         "collectionId": {
@@ -27,7 +28,7 @@
         }
     },
     "examples": [{
-        "readId": 1,
+        "isbn": "9780989671767",
         "collectionId": 2
     }]
 }

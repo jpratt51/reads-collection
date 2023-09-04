@@ -7,7 +7,7 @@
     "required": [
         "title",
         "text",
-        "userId"
+        "username"
     ],
     "properties": {
         "title": {
@@ -28,18 +28,20 @@
                 "sample journal entry"
             ]
         },
-        "userId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The userId Schema",
+        "username": {
+            "type": "string",
+            "maxLength" : 30,
+            "minLength" : 5,
+            "default": "",
+            "title": "The username Schema",
             "examples": [
-                1
+                "testUsername"
             ]
         }
     },
     "examples": [{
         "title": "sample journal title",
         "text": "sample journal entry",
-        "userId": 1
+        "username": "testUsername"
     }]
 }

@@ -32,12 +32,12 @@ router.get(
 );
 
 router.patch(
-    "/:userId",
+    "/:username",
     ensureLoggedIn,
     async function updateUser(req, res, next) {
         try {
-            const { userId } = req.params;
-            if (req.user.id != userId) {
+            const { username } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot Update Other Users",
                     403
@@ -51,8 +51,7 @@ router.patch(
                 const errors = new ExpressError(listOfErrors, 400);
                 return next(errors);
             }
-            const user = await User.getById(userId);
-            inputs.username ? (user.username = inputs.username) : null;
+            const user = await User.getByUsername(username);
             inputs.fname ? (user.fname = inputs.fname) : null;
             inputs.lname ? (user.lname = inputs.lname) : null;
             inputs.email ? (user.email = inputs.email) : null;
@@ -60,6 +59,7 @@ router.patch(
             inputs.totalBooks ? (user.totalBooks = +inputs.totalBooks) : null;
             inputs.totalPages ? (user.totalPages = +inputs.totalPages) : null;
             await user.update();
+
             return res.json(user);
         } catch (error) {
             return next(error);
@@ -68,21 +68,21 @@ router.patch(
 );
 
 router.delete(
-    "/:userId",
+    "/:username",
     ensureLoggedIn,
     async function deleteUser(req, res, next) {
         try {
-            const { userId } = req.params;
-            if (req.user.id != userId) {
+            const { username } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot Delete Other Users",
                     403
                 );
                 return next(invalidUser);
             }
-            const user = await User.getById(userId);
+            const user = await User.getByUsername(username);
             await user.delete();
-            return res.json({ msg: `Deleted user ${userId}` });
+            return res.json({ msg: `Deleted User ${username}` });
         } catch (error) {
             return next(error);
         }

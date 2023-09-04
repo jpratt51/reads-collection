@@ -15,12 +15,12 @@ router.get("/", ensureLoggedIn, async function getAllBadges(req, res, next) {
 });
 
 router.get(
-    "/:badgeId",
+    "/:name",
     ensureLoggedIn,
     async function getOneBadge(req, res, next) {
         try {
-            const { badgeId } = req.params;
-            let badge = await Badge.getById(badgeId);
+            const { name } = req.params;
+            let badge = await Badge.getByName(name);
             return res.json(badge);
         } catch (error) {
             return next(error);

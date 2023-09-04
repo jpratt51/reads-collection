@@ -22,9 +22,25 @@ function dataToSqlForCreate(data) {
 
     const columns = keys.map((name, idx) => `$${idx + 1}`);
     const inserts = values.map((value) =>
-        typeof value === "string" ? `${value}` : value
+        typeof value === "string" ? "'" + `${value}` + "'" : value
     );
 
+    return {
+        columns: columns.join(", "),
+        values: inserts,
+        keys: keys.join(", "),
+    };
+}
+
+function dataToSqlForCreateUserRead(data) {
+    const keys = Object.keys(data);
+    const values = Object.values(data);
+    if (keys.length === 0) return { error: "No data" };
+
+    const columns = keys.map((name, idx) => `$${idx + 1}`);
+    const inserts = values.map((value) =>
+        typeof value === "string" ? `${value}` : value
+    );
     return {
         columns: columns.join(", "),
         values: inserts,
@@ -54,23 +70,23 @@ async function dataToSqlAuths(authors) {
     };
 }
 
-async function dataToSqlReadAuths(readId, authList) {
-    let resourceIds = [],
+async function dataToSqlReadAuths(isbn, authList) {
+    let resources = [],
         readAuthPlaceholders;
     for (const a of authList) {
         const res = await db.query(`SELECT * FROM authors WHERE name = $1`, [
             a,
         ]);
-        const authId = res.rows[0].id;
-        resourceIds.push(authId);
+        const authName = res.rows[0].name;
+        resources.push(authName);
     }
-    resourceIds.unshift(readId);
-    readAuthPlaceholders = resourceIds.map((a, idx) => `( $1, $${idx + 2} )`);
-    readAuthPlaceholders.pop();
+    resources.unshift(isbn);
 
+    readAuthPlaceholders = resources.map((a, idx) => `( $1, $${idx + 2} )`);
+    readAuthPlaceholders.pop();
     return {
         readAuthPlaceholders: readAuthPlaceholders.join(", "),
-        readAuthValues: resourceIds,
+        readAuthValues: resources,
     };
 }
 
@@ -87,6 +103,7 @@ function removeQuotes(inputs) {
 module.exports = {
     dataToSql,
     dataToSqlForCreate,
+    dataToSqlForCreateUserRead,
     dataToSqlAuths,
     dataToSqlReadAuths,
     removeQuotes,

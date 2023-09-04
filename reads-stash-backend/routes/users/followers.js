@@ -7,19 +7,19 @@ const { ensureLoggedIn } = require("../../middleware/auth");
 const ExpressError = require("../../expressError");
 
 router.get(
-    "/:userId/followers",
+    "/:username/followers",
     ensureLoggedIn,
     async function getAllUserFollowers(req, res, next) {
         try {
-            const { userId } = req.params;
-            if (req.user.id != userId) {
+            const { username } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Followers",
                     403
                 );
                 return next(invalidUser);
             }
-            let followers = await UserFollower.getAll(userId);
+            let followers = await UserFollower.getAll(username);
             return res.json(followers);
         } catch (error) {
             return next(error);
@@ -28,19 +28,22 @@ router.get(
 );
 
 router.get(
-    "/:userId/followers/:followerId",
+    "/:username/followers/:followerUsername",
     ensureLoggedIn,
     async function getOneUserFollower(req, res, next) {
         try {
-            const { userId, followerId } = req.params;
-            if (req.user.id != userId) {
+            const { username, followerUsername } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other Users Followers",
                     403
                 );
                 return next(invalidUser);
             }
-            let follower = await UserFollower.getById(userId, followerId);
+            let follower = await UserFollower.getByUsername(
+                username,
+                followerUsername
+            );
             return res.json(follower);
         } catch (error) {
             return next(error);

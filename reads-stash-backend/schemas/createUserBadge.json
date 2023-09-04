@@ -5,29 +5,33 @@
     "default": {},
     "title": "Root Schema",
     "required": [
-        "userId",
-        "badgeId"
+        "name",
+        "user_username"
     ],
     "properties": {
-        "userId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The userId Schema",
+        "name": {
+            "type": "string",
+            "maxLength" : 30,
+            "minLength" : 5,
+            "default": "",
+            "title": "The name Schema",
             "examples": [
-                1
+                "testBadge"
             ]
         },
-        "badgeId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The badgeId Schema",
+        "user_username": {
+            "type": "string",
+            "maxLength" : 30,
+            "minLength" : 5,
+            "default": "",
+            "title": "The username Schema",
             "examples": [
-                1
+                "testUsername"
             ]
         }
     },
     "examples": [{
-        "userId": 1,
-        "badgeId": 1
+        "name": "testBadge",
+        "user_username": "testUsername"
     }]
 }

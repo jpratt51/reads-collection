@@ -5,29 +5,33 @@
     "default": {},
     "title": "Root Schema",
     "required": [
-        "followedId",
-        "userId"
+        "followedUsername",
+        "username"
     ],
     "properties": {
-        "followedId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The followedId Schema",
+        "followedUsername": {
+            "type": "string",
+            "maxLength" : 30,
+            "minLength" : 5,
+            "default": "",
+            "title": "The followedUsername Schema",
             "examples": [
-                2
+                "test1Username"
             ]
         },
-        "userId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The userId Schema",
+        "username": {
+            "type": "string",
+            "maxLength" : 30,
+            "minLength" : 5,
+            "default": "",
+            "title": "The username Schema",
             "examples": [
-                1
+                "test2Username"
             ]
         }
     },
     "examples": [{
-        "followedId": 2,
-        "userId": 1
+        "followedUsername": "test1Username",
+        "username": "test2Username"
     }]
 }

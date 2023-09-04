@@ -6,8 +6,8 @@
     "title": "Root Schema",
     "required": [
         "recommendation",
-        "receiverId",
-        "senderId"
+        "receiverUsername",
+        "senderUsername"
     ],
     "properties": {
         "recommendation": {
@@ -19,26 +19,30 @@
             ],
             "maxLength": 1000
         },
-        "receiverId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The receiverId Schema",
+        "receiverUsername": {
+            "type": "string",
+            "maxLength" : 30,
+            "minLength" : 5,
+            "default": "",
+            "title": "The receiver_username Schema",
             "examples": [
-                1
+                "testUsername"
             ]
         },
-        "senderId": {
-            "type": "integer",
-            "default": 0,
-            "title": "The senderId Schema",
+        "senderUsername": {
+            "type": "string",
+            "maxLength" : 30,
+            "minLength" : 5,
+            "default": "",
+            "title": "The sender_username Schema",
             "examples": [
-                2
+                "testUsername"
             ]
         }
     },
     "examples": [{
         "recommendation": "test recommendation",
-        "receiverId": 1,
-        "senderId": 2
+        "receiverUsername": "testUsername",
+        "senderUsername": "testUsername"
     }]
 }

@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 
 let testUserToken;
-let testBadgeId;
+let testBadgename;
 
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
@@ -27,7 +27,7 @@ beforeAll(async () => {
     const testBadges = await db.query(
         `INSERT INTO badges (name, thumbnail) VALUES ('testBadge', 'testThumbnail'), ('testBadge2', 'testThumbnail2') RETURNING *`
     );
-    testBadgeId = testBadges.rows[0].id;
+    testBadgename = testBadges.rows[0].name;
 });
 
 afterAll(async () => {
@@ -75,10 +75,10 @@ describe("GET /api/badges", () => {
     });
 });
 
-describe("GET /api/badges/:badgeId", () => {
-    test("get badge object and 200 status code with correct token and valid badge id request parameter", async () => {
+describe("GET /api/badges/:name", () => {
+    test("get badge object and 200 status code with correct token and valid badge name", async () => {
         const res = await request(app)
-            .get(`/api/badges/${testBadgeId}`)
+            .get(`/api/badges/${testBadgename}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
@@ -88,8 +88,8 @@ describe("GET /api/badges/:badgeId", () => {
         });
     });
 
-    test("get error message and 401 status code with no token and valid badge id request parameter", async () => {
-        const res = await request(app).get(`/api/badges/${testBadgeId}`);
+    test("get error message and 401 status code with no token and valid badge name", async () => {
+        const res = await request(app).get(`/api/badges/${testBadgename}`);
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
             error: {
@@ -99,16 +99,13 @@ describe("GET /api/badges/:badgeId", () => {
         });
     });
 
-    test("get error message and 404 status code with correct token and incorrect data type for badge id request parameter", async () => {
+    test("get error message and 404 status code with correct token and incorrect badge name request parameter", async () => {
         const res = await request(app)
-            .get(`/api/badges/badType`)
+            .get(`/api/badges/incorrect`)
             .set({ _token: testUserToken });
-        expect(res.statusCode).toBe(400);
+        expect(res.statusCode).toBe(404);
         expect(res.body).toEqual({
-            error: {
-                message: "Invalid badge id data type",
-                status: 400,
-            },
+            error: { message: "Badge incorrect Not Found", status: 404 },
         });
     });
 });

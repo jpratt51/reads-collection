@@ -10,19 +10,19 @@ const updateRecommendationSchema = require("../../schemas/updateRecommendation.j
 const ExpressError = require("../../expressError");
 
 router.get(
-    "/:userId/recommendations",
+    "/:username/recommendations",
     ensureLoggedIn,
     async function getAllUserRecommendations(req, res, next) {
         try {
-            const { userId } = req.params;
-            if (req.user.id != userId) {
+            const { username } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Recommendations",
                     403
                 );
                 return next(invalidUser);
             }
-            let recommendations = await UserRecommendation.getAll(userId);
+            let recommendations = await UserRecommendation.getAll(username);
             return res.json(recommendations);
         } catch (error) {
             return next(error);
@@ -31,12 +31,12 @@ router.get(
 );
 
 router.get(
-    "/:userId/recommendations/:recommendationId",
+    "/:username/recommendations/:recommendationId",
     ensureLoggedIn,
     async function getOneUserRecommendation(req, res, next) {
         try {
-            const { recommendationId, userId } = req.params;
-            if (req.user.id != userId) {
+            const { recommendationId, username } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Recommendations",
                     403
@@ -45,7 +45,7 @@ router.get(
             }
             const recommendation = await UserRecommendation.getById(
                 recommendationId,
-                userId
+                username
             );
             return res.json(recommendation);
         } catch (error) {
@@ -55,13 +55,14 @@ router.get(
 );
 
 router.post(
-    "/:userId/recommendations",
+    "/:username/recommendations",
     ensureLoggedIn,
     async function createUserRecommendation(req, res, next) {
         try {
-            const { recommendation, receiverId, senderId } = req.body;
-            const { userId } = req.params;
-            if (req.user.id != userId) {
+            const { recommendation, receiverUsername, senderUsername } =
+                req.body;
+            const { username } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot Create Recommendations From Other Users",
                     403
@@ -79,8 +80,8 @@ router.post(
             }
             const newRecommendation = await UserRecommendation.create(
                 recommendation,
-                receiverId,
-                senderId
+                receiverUsername,
+                senderUsername
             );
             return res.status(201).json(newRecommendation);
         } catch (error) {
@@ -90,12 +91,12 @@ router.post(
 );
 
 router.patch(
-    "/:userId/recommendations/:recommendationId",
+    "/:username/recommendations/:recommendationId",
     ensureLoggedIn,
     async function updateUserRecommendation(req, res, next) {
         try {
-            const { userId, recommendationId } = req.params;
-            if (req.user.id != userId) {
+            const { username, recommendationId } = req.params;
+            if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot Update Recommendations From Other Users",
                     403
@@ -114,12 +115,12 @@ router.patch(
             }
             const getRecommendation = await UserRecommendation.getById(
                 recommendationId,
-                userId
+                username
             );
             recommendation
                 ? (getRecommendation.recommendation = recommendation)
                 : null;
-            await getRecommendation.update(userId);
+            await getRecommendation.update(username);
             return res.json(getRecommendation);
         } catch (error) {
             return next(error);
@@ -128,22 +129,22 @@ router.patch(
 );
 
 router.delete(
-    "/:userId/recommendations/:recommendationId",
+    "/:username/recommendations/:recommendationId",
     ensureLoggedIn,
     async function deleteUserRecommendation(req, res, next) {
         try {
-            const { userId, recommendationId } = req.params;
-            if (req.user.id != userId) {
-                const invalidUser = new ExpressError("Invalid User ID", 403);
+            const { username, recommendationId } = req.params;
+            if (req.user.username != username) {
+                const invalidUser = new ExpressError("Invalid Username", 403);
                 return next(invalidUser);
             }
             const recommendation = await UserRecommendation.getById(
                 recommendationId,
-                userId
+                username
             );
-            await recommendation.delete(userId);
+            await recommendation.delete(username);
             return res.json({
-                msg: `Deleted user recommendation ${recommendationId}`,
+                msg: `Deleted User Recommendation ${recommendationId}`,
             });
         } catch (error) {
             return next(error);

@@ -4,33 +4,29 @@ const db = require("../../db");
 const ExpressError = require("../../expressError");
 
 class UserCollection {
-    constructor(id, name, user_id) {
+    constructor(id, name, user_username) {
         this.id = id;
         this.name = name;
-        this.userId = user_id;
+        this.username = user_username;
     }
 
-    static async getAll(userId) {
-        if (/^\d+$/.test(userId) === false)
-            throw new ExpressError(`Invalid User ID Data Type`, 400);
+    static async getAll(username) {
         const results = await db.query(
-            `SELECT * FROM collections WHERE user_id = $1;`,
-            [userId]
+            `SELECT * FROM collections WHERE user_username = $1;`,
+            [username]
         );
         const userCollections = results.rows.map(
-            (c) => new UserCollection(c.id, c.name, c.user_id)
+            (c) => new UserCollection(c.id, c.name, c.username)
         );
         return userCollections;
     }
 
-    static async getById(userId, collectionId) {
-        if (/^\d+$/.test(userId) === false)
-            throw new ExpressError(`Invalid User ID Data Type`, 400);
+    static async getById(username, collectionId) {
         if (/^\d+$/.test(collectionId) === false)
             throw new ExpressError(`Invalid Collection ID Data Type`, 400);
         const results = await db.query(
-            `SELECT * FROM collections WHERE id = $1 AND user_id = $2;`,
-            [collectionId, userId]
+            `SELECT * FROM collections WHERE id = $1 AND user_username = $2;`,
+            [collectionId, username]
         );
         const c = results.rows[0];
         if (!c) {
@@ -38,44 +34,41 @@ class UserCollection {
                 `User's Collection ${collectionId} Not Found`
             );
         }
-        return new UserCollection(c.id, c.name, c.user_id);
+        return new UserCollection(c.id, c.name, c.username);
     }
 
-    static async create(name, userId) {
+    static async create(name, username) {
         const duplicateCheck = await db.query(
-            `SELECT * FROM collections WHERE user_id = $1 AND name = $2`,
-            [userId, name]
+            `SELECT * FROM collections WHERE user_username = $1 AND name = $2`,
+            [username, name]
         );
-
         if (duplicateCheck.rows.length !== 0)
             throw new ExpressError(
-                `Collection With Name ${name} And User ID ${userId} Already Exists`,
+                `Collection With Name ${name} And Username ${username} Already Exists`,
                 400
             );
-
         const results = await db.query(
-            "INSERT INTO collections (name, user_id) VALUES ($1, $2) RETURNING * ;",
-            [name, userId]
+            "INSERT INTO collections (name, user_username) VALUES ($1, $2) RETURNING * ;",
+            [name, username]
         );
         const c = results.rows[0];
-
-        return new UserCollection(c.id, c.name, c.user_id);
+        return new UserCollection(c.id, c.name, c.username);
     }
 
     async update() {
         await db.query(
             `UPDATE collections
                     SET name = $1
-                    WHERE id = $2 AND user_id = $3
+                    WHERE id = $2 AND user_username = $3
                     RETURNING *`,
-            [this.name, this.id, this.user_id]
+            [this.name, this.id, this.username]
         );
     }
 
-    async delete(userId) {
+    async delete(username) {
         await db.query(
-            "DELETE FROM collections WHERE id = $1 AND user_id = $2;",
-            [this.id, userId]
+            "DELETE FROM collections WHERE id = $1 AND user_username = $2;",
+            [this.id, username]
         );
     }
 }

@@ -12,7 +12,7 @@ const { SECRET_KEY } = require("../../config");
 
 let testUserToken;
 
-let testUserId, test2UserId, test3UserId;
+let test1Username, test2Username, test3Username;
 let recId1, recId2, recId3;
 
 beforeAll(async () => {
@@ -26,13 +26,13 @@ beforeAll(async () => {
 
     const testUser = { username: res.rows[0].username, id: res.rows[0].id };
 
-    testUserId = res.rows[0].id;
-    test2UserId = res.rows[1].id;
-    test3UserId = res.rows[2].id;
+    test1Username = res.rows[0].username;
+    test2Username = res.rows[1].username;
+    test3Username = res.rows[2].username;
 
     const recIds = await db.query(
-        `INSERT INTO recommendations (recommendation, receiver_id, sender_id) VALUES ('recommendation from test1 to test2', $1, $2), ('recommendation from test2 to test1', $2, $1), ('recommendation from test2 to test3', $3, $1) RETURNING id`,
-        [test2UserId, testUserId, test3UserId]
+        `INSERT INTO recommendations (recommendation, receiver_username, sender_username) VALUES ('recommendation from test1 to test2', $1, $2), ('recommendation from test2 to test1', $2, $1), ('recommendation from test2 to test3', $3, $1) RETURNING id`,
+        [test2Username, test1Username, test3Username]
     );
 
     recId1 = recIds.rows[0].id;
@@ -47,31 +47,31 @@ afterAll(async () => {
     await db.end();
 });
 
-describe("GET /api/users/:userId/recommendations", () => {
-    test("get all user recommendations and 200 status code with valid token and current user id. Should not get recommendation where neither the sender or receiver id matches the current user's id.", async () => {
+describe("GET /api/users/:username/recommendations", () => {
+    test("get all user recommendations and 200 status code with valid token and current username. Should not get recommendation where neither the sender or receiver username matches the current username.", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/recommendations`)
+            .get(`/api/users/${test1Username}/recommendations`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual([
             {
                 id: expect.any(Number),
-                receiverId: test2UserId,
+                receiverUsername: "test2",
                 recommendation: "recommendation from test1 to test2",
-                senderId: testUserId,
+                senderUsername: "test1",
             },
             {
                 id: expect.any(Number),
-                receiverId: testUserId,
+                receiverUsername: "test1",
                 recommendation: "recommendation from test2 to test1",
-                senderId: test2UserId,
+                senderUsername: "test2",
             },
         ]);
     });
 
-    test("get error message and 401 status code if no token sent and current user id", async () => {
+    test("get error message and 401 status code if no token sent and current username", async () => {
         const res = await request(app).get(
-            `/api/users/${testUserId}/recommendations`
+            `/api/users/${test1Username}/recommendations`
         );
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -79,9 +79,9 @@ describe("GET /api/users/:userId/recommendations", () => {
         });
     });
 
-    test("get error message and 401 status code if bad token sent and current user id", async () => {
+    test("get error message and 401 status code if bad token sent and current username", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/recommendations`)
+            .get(`/api/users/${test1Username}/recommendations`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -89,9 +89,9 @@ describe("GET /api/users/:userId/recommendations", () => {
         });
     });
 
-    test("get error message and 403 status code if valid token sent and other user's id", async () => {
+    test("get error message and 403 status code if valid token sent and other username", async () => {
         const res = await request(app)
-            .get(`/api/users/${test2UserId}/recommendations`)
+            .get(`/api/users/${test2Username}/recommendations`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -103,23 +103,23 @@ describe("GET /api/users/:userId/recommendations", () => {
     });
 });
 
-describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
-    test("get one user recommendation and 200 status code with valid token, valid user id and valid user recommendation id", async () => {
+describe("GET /api/users/:username/recommendations/:recommendationId", () => {
+    test("get one user recommendation and 200 status code with valid token, valid username and valid user recommendation id", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .get(`/api/users/${test1Username}/recommendations/${recId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             id: expect.any(Number),
-            receiverId: test2UserId,
+            receiverUsername: test2Username,
             recommendation: "recommendation from test1 to test2",
-            senderId: testUserId,
+            senderUsername: test1Username,
         });
     });
 
-    test("get error message and 401 status code with no token, a valid user id and valid recommendation id", async () => {
+    test("get error message and 401 status code with no token, a valid username and valid recommendation id", async () => {
         const res = await request(app).get(
-            `/api/users/${testUserId}/recommendations/${recId1}`
+            `/api/users/${test1Username}/recommendations/${recId1}`
         );
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -127,9 +127,9 @@ describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    test("get error message and 401 status code with bad token, a valid user id and valid recommendation id", async () => {
+    test("get error message and 401 status code with bad token, a valid username and valid recommendation id", async () => {
         const res = await request(app)
-            .get(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .get(`/api/users/${test1Username}/recommendations/${recId1}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -137,9 +137,9 @@ describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    test("get error message and 403 status code with valid token, invalid user id and valid recommendation id", async () => {
+    test("get error message and 403 status code with valid token, invalid username and valid recommendation id", async () => {
         const res = await request(app)
-            .get(`/api/users/${test2UserId}/recommendations/${recId3}`)
+            .get(`/api/users/${test2Username}/recommendations/${recId3}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -150,9 +150,9 @@ describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    test("get error message and 403 status code with valid token, invalid userId parameter type and valid recommendation id", async () => {
+    test("get error message and 403 status code with valid token, incorrect username and valid recommendation id", async () => {
         const res = await request(app)
-            .get(`/api/users/bad_type/recommendations/${recId1}`)
+            .get(`/api/users/incorrect/recommendations/${recId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -164,33 +164,33 @@ describe("GET /api/users/:userId/recommendations/:recommendationId", () => {
     });
 });
 
-describe("POST /api/users/:userId/recommendations", () => {
-    test("get created user recommendation object and 201 status code when sending in valid token, valid userId, valid receiverId and valid user recommendation", async () => {
+describe("POST /api/users/:username/recommendations", () => {
+    test("get created user recommendation object and 201 status code when sending in valid token, valid username, valid receiverUsername and valid user recommendation", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/recommendations`)
+            .post(`/api/users/${test1Username}/recommendations`)
             .set({ _token: testUserToken })
             .send({
                 recommendation: "test recommendation",
-                receiverId: test2UserId,
-                senderId: testUserId,
+                receiverUsername: test2Username,
+                senderUsername: test1Username,
             });
         expect(res.statusCode).toBe(201);
         expect(res.body).toEqual({
             id: expect.any(Number),
-            receiverId: test2UserId,
+            receiverUsername: test2Username,
             recommendation: "test recommendation",
-            senderId: testUserId,
+            senderUsername: test1Username,
         });
     });
 
-    test("get error message and 401 status code when sending in invalid token, valid userId, valid receiverId and valid user recommendation", async () => {
+    test("get error message and 401 status code when sending in invalid token, valid username, valid receiverUsername and valid user recommendation", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/recommendations`)
+            .post(`/api/users/${test1Username}/recommendations`)
             .set({ _token: "bad token" })
             .send({
                 recommendation: "test recommendation?",
-                receiverId: test2UserId,
-                senderId: testUserId,
+                receiverUsername: test2Username,
+                senderUsername: test1Username,
             });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -198,14 +198,14 @@ describe("POST /api/users/:userId/recommendations", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid userId, valid receiverId and valid recommendation input", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username, valid receiverUsername and valid recommendation input", async () => {
         const res = await request(app)
             .post(`/api/users/1000/recommendations`)
             .set({ _token: testUserToken })
             .send({
                 recommendation: "test recommendation?",
-                receiverId: test2UserId,
-                senderId: testUserId,
+                receiverUsername: test2Username,
+                senderUsername: test1Username,
             });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -216,14 +216,14 @@ describe("POST /api/users/:userId/recommendations", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid userId data type, valid receiverId and valid recommendation input", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username data type, valid receiverUsername and valid recommendation input", async () => {
         const res = await request(app)
             .post(`/api/users/bad_type/recommendations`)
             .set({ _token: testUserToken })
             .send({
                 recommendation: "test recommendation?",
-                receiverId: test2UserId,
-                senderId: testUserId,
+                receiverUsername: test2Username,
+                senderUsername: test1Username,
             });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
@@ -234,9 +234,9 @@ describe("POST /api/users/:userId/recommendations", () => {
         });
     });
 
-    test("get error message and 400 status code when sending in valid token, valid userId and invalid recommendation input", async () => {
+    test("get error message and 400 status code when sending in valid token, valid username and invalid recommendation input", async () => {
         const res = await request(app)
-            .post(`/api/users/${testUserId}/recommendations`)
+            .post(`/api/users/${test1Username}/recommendations`)
             .set({ _token: testUserToken })
             .send({ badInput: "nope" });
         expect(res.statusCode).toBe(400);
@@ -244,8 +244,8 @@ describe("POST /api/users/:userId/recommendations", () => {
             error: {
                 message: [
                     'instance requires property "recommendation"',
-                    'instance requires property "receiverId"',
-                    'instance requires property "senderId"',
+                    'instance requires property "receiverUsername"',
+                    'instance requires property "senderUsername"',
                 ],
                 status: 400,
             },
@@ -253,24 +253,24 @@ describe("POST /api/users/:userId/recommendations", () => {
     });
 });
 
-describe("PATCH /api/users/:userId/recommendations/:recommendationId", () => {
-    test("get updated user recommendation object and 200 status code when sending in valid token, valid userId, valid recommendation id and valid user recommendation input", async () => {
+describe("PATCH /api/users/:username/recommendations/:recommendationId", () => {
+    test("get updated user recommendation object and 200 status code when sending in valid token, valid username, valid recommendation id and valid user recommendation input", async () => {
         const res = await request(app)
-            .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .patch(`/api/users/${test1Username}/recommendations/${recId1}`)
             .set({ _token: testUserToken })
             .send({ recommendation: "updated recommendation" });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             id: expect.any(Number),
-            receiverId: test2UserId,
+            receiverUsername: test2Username,
             recommendation: "updated recommendation",
-            senderId: testUserId,
+            senderUsername: test1Username,
         });
     });
 
-    test("get error message and 401 status code when sending in invalid token, valid user id, valid recommendation id and valid update recommendation input", async () => {
+    test("get error message and 401 status code when sending in invalid token, valid username, valid recommendation id and valid update recommendation input", async () => {
         const res = await request(app)
-            .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .patch(`/api/users/${test1Username}/recommendations/${recId1}`)
             .set({ _token: "bad token" })
             .send({ recommendation: "update recommendation?" });
         expect(res.statusCode).toBe(401);
@@ -279,7 +279,7 @@ describe("PATCH /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid user id, valid recommendation id and valid update recommendation input", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username, valid recommendation id and valid update recommendation input", async () => {
         const res = await request(app)
             .patch(`/api/users/1000/recommendations/${recId1}`)
             .set({ _token: testUserToken })
@@ -293,7 +293,7 @@ describe("PATCH /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    test("get error message and 403 status code when sending in valid token, invalid user id data type, valid recommendation id and valid update recommendation input", async () => {
+    test("get error message and 403 status code when sending in valid token, invalid username data type, valid recommendation id and valid update recommendation input", async () => {
         const res = await request(app)
             .patch(`/api/users/bad_type/recommendations/${recId1}`)
             .set({ _token: testUserToken })
@@ -307,9 +307,9 @@ describe("PATCH /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    test("get error message and 400 status code when sending in valid token, valid user id, valid recommendation id and invalid update recommendation input", async () => {
+    test("get error message and 400 status code when sending in valid token, valid username, valid recommendation id and invalid update recommendation input", async () => {
         const res = await request(app)
-            .patch(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .patch(`/api/users/${test1Username}/recommendations/${recId1}`)
             .set({ _token: testUserToken })
             .send({ recommendation: 12345 });
         expect(res.statusCode).toBe(400);
@@ -322,23 +322,23 @@ describe("PATCH /api/users/:userId/recommendations/:recommendationId", () => {
     });
 });
 
-describe("DELETE /api/users/:userId/recommendations/:recommendationId", () => {
-    test("get error message and 403 status code if valid token, other user's id and valid recommendation id", async () => {
+describe("DELETE /api/users/:username/recommendations/:recommendationId", () => {
+    test("get error message and 403 status code if valid token, other username and valid recommendation id", async () => {
         const res = await request(app)
-            .delete(`/api/users/${test2UserId}/recommendations/${recId1}`)
+            .delete(`/api/users/${test2Username}/recommendations/${recId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
             error: {
-                message: "Invalid User ID",
+                message: "Invalid Username",
                 status: 403,
             },
         });
     });
 
-    test("get error message and 401 status code if invalid token, valid user id and valid recommendation id", async () => {
+    test("get error message and 401 status code if invalid token, valid username and valid recommendation id", async () => {
         const res = await request(app)
-            .delete(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .delete(`/api/users/${test1Username}/recommendations/${recId1}`)
             .set({ _token: "bad token" });
         expect(res.statusCode).toBe(401);
         expect(res.body).toEqual({
@@ -346,19 +346,19 @@ describe("DELETE /api/users/:userId/recommendations/:recommendationId", () => {
         });
     });
 
-    test("get error message and 403 status code if valid token, bad data type user id and valid recommendation id", async () => {
+    test("get error message and 403 status code if valid token, bad data type username and valid recommendation id", async () => {
         const res = await request(app)
             .delete(`/api/users/bad_type/recommendations/${recId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(403);
         expect(res.body).toEqual({
-            error: { message: "Invalid User ID", status: 403 },
+            error: { message: "Invalid Username", status: 403 },
         });
     });
 
-    test("get deleted user recommendation message and 200 status code if valid token, valid user id and valid recommendation id", async () => {
+    test("get deleted user recommendation message and 200 status code if valid token, valid username and valid recommendation id", async () => {
         const res = await request(app)
-            .delete(`/api/users/${testUserId}/recommendations/${recId1}`)
+            .delete(`/api/users/${test1Username}/recommendations/${recId1}`)
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({ msg: expect.stringContaining("Deleted") });
