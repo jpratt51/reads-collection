@@ -15,6 +15,7 @@ let testUserToken, test1Username, test2Username, isbn1, isbn2, isbn3;
 beforeAll(async () => {
     await db.query("DELETE FROM users;");
     await db.query("DELETE FROM reads;");
+    await db.query("DELETE FROM authors;");
 
     const hashedPassword = await bcrypt.hash("secret", 1);
     const res = await db.query(
@@ -45,11 +46,19 @@ beforeAll(async () => {
         [350, 2, 350, test1Username]
     );
 
+    await db.query(`INSERT INTO authors (name) VALUES ('Will Wight');`);
+
+    await db.query(
+        `INSERT INTO reads_authors (read_isbn, author_name) VALUES ('1243567119', 'Will Wight');`
+    );
+
     testUserToken = jwt.sign(testUser, SECRET_KEY);
 });
 
 afterAll(async () => {
     await db.query("DELETE FROM users;");
+    await db.query("DELETE FROM reads;");
+    await db.query("DELETE FROM authors;");
     await db.end();
 });
 
@@ -58,6 +67,44 @@ describe("GET /api/users/:username/reads", () => {
         const res = await request(app)
             .get(`/api/users/${test1Username}/reads`)
             .set({ _token: testUserToken });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual([
+            {
+                authors: "Will Wight",
+                avgRating: 4,
+                description: "test description",
+                id: expect.any(Number),
+                infoLink: null,
+                isbn: "1243567119",
+                pageCount: 100,
+                printType: "BOOK",
+                publishedDate: "2023-01-01T06:00:00.000Z",
+                thumbnail: null,
+                title: "test title",
+                username: "test1",
+            },
+            {
+                authors: null,
+                avgRating: 4,
+                description: "test description 2",
+                id: expect.any(Number),
+                infoLink: null,
+                isbn: "1243567129",
+                pageCount: 250,
+                printType: "BOOK",
+                publishedDate: "2023-01-01T06:00:00.000Z",
+                thumbnail: null,
+                title: "test title 2",
+                username: "test1",
+            },
+        ]);
+    });
+
+    test("get all user reads with matching title and 200 status code with valid token and valid username. Does not get reads with other titles.", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test1Username}/reads`)
+            .set({ _token: testUserToken })
+            .send({ title: "test title 2" });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual([
             {
@@ -74,8 +121,18 @@ describe("GET /api/users/:username/reads", () => {
                 title: "test title 2",
                 username: "test1",
             },
+        ]);
+    });
+
+    test("get all user reads with matching author name and 200 status code with valid token and valid username. Does not get reads with different authors.", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test1Username}/reads`)
+            .set({ _token: testUserToken })
+            .send({ author: "Will Wight" });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual([
             {
-                authors: null,
+                authors: "Will Wight",
                 avgRating: 4,
                 description: "test description",
                 id: expect.any(Number),
@@ -130,7 +187,7 @@ describe("GET /api/users/:username/reads/:isbn", () => {
             .set({ _token: testUserToken });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
-            authors: null,
+            authors: "Will Wight",
             avgRating: 4,
             description: "test description",
             id: expect.any(Number),
@@ -322,7 +379,7 @@ describe("PATCH /api/users/:username/reads/:isbn", () => {
             });
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
-            authors: null,
+            authors: "Will Wight",
             avgRating: 4,
             description: "test description",
             id: expect.any(Number),
