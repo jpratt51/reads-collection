@@ -29,7 +29,7 @@ beforeAll(async () => {
     test2Username = res.rows[1].username;
 
     const isbns = await db.query(
-        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, published_date, page_count) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', '2023-01-01', 100), ('test title 2', 'test description 2', '1243567129', 4, 'BOOK', '2023-01-01', 250), ('test title 2', 'test description 2', '1243567139', 4, 'BOOK', '2023-01-01', 300) RETURNING isbn`
+        `INSERT INTO reads (title, description, isbn, avg_rating, print_type, published_date, page_count) VALUES ('test title', 'test description', '1243567119', 4, 'BOOK', '2023-01-01', 100), ('test title 2', 'test description 2', '1243567129', 4, 'BOOK', '2023-01-01', 250), ('test title 2', 'test description 2', '1243567139', 4, 'BOOK', '2023-01-01', 300), ('test title 3', 'test description 3', '1235782973', 3.5, 'BOOK', '2023-10-10', 250) RETURNING isbn`
     );
 
     isbn1 = isbns.rows[0].isbn;
@@ -37,19 +37,19 @@ beforeAll(async () => {
     isbn3 = isbns.rows[2].isbn;
 
     await db.query(
-        `INSERT INTO users_reads (rating, review_text, review_date, user_username, read_isbn) VALUES (4, 'test review', '2023-07-19', $1, $2), (3, 'test review 2', '2023-07-19', $1, $3) RETURNING id`,
+        `INSERT INTO users_reads (rating, review_text, review_date, user_username, read_isbn) VALUES (4, 'test review', '2023-07-19', $1, $2), (3, 'test review 2', '2023-07-19', $1, $3), (4.5, 'test review', '2023-09-04', $1, '1235782973') RETURNING id`,
         [test1Username, isbn1, isbn2]
     );
 
     await db.query(
         `UPDATE users SET exp = $1, total_books = $2, total_pages = $3 WHERE username = $4`,
-        [350, 2, 350, test1Username]
+        [600, 3, 600, test1Username]
     );
 
     await db.query(`INSERT INTO authors (name) VALUES ('Will Wight');`);
 
     await db.query(
-        `INSERT INTO reads_authors (read_isbn, author_name) VALUES ('1243567119', 'Will Wight');`
+        `INSERT INTO reads_authors (read_isbn, author_name) VALUES ('1243567119', 'Will Wight'), ('1235782973', 'Will Wight');`
     );
 
     testUserToken = jwt.sign(testUser, SECRET_KEY);
@@ -81,6 +81,20 @@ describe("GET /api/users/:username/reads", () => {
                 publishedDate: "2023-01-01T06:00:00.000Z",
                 thumbnail: null,
                 title: "test title",
+                username: "test1",
+            },
+            {
+                authors: "Will Wight",
+                avgRating: 3.5,
+                description: "test description 3",
+                id: expect.any(Number),
+                infoLink: null,
+                isbn: "1235782973",
+                pageCount: 250,
+                printType: "BOOK",
+                publishedDate: "2023-10-10T05:00:00.000Z",
+                thumbnail: null,
+                title: "test title 3",
                 username: "test1",
             },
             {
@@ -143,6 +157,44 @@ describe("GET /api/users/:username/reads", () => {
                 publishedDate: "2023-01-01T06:00:00.000Z",
                 thumbnail: null,
                 title: "test title",
+                username: "test1",
+            },
+            {
+                authors: "Will Wight",
+                avgRating: 3.5,
+                description: "test description 3",
+                id: expect.any(Number),
+                infoLink: null,
+                isbn: "1235782973",
+                pageCount: 250,
+                printType: "BOOK",
+                publishedDate: "2023-10-10T05:00:00.000Z",
+                thumbnail: null,
+                title: "test title 3",
+                username: "test1",
+            },
+        ]);
+    });
+
+    test("get all user reads with matching author name and read title and 200 status code with valid token and valid username. Does not get reads with different authors and titles.", async () => {
+        const res = await request(app)
+            .get(`/api/users/${test1Username}/reads`)
+            .set({ _token: testUserToken })
+            .send({ author: "Will Wight", title: "test title 3" });
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toEqual([
+            {
+                authors: "Will Wight",
+                avgRating: 3.5,
+                description: "test description 3",
+                id: expect.any(Number),
+                infoLink: null,
+                isbn: "1235782973",
+                pageCount: 250,
+                printType: "BOOK",
+                publishedDate: "2023-10-10T05:00:00.000Z",
+                thumbnail: null,
+                title: "test title 3",
                 username: "test1",
             },
         ]);
@@ -356,12 +408,12 @@ describe("POST /api/users/:username/reads", () => {
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             email: "test@email.com",
-            exp: 650,
+            exp: 900,
             fname: "tfn",
             id: expect.any(Number),
             lname: "tln",
-            totalBooks: 3,
-            totalPages: 650,
+            totalBooks: 4,
+            totalPages: 900,
             username: test1Username,
         });
     });
@@ -501,12 +553,12 @@ describe("DELETE /api/users/:username/reads/:isbn", () => {
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual({
             email: "test@email.com",
-            exp: 550,
+            exp: 800,
             fname: "tfn",
             id: expect.any(Number),
             lname: "tln",
-            totalBooks: 2,
-            totalPages: 550,
+            totalBooks: 3,
+            totalPages: 800,
             username: test1Username,
         });
     });
