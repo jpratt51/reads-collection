@@ -34,14 +34,14 @@ const RegisterUser = () => {
                 JSON.stringify({ username: formData.username, token: res })
             );
             console.debug(userToken);
-            setMessages([`Successfully registered user ${formData.username}!`]);
+            setMessages(`Successfully registered user ${formData.username}!`);
             toggleLoggedIn();
             setTimeout(() => {
                 navigate("/");
             }, 4000);
         } catch (errors) {
             errors.unshift("Inputs error");
-            setMessages(errors);
+            setMessages(errors.toString());
             console.debug(errors);
         }
         setFormData(INITIAL_STATE);

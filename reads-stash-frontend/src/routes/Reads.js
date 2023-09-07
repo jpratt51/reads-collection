@@ -1,5 +1,5 @@
 import React from "react";
-import GoogleBooksSearchForm from "../GoogleBooksSearchForm";
+import GoogleBooksSearchForm from "../forms/GoogleBooksSearchForm";
 
 const Reads = () => {
     return (

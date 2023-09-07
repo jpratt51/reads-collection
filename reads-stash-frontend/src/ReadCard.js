@@ -53,7 +53,7 @@ const ReadCard = (props) => {
             return (
                 <div>
                     <h1>{props.title}</h1>
-                    <p>By {props.authors}</p>
+                    <p>By {props.authors.toString()}</p>
                     <Link to={`/read/${props.isbn}`} state={{ props: props }}>
                         <img src={props.thumbnail} alt="book cover" />
                     </Link>

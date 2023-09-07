@@ -13,43 +13,50 @@ function ReadDetails() {
     const location = useLocation();
     const { props } = location.state;
     const { user } = useContext(UserContext);
-    const [read, setRead] = useState("");
+    const [userRead, setUserRead] = useState("");
     const [messages, setMessages] = useState("");
-    const readData = {
-        title: props.title,
-        description: props.description,
-        isbn: props.isbn,
-        avgRating: props.avgRating,
-        printType: props.printType,
-        pages: props.pageCount,
-        thumbnail: props.thumbnail,
-        authors: props.authors,
-    };
 
     useEffect(() => {
-        const getReadByIsbn = async () => {
+        const getUserReadByIsbn = async () => {
             let res;
             try {
-                res = await new ReadsStashApi().constructor.getRead(props.isbn);
-                setRead(res.rows[0]);
-            } catch {
-                setRead("");
+                if (user.username && props.isbn) {
+                    res = await new ReadsStashApi().constructor.getUserRead(
+                        user.username,
+                        props.isbn
+                    );
+                    setUserRead(res);
+                }
+            } catch (error) {
+                console.debug(error);
+                setUserRead("");
             }
         };
-        getReadByIsbn();
-    }, [props.isbn]);
+        getUserReadByIsbn();
+    }, [user.username, props.isbn]);
 
-    const addReadToDb = async () => {
+    const addUserRead = async () => {
         try {
-            await new ReadsStashApi().constructor.postRead(readData);
+            await new ReadsStashApi().constructor.postRead(props);
             await new ReadsStashApi().constructor.postUserRead({
                 username: user.username,
                 isbn: props.isbn,
             });
-            setMessages([`Successfully added ${props.title} to stash!`]);
+            setMessages(`Successfully added ${props.title} to stash!`);
         } catch (errors) {
-            if (typeof errors === "object") errors = errors.toString();
-            setMessages([errors]);
+            setMessages(errors.toString());
+        }
+    };
+
+    const removeUserRead = async () => {
+        try {
+            await new ReadsStashApi().constructor.deleteUserRead({
+                username: user.username,
+                isbn: props.isbn,
+            });
+            setMessages(`Successfully removed ${props.title} from stash`);
+        } catch (errors) {
+            setMessages(errors.toString());
         }
     };
 
@@ -61,15 +68,37 @@ function ReadDetails() {
                     title={props.title}
                     publishedDate={props.publishedDate}
                     description={props.description}
+                    avgRating={props.avgRating}
                     pageCount={props.pageCount}
                     printType={props.printType}
                     thumbnail={props.thumbnail}
                     infoLink={props.infoLink}
+                    authors={props.authors}
                 />
-                {user && !read ? (
-                    <button onClick={addReadToDb}>Add to Stash</button>
-                ) : null}
-                {messages.length ? <Messages messages={messages} /> : null}
+                {!userRead ? (
+                    <button onClick={addUserRead}>Add to Stash</button>
+                ) : (
+                    <div>
+                        <button onClick={removeUserRead}>
+                            Remove from stash
+                        </button>
+                    </div>
+                )}
+                <form action="#">
+                    <label for="lang">Add read to collection</label>
+                    <select name="languages" id="lang">
+                        <option value="javascript">JavaScript</option>
+                        <option value="php">PHP</option>
+                        <option value="java">Java</option>
+                        <option value="golang">Golang</option>
+                        <option value="python">Python</option>
+                        <option value="c#">C#</option>
+                        <option value="C++">C++</option>
+                        <option value="erlang">Erlang</option>
+                    </select>
+                    <input type="submit" value="Submit" />
+                </form>
+                ;{messages ? <Messages messages={messages} /> : null}
             </div>
         );
     } else {

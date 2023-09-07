@@ -19,6 +19,12 @@ function Navigation({ logout }) {
                 <li>
                     <NavLink to="/reads">Reads</NavLink>
                 </li>
+                <li>
+                    <NavLink to="/user/reads">Reads Stash</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/user/collections">Read Collections</NavLink>
+                </li>
             </ul>
         );
     }

@@ -1,8 +1,8 @@
 import { React, useState, useEffect, useContext } from "react";
 import axios from "axios";
-import ReadCard from "./ReadCard";
-import { GOOGLE_BOOKS_BASE_URL, GOOGLE_BOOKS_API_KEY } from "./config";
-import UserContext from "./UserContext";
+import ReadCard from "../ReadCard";
+import { GOOGLE_BOOKS_BASE_URL, GOOGLE_BOOKS_API_KEY } from "../Config";
+import UserContext from "../UserContext";
 
 function GoogleBooksSearchForm() {
     const [data, setData] = useState("");
@@ -25,20 +25,23 @@ function GoogleBooksSearchForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         let URL = GOOGLE_BOOKS_BASE_URL;
-        if (formData.title) URL = URL + formData.title.trim();
-        if (formData.author) URL = URL + "+inauthor:" + formData.author.trim();
-        URL = URL + "&key=" + GOOGLE_BOOKS_API_KEY;
-        try {
-            axios.get(URL).then((res) => {
-                setData(res.data.items);
-            });
-        } catch (errors) {
-            console.debug(errors);
-            setReadCards(errorLoadingMessage);
+        if (formData.title || formData.author) {
+            if (formData.title) URL = URL + formData.title.trim();
+            if (formData.author)
+                URL = URL + "+inauthor:" + formData.author.trim();
+            URL = URL + "&key=" + GOOGLE_BOOKS_API_KEY;
+            try {
+                axios.get(URL).then((res) => {
+                    setData(res.data.items);
+                });
+            } catch (errors) {
+                console.debug(errors);
+                setReadCards(errorLoadingMessage);
+            }
+            setDisabledStatus(true);
+            setFormData(INITIAL_STATE);
+            setTimeout(() => setDisabledStatus(false), 2000);
         }
-        setDisabledStatus(true);
-        setFormData(INITIAL_STATE);
-        setTimeout(() => setDisabledStatus(false), 2000);
     };
 
     useEffect(() => {
@@ -46,26 +49,32 @@ function GoogleBooksSearchForm() {
             setReadCards(
                 data.map((read) => (
                     <ReadCard
-                        key={read.volumeInfo.industryIdentifiers[0].identifier}
-                        isbn={read.volumeInfo.industryIdentifiers[0].identifier}
-                        title={read.volumeInfo.title}
-                        publishedDate={read.volumeInfo.publishedDate}
-                        description={read.volumeInfo.description}
-                        pageCount={read.volumeInfo.pageCount}
-                        printType={read.volumeInfo.printType}
-                        thumbnail={
-                            typeof read.volumeInfo.imageLinks.thumbnail ===
-                            "undefined"
-                                ? null
-                                : read.volumeInfo.imageLinks.thumbnail
+                        key={
+                            read.volumeInfo.industryIdentifiers[0].identifier ||
+                            null
                         }
-                        infoLink={read.volumeInfo.infoLink}
+                        isbn={
+                            read.volumeInfo.industryIdentifiers[0].identifier ||
+                            null
+                        }
+                        title={read.volumeInfo.title || null}
+                        publishedDate={read.volumeInfo.publishedDate || null}
+                        description={read.volumeInfo.description || null}
+                        pageCount={read.volumeInfo.pageCount || null}
+                        printType={read.volumeInfo.printType || null}
+                        thumbnail={
+                            read.volumeInfo.hasOwnProperty("imageLinks")
+                                ? read.volumeInfo.imageLinks.thumbnail
+                                : "https://t4.ftcdn.net/jpg/04/99/93/31/360_F_499933117_ZAUBfv3P1HEOsZDrnkbNCt4jc3AodArl.jpg"
+                        }
+                        infoLink={read.volumeInfo.infoLink || null}
                         authors={read.volumeInfo.authors}
                     />
                 ))
             );
-        } catch {
-            setReadCards(errorLoadingMessage);
+        } catch (error) {
+            if (error.message !== "data.map is not a function")
+                setReadCards(errorLoadingMessage);
         }
     }, [data, errorLoadingMessage]);
     return (

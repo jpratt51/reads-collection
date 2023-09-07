@@ -21,7 +21,7 @@ class ReadsStashApi {
         try {
             return (await axios({ url, method, data, params, headers })).data;
         } catch (err) {
-            console.error("API Error:", err.response);
+            console.error("API Error:", err.response, headers);
             let message = err.response.data.error.message;
             throw Array.isArray(message) ? message : [message];
         }
@@ -52,6 +52,48 @@ class ReadsStashApi {
             `api/users/${data.username}/reads`,
             data,
             "post"
+        );
+        return res;
+    }
+
+    static async deleteUserRead(data) {
+        let res = await this.request(
+            `api/users/${data.username}/reads/${data.isbn}`,
+            data,
+            "delete"
+        );
+        return res;
+    }
+
+    static async getAllUserReads(username, data) {
+        let res = await this.request(`api/users/${username}/reads`, data);
+        return res;
+    }
+
+    static async getUserRead(username, isbn) {
+        let res = await this.request(`api/users/${username}/reads/${isbn}`);
+        return res;
+    }
+
+    static async postUserCollection(username, data) {
+        let res = await this.request(
+            `api/users/${username}/collections`,
+            data,
+            "post"
+        );
+        return res;
+    }
+
+    static async getAllUserCollections(username) {
+        let res = await this.request(`api/users/${username}/collections`);
+        return res;
+    }
+
+    static async deleteUserCollection(username, collectionId) {
+        let res = await this.request(
+            `api/users/${username}/collections/${collectionId}`,
+            null,
+            "delete"
         );
         return res;
     }
