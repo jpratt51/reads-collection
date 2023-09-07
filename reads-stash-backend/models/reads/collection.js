@@ -60,7 +60,7 @@ class ReadCollection {
         return readCollections;
     }
 
-    static async getById(username, isbn, collectionId) {
+    static async getById(username, collectionId) {
         if (/^\d+$/.test(collectionId) === false)
             throw new ExpressError(`Invalid collection id data type`, 400);
         const results = await db.query(
@@ -85,11 +85,8 @@ class ReadCollection {
         JOIN users_reads ur ON ur.read_isbn = r.isbn
         JOIN collections c ON rc.collection_id = c.id
         WHERE
-            c.id = $1 AND c.user_username = $2
-            AND r.isbn = $3
-            AND rc.collection_id = $1 AND rc.read_isbn = $3
-            AND ur.user_username = $2 AND ur.read_isbn = $3;`,
-            [collectionId, username, isbn]
+            c.id = $1 AND c.user_username = $2;`,
+            [collectionId, username]
         );
         const rc = results.rows[0];
         if (!rc) {

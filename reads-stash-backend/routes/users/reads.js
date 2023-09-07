@@ -15,7 +15,7 @@ router.get(
     async function getAllUserReads(req, res, next) {
         try {
             const { username } = req.params;
-            const { title, author } = req.body;
+            const { title, author } = req.query;
             if (req.user.username != username) {
                 const invalidUser = new ExpressError(
                     "Cannot View Other User's Reads",

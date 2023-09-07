@@ -46,6 +46,7 @@ class UserRead {
     }
 
     static async getAll(username, title, author) {
+        console.log("backend username, title, author", username, title, author);
         let queryString = `SELECT ur.id, r.title, r.description, r.isbn, r.avg_rating, r.print_type, r.published_date, r.page_count, r.info_link, r.thumbnail, ur.user_username AS username, ra.author_name AS author FROM users_reads ur JOIN users u ON ur.user_username = u.username JOIN reads r ON ur.read_isbn = r.isbn LEFT JOIN reads_authors ra ON ra.read_isbn = r.isbn WHERE u.username = $1`;
         let values = [username];
         let results;

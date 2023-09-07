@@ -29,6 +29,7 @@ router.get("/:isbn", async function getOneRead(req, res, next) {
 
 router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
     try {
+        console.log("backend req.body", req.body);
         const validator = jsonschema.validate(req.body, createReadSchema);
         if (!validator.valid) {
             const listOfErrors = validator.errors.map((e) => e.stack);
@@ -37,15 +38,15 @@ router.post("/", ensureLoggedIn, async function createRead(req, res, next) {
         }
         const {
             title,
-            description,
-            isbn,
-            avgRating,
-            printType,
-            publishedDate,
-            pageCount,
-            infoLink,
-            thumbnail,
-            authors,
+            description = "",
+            isbn = "",
+            avgRating = "",
+            printType = "",
+            publishedDate = "",
+            pageCount = "",
+            infoLink = "",
+            thumbnail = "",
+            authors = "",
         } = req.body;
         const validInputs = {};
         validInputs["title"] = title;
